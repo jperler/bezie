@@ -43,7 +43,10 @@ const config = merge(baseConfig, {
         warnings: false
       }
     }),
-    new ExtractTextPlugin('style.css', { allChunks: true })
+    new ExtractTextPlugin('style.css', { allChunks: true }),
+    new webpack.ProvidePlugin({
+        d3: 'd3',
+    }),
   ],
 
   target: 'electron-renderer'
