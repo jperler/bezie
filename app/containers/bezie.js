@@ -12,7 +12,7 @@ function mapStateToProps (state) {
         width: 96 * 4 * state.bezie.bars * state.bezie.zoom.x,
         height: 127 * state.bezie.zoom.y,
         paths: state.bezie.paths,
-        activePath: state.bezie.activePath,
+        activeIdx: state.bezie.activeIdx,
     }
 }
 

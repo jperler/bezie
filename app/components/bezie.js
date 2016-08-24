@@ -6,27 +6,20 @@ import ReactDom from 'react-dom'
 import * as utils from '../utils'
 import Axis from './axis'
 import Bar from './bar'
+import ClickArea from './clickArea'
 
 class Bezie extends Component {
     static propTypes = {
         snap: PropTypes.bool.isRequired,
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
-        activePath: PropTypes.number.isRequired,
+        activeIdx: PropTypes.number.isRequired,
         addPoint: PropTypes.func.isRequired,
     }
 
-    render() {
-        let margin = {
-            top: 6,
-            right: 6,
-            bottom: 6,
-            left: 6,
-        }
-
-        let line = d3.svg.line()
-            .x(point => point[0])
-            .y(point => point[1])
+    render () {
+        const margin = { top: 6, right: 6, bottom: 6, left: 6 }
+        const transform = `translate(${margin.left}, ${margin.top})`
 
         const {
             snap,
@@ -36,8 +29,12 @@ class Bezie extends Component {
             width,
             height,
             paths,
+            activeIdx,
         } = this.props
-        const transform = `translate(${margin.left}, ${margin.top})`
+
+        let line = d3.svg.line()
+            .x(point => point[0])
+            .y(point => point[1])
 
         return (
             <svg
@@ -56,7 +53,7 @@ class Bezie extends Component {
                     ))}
                     <Axis.X {...this.props} />
                     <Axis.Y {...this.props} />
-                    <rect height={height} width={width} ref="rect" />
+                    <ClickArea {...this.props} />
                     <g>
                         {paths.map((path, i) => (
                             <path
@@ -66,22 +63,19 @@ class Bezie extends Component {
                             />
                         ))}
                     </g>
+                    <g>
+                        {utils.takeInner(paths[activeIdx]).map((point, i) => (
+                            <circle
+                                r={5}
+                                cx={point[0]}
+                                cy={point[1]}
+                                key={`circle-${i}`}
+                            />
+                        ))}
+                    </g>
                 </g>
             </svg>
         )
-    }
-
-    componentDidMount () {
-        const rect = d3.select(this.refs.rect)
-        rect.on('mousedown', ::this.onMouseDownRect)
-    }
-
-    onMouseDownRect () {
-        const { paths, activePath, addPoint } = this.props
-        const [x , y] = d3.mouse(this.refs.rect)
-        const path = paths[activePath]
-        let index = utils.getInsertIndex(path, x)
-        addPoint({ index, x, y })
     }
 }
 

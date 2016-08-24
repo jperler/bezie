@@ -4,13 +4,16 @@ import Immutable from 'seamless-immutable'
 const initialState = Immutable({
     snap: true,
     bars: 4,
-    zoom: { x: .8, y: 2 },
+    zoom: {
+        x: (window.innerWidth - 16 - 12) / (4 * 4 * 96),
+        y: 2,
+    },
     interval: { x: 4, y: 16 },
     paths: [
         [[0 , 100], [100, 100]],
         [[100 , 50], [200, 50]],
     ],
-    activePath: 0,
+    activeIdx: 0,
 })
 
 export default function bezie (state = initialState, action) {
@@ -20,8 +23,8 @@ export default function bezie (state = initialState, action) {
             state.snap = !state.snap
             return state
         case ADD_POINT:
-            return state.setIn(['paths', state.activePath],
-                state.paths[state.activePath].concat([[payload.x, payload.y]]))
+            return state.setIn(['paths', state.activeIdx],
+                state.paths[state.activeIdx].concat([[payload.x, payload.y]]))
         default:
             return state
     }
