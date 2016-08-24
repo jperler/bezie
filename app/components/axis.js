@@ -10,7 +10,10 @@ class XAxis extends Component {
         bars: PropTypes.number.isRequired,
     }
 
-    componentDidMount () {
+    componentDidMount () { this.updateAxis() }
+    componentDidUpdate () { this.updateAxis() }
+
+    updateAxis () {
         let {
             height,
             width,
@@ -18,7 +21,8 @@ class XAxis extends Component {
             bars,
          } = this.props
 
-        let tickRange = utils.rangeInclusive(0, width, width / (interval.x * bars))
+        let skip = width / (interval.x * bars)
+        let tickRange = utils.rangeInclusive(0, width, skip)
         let scale = d3.scale.linear()
             .domain([0, width])
             .range([0, width])
@@ -57,14 +61,18 @@ class YAxis extends Component {
         interval: PropTypes.object.isRequired,
     }
 
-    componentDidMount () {
+    componentDidMount () { this.updateAxis() }
+    componentDidUpdate () { this.updateAxis() }
+
+    updateAxis () {
         let {
             height,
             width,
             interval,
          } = this.props
 
-        let tickRange = utils.rangeInclusive(0, height, height / interval.y)
+        let skip = height / interval.y
+        let tickRange = utils.rangeInclusive(0, height, skip)
         let scale = d3.scale.linear()
             .domain([0, height])
             .range([height, 0])

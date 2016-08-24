@@ -5,6 +5,7 @@ import _ from 'lodash'
 import ReactDom from 'react-dom'
 import * as utils from '../utils'
 import Axis from './axis'
+import Bar from './bar'
 
 class Bezie extends Component {
     static propTypes = {
@@ -36,6 +37,7 @@ class Bezie extends Component {
             height,
             paths,
         } = this.props
+        const transform = `translate(${margin.left}, ${margin.top})`
 
         return (
             <svg
@@ -43,26 +45,25 @@ class Bezie extends Component {
                 height={height + margin.top + margin.bottom}
                 ref="svg"
             >
-                <g transform={'translate(' + margin.left + ',' + margin.top + ')'}>
+                <g transform={transform}>
                     {_.range(bars).map(i => (
-                        <rect
-                            width={width / bars}
+                        <Bar width={width}
                             height={height}
-                            transform={'translate(' + (width / bars * i) + ', 0)'}
-                            fill={i % 2 === 0 ? '#333' : '#666'}
-                            key={'rect-' + i}
+                            bars={bars}
+                            index={i}
+                            key={`bar-${i}`}
                         />
                     ))}
                     <Axis.X {...this.props} />
                     <Axis.Y {...this.props} />
-                    <rect
-                        height={height}
-                        width={width}
-                        ref="rect"
-                    />
+                    <rect height={height} width={width} ref="rect" />
                     <g>
                         {paths.map((path, i) => (
-                            <path className="line" d={line(path)} key={`path-${i}`} />
+                            <path
+                                className="line"
+                                d={line(path)}
+                                key={`path-${i}`}
+                            />
                         ))}
                     </g>
                 </g>
