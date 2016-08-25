@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react'
+import classNames from 'classnames'
+import styles from './bar.css'
 
 class Bar extends Component {
     render () {
@@ -10,14 +12,16 @@ class Bar extends Component {
         } = this.props
         const barWidth = width / bars
         const transform = `translate(${barWidth * index}, 0)`
-        const fill = index % 2 === 0 ? '#333' : '#666'
+        const classes = classNames(styles.bar, {
+            [styles.even]: index % 2 === 0,
+        })
 
         return (
             <rect
+                className={classes}
                 width={barWidth}
                 height={height}
                 transform={transform}
-                fill={fill}
             />
         )
     }

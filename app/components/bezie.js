@@ -6,7 +6,6 @@ import ReactDom from 'react-dom'
 import * as utils from '../utils'
 import Axis from './axis'
 import Bar from './bar'
-import ClickArea from './clickArea'
 
 class Bezie extends Component {
     static propTypes = {
@@ -15,26 +14,36 @@ class Bezie extends Component {
         height: PropTypes.number.isRequired,
         activeIdx: PropTypes.number.isRequired,
         addPoint: PropTypes.func.isRequired,
+        updatePoint: PropTypes.func.isRequired,
+        paths: PropTypes.array.isRequired,
+    }
+
+    constructor () {
+        super()
+
+        this.state = {
+            draggedIdx: null,
+        }
+    }
+
+    componentDidMount () {
+        d3.select(window)
+            .on('mousemove', ::this.onMouseMove)
+            .on('mouseup', ::this.onMouseUp)
+
+        d3.select(this.refs.rect)
+            .on('mousedown', ::this.onMouseDownRect)
     }
 
     render () {
         const margin = { top: 6, right: 6, bottom: 6, left: 6 }
         const transform = `translate(${margin.left}, ${margin.top})`
-
-        const {
-            snap,
-            bars,
-            zoom,
-            interval,
-            width,
-            height,
-            paths,
-            activeIdx,
-        } = this.props
+        const { bars, width, height, paths, activeIdx } = this.props
+        const innerPath = utils.takeInner(paths[activeIdx])
 
         let line = d3.svg.line()
-            .x(point => point[0])
-            .y(point => point[1])
+            .x(point => point.x)
+            .y(point => point.y)
 
         return (
             <svg
@@ -53,7 +62,7 @@ class Bezie extends Component {
                     ))}
                     <Axis.X {...this.props} />
                     <Axis.Y {...this.props} />
-                    <ClickArea {...this.props} />
+                    <rect height={height} width={width} ref="rect" />
                     <g>
                         {paths.map((path, i) => (
                             <path
@@ -64,18 +73,72 @@ class Bezie extends Component {
                         ))}
                     </g>
                     <g>
-                        {utils.takeInner(paths[activeIdx]).map((point, i) => (
+                        {innerPath.map((point, i) => (
                             <circle
                                 r={5}
-                                cx={point[0]}
-                                cy={point[1]}
+                                cx={point.x}
+                                cy={point.y}
                                 key={`circle-${i}`}
+                                onMouseDown={_.partial(::this.onMouseDownPoint, i + 1)}
                             />
                         ))}
                     </g>
                 </g>
             </svg>
         )
+    }
+
+    onMouseDownPoint (i) {
+        this.setState({ draggedIdx: i })
+    }
+
+    onMouseUp () {
+        this.setState({ draggedIdx: null })
+    }
+
+    onMouseMove () {
+        if (!this.state.draggedIdx) return undefined
+        let [x , y] = d3.mouse(this.refs.rect)
+        const {
+            updatePoint,
+            width,
+            height,
+            snap,
+            paths,
+            activeIdx,
+            xAxisTickRange,
+            yAxisTickRange,
+        } = this.props
+        const { draggedIdx } = this.state
+        const path = paths[activeIdx]
+        const draggedPoint = path[draggedIdx]
+        const mousePoint = { x, y }
+        const gridPoint = snap ?
+            utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
+            mousePoint
+        const left = path[draggedIdx - 1]
+        const right = path[draggedIdx + 1]
+
+        let minX = draggedIdx == 0 ? 0 : Math.max(0, left.x)
+        let maxX = draggedIdx < path.length - 1 ?
+            Math.min(width, gridPoint.x, right.x) :
+            Math.min(width, gridPoint.x)
+
+        x = Math.max(minX, maxX)
+        y = Math.max(0, Math.min(height, gridPoint.y))
+
+        if (draggedPoint.x !== x || draggedPoint.y !== y) {
+            updatePoint({ index: draggedIdx, x, y })
+        }
+    }
+
+    onMouseDownRect () {
+        const { paths, activeIdx, addPoint } = this.props
+        const [x , y] = d3.mouse(this.refs.rect)
+        const path = paths[activeIdx]
+        const index = utils.getInsertIndex(path, x)
+        addPoint({ index, x, y })
+        this.setState({ draggedIdx: index })
     }
 }
 

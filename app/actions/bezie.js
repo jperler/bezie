@@ -1,5 +1,6 @@
 export const TOGGLE_SNAP = 'TOGGLE_SNAP'
 export const ADD_POINT = 'ADD_POINT'
+export const UPDATE_POINT = 'UPDATE_POINT'
 
 export function toggleSnap () {
     return {
@@ -10,10 +11,13 @@ export function toggleSnap () {
 export function addPoint ({ index, x, y }) {
     return {
         type: ADD_POINT,
-        payload: {
-            index,
-            x,
-            y,
-        },
+        payload: { index, x, y },
+    }
+}
+
+export function updatePoint ({ index, x, y }) {
+    return {
+        type: UPDATE_POINT,
+        payload: { index, x, y },
     }
 }

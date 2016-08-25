@@ -96,6 +96,7 @@
     "webpack-merge": "^0.14.0"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.1",
     "d3": "3.5.10",
     "electron-debug": "^1.0.1",

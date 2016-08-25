@@ -8,6 +8,7 @@ class XAxis extends Component {
         height: PropTypes.number.isRequired,
         interval: PropTypes.object.isRequired,
         bars: PropTypes.number.isRequired,
+        xAxisTickRange: PropTypes.array.isRequired,
     }
 
     componentDidMount () { this.updateAxis() }
@@ -19,10 +20,9 @@ class XAxis extends Component {
             width,
             interval,
             bars,
+            xAxisTickRange,
          } = this.props
 
-        let skip = width / (interval.x * bars)
-        let tickRange = utils.rangeInclusive(0, width, skip)
         let scale = d3.scale.linear()
             .domain([0, width])
             .range([0, width])
@@ -32,7 +32,7 @@ class XAxis extends Component {
             .orient('bottom')
             .innerTickSize(-height)
             .outerTickSize(0)
-            .tickValues(tickRange)
+            .tickValues(xAxisTickRange)
 
         d3.select(this.refs.axis).call(xAxis)
     }
@@ -59,6 +59,7 @@ class YAxis extends Component {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
         interval: PropTypes.object.isRequired,
+        yAxisTickRange: PropTypes.array.isRequired,
     }
 
     componentDidMount () { this.updateAxis() }
@@ -69,10 +70,9 @@ class YAxis extends Component {
             height,
             width,
             interval,
+            yAxisTickRange,
          } = this.props
 
-        let skip = height / interval.y
-        let tickRange = utils.rangeInclusive(0, height, skip)
         let scale = d3.scale.linear()
             .domain([0, height])
             .range([height, 0])
@@ -82,7 +82,7 @@ class YAxis extends Component {
             .orient('left')
             .innerTickSize(-width)
             .outerTickSize(0)
-            .tickValues(tickRange)
+            .tickValues(yAxisTickRange)
 
         d3.select(this.refs.axis).call(axis)
     }
