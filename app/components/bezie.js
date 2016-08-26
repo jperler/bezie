@@ -72,7 +72,7 @@ class Bezie extends Component {
                 className="line"
                 d={line(path)}
                 key={`path-${i}`}
-                stroke={i === pathIdx ? colors[i] : 'white'}
+                stroke={colors[i]}
                 strokeOpacity={i === pathIdx ? 1 : .2}
                 fill={i === pathIdx ? colors[i] : 'none'}
             />
