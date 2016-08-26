@@ -1,6 +1,7 @@
 import {
     TOGGLE_SNAP,
     ADD_POINT,
+    REMOVE_POINT,
     UPDATE_POINT,
     CHANGE_PATH,
 } from '../actions/bezie'
@@ -34,6 +35,7 @@ export default function bezie (state = initialState, action) {
     switch (action.type) {
         case TOGGLE_SNAP: return handleToggleSnap(state)
         case ADD_POINT: return handleAddPoint(state, payload)
+        case REMOVE_POINT: return handleRemovePoint(state, payload)
         case UPDATE_POINT: return handleUpdatePoint(state, payload)
         case CHANGE_PATH: return handleChangePath(state, payload)
         default: return state
@@ -50,6 +52,12 @@ function handleAddPoint (state, payload) {
     return state.setIn(['paths', state.pathIdx], path)
 }
 
+function handleRemovePoint (state, payload) {
+    let path = state.paths[state.pathIdx].asMutable()
+    path.splice(payload.index, 1)
+    return state.setIn(['paths', state.pathIdx], path)
+}
+
 function handleUpdatePoint (state, payload) {
     let path = state.paths[state.pathIdx].asMutable()
     path[payload.index] = { x: payload.x, y: payload.y }
@@ -62,10 +70,7 @@ function handleChangePath (state, payload) {
     const width = 96 * 4 * bars * zoom.x
     let path = state.paths[payload.index].asMutable()
     if (!path.length) {
-        path.push(
-            { x: 0, y: height },
-            { x: width, y: height },
-        )
+        path.push({ x: 0, y: height }, { x: width, y: height })
     }
     return state
         .set('pathIdx', payload.index)

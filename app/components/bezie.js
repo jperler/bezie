@@ -6,7 +6,7 @@ import * as Axis from './axis'
 import Bar from './bar'
 import Point from './point'
 import classNames from 'classnames'
-import { DropdownButton, MenuItem } from 'react-bootstrap'
+import { DropdownButton, MenuItem, OverlayTrigger } from 'react-bootstrap'
 import { colors, labels } from '../constants'
 
 class Bezie extends Component {
@@ -16,6 +16,7 @@ class Bezie extends Component {
         height: PropTypes.number.isRequired,
         pathIdx: PropTypes.number.isRequired,
         addPoint: PropTypes.func.isRequired,
+        removePoint: PropTypes.func.isRequired,
         updatePoint: PropTypes.func.isRequired,
         changePath: PropTypes.func.isRequired,
         paths: PropTypes.array.isRequired,
@@ -56,7 +57,9 @@ class Bezie extends Component {
         elements.points = innerPath.map((point, i) => (
             <Point
                 onMouseDown={() => this.onMouseDownPoint(i + 1)}
+                onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
                 selected={i + 1 === selectedIdx}
+                dragging={i + 1 === draggedIdx}
                 x={point.x}
                 y={point.y}
                 key={`point-${i}`}
@@ -150,6 +153,10 @@ class Bezie extends Component {
             draggedIdx: i,
             selectedIdx: i,
         })
+    }
+
+    onDoubleClickPoint (i) {
+        this.props.removePoint({ index: i })
     }
 
     onMouseUp () {
