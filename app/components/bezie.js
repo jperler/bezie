@@ -149,13 +149,11 @@ class Bezie extends Component {
     }
 
     onMouseDownPoint (i) {
-        this.setState({
-            draggedIdx: i,
-            selectedIdx: i,
-        })
+        this.setState({ draggedIdx: i, selectedIdx: i })
     }
 
     onDoubleClickPoint (i) {
+        this.setState({ draggedIdx: null, selectedIdx: null })
         this.props.removePoint({ index: i })
     }
 

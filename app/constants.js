@@ -1,3 +1,6 @@
+export const CONTROL_MAX = 127
+export const PPQ = 96
+
 export const colors = [
     '#FF00FF',
     '#00FFFF',

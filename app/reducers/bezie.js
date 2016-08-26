@@ -7,6 +7,7 @@ import {
 } from '../actions/bezie'
 import Immutable from 'seamless-immutable'
 import _ from 'lodash'
+import * as utils from '../utils'
 
 const initialState = Immutable({
     snap: true,
@@ -19,16 +20,13 @@ const initialState = Immutable({
 
 export default function bezie (state = initialState, action) {
     const { payload } = action
-    const { pathIdx, paths, zoom, bars } = state
+    const { pathIdx, paths } = state
     if (pathIdx === 0 && paths[pathIdx].length === 0) {
         let path = paths[pathIdx].asMutable()
-        const height = 127 * zoom.y
-        const width = 96 * 4 * bars * zoom.x
+        const height = utils.getHeight(state)
+        const width = utils.getWidth(state)
         if (!path.length) {
-            path.push(
-                { x: 0, y: height },
-                { x: width, y: height },
-            )
+            path.push({ x: 0, y: height }, { x: width, y: height })
         }
         state = state.setIn(['paths', pathIdx], path)
     }
@@ -65,9 +63,8 @@ function handleUpdatePoint (state, payload) {
 }
 
 function handleChangePath (state, payload) {
-    const { zoom, bars } = state
-    const height = 127 * zoom.y
-    const width = 96 * 4 * bars * zoom.x
+    const height = utils.getHeight(state)
+    const width = utils.getWidth(state)
     let path = state.paths[payload.index].asMutable()
     if (!path.length) {
         path.push({ x: 0, y: height }, { x: width, y: height })
