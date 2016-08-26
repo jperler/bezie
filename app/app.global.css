@@ -12,8 +12,33 @@ body {
     overflow-y: hidden;
 }
 
+.bezie {
+    width: 100%;
+    overflow: hidden;
+    overflow-x: auto;
+}
+
+.bezie.dragging {
+    cursor: move !important;
+}
+
+::-webkit-scrollbar {
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.8);
+    border-radius: 10px;
+}
+
 svg {
     outline: none;
+    background: rgba(0,0,0, .2);
 }
 
 rect {
@@ -26,6 +51,10 @@ circle,
 .line {
     stroke-width: 1.5px;
     stroke: #00ffff;
+}
+
+circle.selected {
+    stroke: #00FF00;
 }
 
 .line {

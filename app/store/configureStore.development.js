@@ -19,8 +19,9 @@ const logger = createLogger({
 
 const router = routerMiddleware(hashHistory);
 
+// removed logger from applyMiddleware
 const enhancer = compose(
-  applyMiddleware(thunk, router, logger),
+  applyMiddleware(thunk, router),
   window.devToolsExtension ?
     window.devToolsExtension({ actionCreators }) :
     noop => noop

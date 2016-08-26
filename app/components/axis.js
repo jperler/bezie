@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import * as utils from '../utils'
 import ReactDom from 'react-dom'
 
-class XAxis extends Component {
+export class X extends Component {
     static propTypes = {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
@@ -33,28 +33,27 @@ class XAxis extends Component {
             .innerTickSize(-height)
             .outerTickSize(0)
             .tickValues(xAxisTickRange)
+            .tickFormat(() => '')
 
         d3.select(this.refs.axis).call(xAxis)
     }
 
     render () {
-        let {
-            height,
-        } = this.props
+        let { height } = this.props
 
         return (
             <g
                 className="x axis"
                 stroke="#FFF"
                 strokeOpacity=".1"
-                transform={'translate(0,' + height + ')'}
+                transform={`translate(0, ${height})`}
                 ref="axis"
             />
         )
     }
 }
 
-class YAxis extends Component {
+export class Y extends Component {
     static propTypes = {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
@@ -83,13 +82,12 @@ class YAxis extends Component {
             .innerTickSize(-width)
             .outerTickSize(0)
             .tickValues(yAxisTickRange)
+            .tickFormat(() => '')
 
         d3.select(this.refs.axis).call(axis)
     }
 
     render () {
-        let { height } = this.props
-
         return (
             <g
                 className="y axis"
@@ -99,9 +97,4 @@ class YAxis extends Component {
             />
         )
     }
-}
-
-export default {
-    X: XAxis,
-    Y: YAxis,
 }

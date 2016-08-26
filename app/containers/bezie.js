@@ -13,7 +13,7 @@ function mapStateToProps (state) {
         width: getWidth(state),
         height: getHeight(state),
         paths: state.bezie.paths,
-        activeIdx: state.bezie.activeIdx,
+        pathIdx: state.bezie.pathIdx,
         xAxisTickRange: getXAxisTickRange(state),
         yAxisTickRange: getYAxisTickRange(state),
     }
