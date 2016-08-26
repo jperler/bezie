@@ -6,6 +6,8 @@ import * as Axis from './axis'
 import Bar from './bar'
 import Point from './point'
 import classNames from 'classnames'
+import { DropdownButton, MenuItem } from 'react-bootstrap'
+import { colors, labels } from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -15,12 +17,12 @@ class Bezie extends Component {
         pathIdx: PropTypes.number.isRequired,
         addPoint: PropTypes.func.isRequired,
         updatePoint: PropTypes.func.isRequired,
+        changePath: PropTypes.func.isRequired,
         paths: PropTypes.array.isRequired,
     }
 
     constructor () {
         super()
-
         this.state = {
             draggedIdx: null,
             selectedIdx: null,
@@ -39,9 +41,10 @@ class Bezie extends Component {
     render () {
         const margin = { top: 6, right: 6, bottom: 6, left: 6 }
         const { bars, width, height, paths, pathIdx, interval } = this.props
+        const { draggedIdx, selectedIdx } = this.state
         const innerPath = utils.takeInner(paths[pathIdx])
-        const classes = classNames('bezie', {
-            dragging: !!this.state.draggedIdx,
+        const classes = classNames({
+            dragging: !!draggedIdx,
         })
 
         let line = d3.svg.line()
@@ -53,10 +56,11 @@ class Bezie extends Component {
         elements.points = innerPath.map((point, i) => (
             <Point
                 onMouseDown={() => this.onMouseDownPoint(i + 1)}
-                selected={i + 1 === this.state.selectedIdx}
+                selected={i + 1 === selectedIdx}
                 x={point.x}
                 y={point.y}
                 key={`point-${i}`}
+                color={colors[pathIdx]}
             />
         ))
 
@@ -65,6 +69,9 @@ class Bezie extends Component {
                 className="line"
                 d={line(path)}
                 key={`path-${i}`}
+                stroke={i === pathIdx ? colors[i] : 'white'}
+                strokeOpacity={i === pathIdx ? 1 : .2}
+                fill={i === pathIdx ? colors[i] : 'none'}
             />
         ))
 
@@ -80,22 +87,62 @@ class Bezie extends Component {
 
         return (
             <div className={classes}>
-                <svg
-                    width={width + margin.left + margin.right}
-                    height={height + margin.top + margin.bottom}
-                    ref="svg"
-                >
-                    <g transform={`translate(${margin.left}, ${margin.top})`}>
-                        <g>{elements.bars}</g>
-                        <Axis.X {...this.props} />
-                        <Axis.Y {...this.props} />
-                        <rect height={height} width={width} ref="rect" />
-                        <g>{elements.paths}</g>
-                        <g>{elements.points}</g>
-                    </g>
-                </svg>
+                {this.renderPathSelectDropdown()}
+                <div className="bezie">
+                    <svg
+
+                        width={width + margin.left + margin.right}
+                        height={height + margin.top + margin.bottom}
+                        ref="svg"
+                    >
+                        <g transform={`translate(${margin.left}, ${margin.top})`}>
+                            <g>{elements.bars}</g>
+                            <Axis.X {...this.props} />
+                            <Axis.Y {...this.props} />
+                            <rect height={height} width={width} ref="rect" />
+                            <g>{elements.paths}</g>
+                            <g>{elements.points}</g>
+                        </g>
+                    </svg>
+                </div>
             </div>
         )
+    }
+
+    renderPathSelectDropdown () {
+        const { pathIdx } = this.props
+
+        const getTitle = ({ i }) => (
+            <span>
+                <i className="fa fa-circle" style={{ color: colors[i] }} />
+                {labels[i]}
+            </span>
+        )
+
+        const items = _.map(colors, (color, i) => (
+            <MenuItem
+                bsSize="small"
+                eventKey={i}
+                onClick={() => this.onChangePath(i)}
+                key={`path-select-${i}`}
+            >
+                {getTitle({ i })}
+            </MenuItem>
+        ))
+
+        return (
+            <DropdownButton
+                bsSize="xsmall"
+                title={getTitle({ i: pathIdx })}
+                id="dropdown-size-extra-small"
+            >
+                {items}
+            </DropdownButton>
+        )
+    }
+
+    onChangePath (i) {
+        this.props.changePath({ index: i })
     }
 
     onMouseDownPoint (i) {

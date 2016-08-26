@@ -2,28 +2,25 @@ body {
     position: relative;
     color: white;
     height: 100vh;
-    background-color: #999;
-    background-image: linear-gradient(
-        45deg,
-        rgba(0, 0, 0, .2) 10%,
-        rgba(0, 0, 0, .8)
-    );
-    font-family: Arial, Helvetica, Helvetica Neue;
+    background-color: #FFF;
     overflow-y: hidden;
+    margin: 10px !important;
 }
 
 .bezie {
     width: 100%;
     overflow: hidden;
     overflow-x: auto;
-}
-
-.bezie.dragging {
-    cursor: move !important;
+    background: #333;
+    /*background-image: linear-gradient(*/
+        /*0deg,*/
+        /*rgba(0, 0, 0, .4),*/
+        /*rgba(0, 0, 0, 1)*/
+    /*);*/
 }
 
 ::-webkit-scrollbar {
-    height: 4px;
+    height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -34,6 +31,10 @@ body {
 ::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.8);
     border-radius: 10px;
+}
+
+.bezie.dragging {
+    cursor: move !important;
 }
 
 svg {
@@ -50,7 +51,6 @@ rect {
 circle,
 .line {
     stroke-width: 1.5px;
-    stroke: #00ffff;
 }
 
 circle.selected {
@@ -59,12 +59,10 @@ circle.selected {
 
 .line {
     pointer-events: none;
-    fill: #00ffff;
     fill-opacity: .1;
 }
 
 circle {
-    fill: #000;
     fill-opacity: .2;
     cursor: move;
 }
@@ -82,4 +80,13 @@ circle.curve {
 .axis path.domain,
 .axis text {
     display: none;
+}
+
+/* Flatten das boostrap */
+.well, .navbar-inner, .popover, .btn, .tooltip, input, select, textarea, pre, .progress, .modal, .add-on, .alert, .table-bordered, .nav>.active>a, .dropdown-menu, .tooltip-inner, .badge, .label, .img-polaroid {
+    -moz-box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    outline: none;
 }

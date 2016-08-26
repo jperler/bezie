@@ -8,6 +8,7 @@ class Point extends Component {
         x: React.PropTypes.number,
         y: React.PropTypes.number,
         selected: React.PropTypes.bool,
+        color: React.PropTypes.string.isRequired,
     }
 
     shouldComponentUpdate (nextProps) {
@@ -19,7 +20,7 @@ class Point extends Component {
     }
 
     render () {
-        const { onMouseDown, selected, x, y } = this.props
+        const { onMouseDown, selected, x, y, color } = this.props
         const classes = classNames({ selected })
 
         return (
@@ -29,6 +30,7 @@ class Point extends Component {
                 r={5}
                 cx={x}
                 cy={y}
+                stroke={color}
             />
         )
     }
