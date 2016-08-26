@@ -13,7 +13,7 @@ export const colors = [
 export const labels = [
     '1 - Modulation',
     '2 - Breath',
-    '3 - (Controller)',
+    '3 - Controller',
     '4 - Foot Pedal',
     '5 - Portamento Time',
     '6 - Data Entry',
