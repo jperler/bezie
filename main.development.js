@@ -85,6 +85,11 @@ app.on('ready', async () => {
         accelerator: 'Command+H',
         selector: 'hide:'
       }, {
+          label: 'Test Store',
+          click () {
+              mainWindow.webContents.send('save-file', 'FILENAME')
+          },
+      }, {
         label: 'Hide Others',
         accelerator: 'Command+Shift+H',
         selector: 'hideOtherApplications:'
