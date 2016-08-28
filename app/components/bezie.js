@@ -8,6 +8,11 @@ import Point from './point'
 import classNames from 'classnames'
 import { DropdownButton, MenuItem, OverlayTrigger } from 'react-bootstrap'
 import { colors, labels } from '../constants'
+import { ipcRenderer } from 'electron'
+import fs from 'fs'
+import xml2js from 'xml2js'
+import zlib from 'zlib'
+import { PPQ } from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -37,6 +42,70 @@ class Bezie extends Component {
 
         d3.select(this.refs.rect)
             .on('mousedown', ::this.onMouseDownRect)
+
+        ipcRenderer.on('open-file', ::this.openFile)
+        ipcRenderer.on('save-file', ::this.saveFile)
+    }
+
+    saveFile (sender, filename) {
+        const { paths, height, zoom } = this.props
+        const contents = fs.readFileSync('../clip.xml', 'utf-8')
+        const offset = 331
+        const init = -63072000
+        const path = [
+            'Ableton',
+            'LiveSet', 0, 'Tracks', 0, 'MidiTrack', 0, 'DeviceChain', 0,
+            'MainSequencer', 0, 'ClipSlotList', 0, 'ClipSlot', 0, 'ClipSlot', 0,
+            'Value', 0, 'MidiClip', 0
+        ]
+        const envelopesPath = path.concat(['Envelopes', 0, 'Envelopes'])
+        const namePath = path.concat(['Name', 0])
+
+        xml2js.parseString(contents, (err, clip) => {
+            let builder = new xml2js.Builder()
+            let envelopes = _.get(clip, envelopesPath)
+
+            // Remove empty string
+            envelopes.pop()
+
+            envelopes.push({
+                ClipEnvelope: [],
+            })
+
+            _.each(paths, (path, i) => {
+                let events = [{
+                    FloatEvent: [{ $: { Time: init, Value: 0 } }]
+                }]
+
+                _.each(path, point => {
+                    events[0].FloatEvent.push({
+                        $: {
+                            Time: point.x / zoom.x / PPQ,
+                            Value: (height - point.y) / zoom.y,
+                        },
+                    })
+                })
+
+                envelopes[0].ClipEnvelope.push({
+                    EnvelopeTarget: [{
+                        PointeeId: { $ : { Value: i + offset } },
+                    }],
+                    Automation: [{ Events: events }],
+                    LoopSlot: [{ Value: {} }],
+                    ScrollerTimePreserver: [{
+                        LeftTime: { $: { Value: 0 } },
+                        RightTime: { $: { Value: 0 } },
+                    }],
+                })
+            })
+
+            let compressed = zlib.gzipSync(builder.buildObject(clip))
+            fs.writeFile(filename, compressed)
+        })
+    }
+
+    openFile (filename) {
+
     }
 
     render () {

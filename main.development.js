@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell } from 'electron';
+import { app, BrowserWindow, Menu, shell, dialog } from 'electron';
 
 let menu;
 let template;
@@ -69,9 +69,9 @@ app.on('ready', async () => {
 
   if (process.platform === 'darwin') {
     template = [{
-      label: 'Electron',
+      label: 'Bezie',
       submenu: [{
-        label: 'About ElectronReact',
+        label: 'About Bezie',
         selector: 'orderFrontStandardAboutPanel:'
       }, {
         type: 'separator'
@@ -84,12 +84,8 @@ app.on('ready', async () => {
         label: 'Hide ElectronReact',
         accelerator: 'Command+H',
         selector: 'hide:'
-      }, {
-          label: 'Test Store',
-          click () {
-              mainWindow.webContents.send('save-file', 'FILENAME')
-          },
-      }, {
+      },
+      {
         label: 'Hide Others',
         accelerator: 'Command+Shift+H',
         selector: 'hideOtherApplications:'
@@ -105,7 +101,38 @@ app.on('ready', async () => {
           app.quit();
         }
       }]
-    }, {
+    },
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Open',
+                click () {
+                    dialog.showOpenDialog({
+                        properties: ['openFile'],
+                        filters: [
+                            { name: 'Ableton', extensions: ['alc'] },
+                        ],
+                    }, filename => {
+                        mainWindow.webContents.send('open-file', filename)
+                    })
+                },
+            },
+            {
+                label: 'Save',
+                click () {
+                    dialog.showSaveDialog({
+                        filters: [
+                            { name: 'Ableton', extensions: ['alc'] },
+                        ],
+                    }, filename => {
+                        mainWindow.webContents.send('save-file', filename)
+                    })
+                },
+            },
+        ],
+    },
+    {
       label: 'Edit',
       submenu: [{
         label: 'Undo',

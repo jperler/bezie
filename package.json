@@ -112,7 +112,8 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "seamless-immutable": "^6.1.1",
-    "source-map-support": "^0.4.2"
+    "source-map-support": "^0.4.2",
+    "xml2js": "^0.4.17"
   },
   "devEngines": {
     "node": "4.x || 5.x || 6.x",
