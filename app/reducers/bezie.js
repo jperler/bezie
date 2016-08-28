@@ -13,7 +13,7 @@ const initialState = Immutable({
     snap: true,
     bars: 4,
     zoom: { x: 1, y: 2 },
-    interval: { x: 8, y: 4 },
+    interval: { x: 8, y: 10 },
     pathIdx: 0,
     paths: _.fill(Array(6), []),
 })

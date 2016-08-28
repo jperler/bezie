@@ -32,7 +32,7 @@ class Bezie extends Component {
 
     componentDidMount () {
         d3.select(window)
-            .on('mousemove', ::this.onMouseMove)
+            .on('mousemove', _.throttle(::this.onMouseMove, 30, { trailing: false }))
             .on('mouseup', ::this.onMouseUp)
 
         d3.select(this.refs.rect)
@@ -192,7 +192,10 @@ class Bezie extends Component {
         x = Math.max(minX, maxX)
         y = Math.max(0, Math.min(height, gridPoint.y))
 
-        updatePoint({ index: draggedIdx, x, y })
+        // Only call update action when the point's coordinates have changed
+        if (!_.isEqual(draggedPoint.x, x) || !_.isEqual(draggedPoint.y, y)) {
+            updatePoint({ index: draggedIdx, x, y })
+        }
     }
 
     onMouseDownRect () {

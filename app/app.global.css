@@ -33,7 +33,7 @@ body {
     border-radius: 10px;
 }
 
-.bezie.dragging {
+.dragging {
     cursor: move !important;
 }
 
