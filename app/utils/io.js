@@ -3,8 +3,8 @@ import path from 'path'
 import xml2js from 'xml2js'
 import zlib from 'zlib'
 import { PPQ } from '../constants'
+import { TEMPLATE } from '../constants/clip'
 
-const CLIP_FILENAME = './app/clip.xml'
 const AUTOMATION_OFFSET = 331
 const INITIAL_AUTOMATION = -63072000
 const CLIP_PATH = [
@@ -16,9 +16,7 @@ const ENVELOPES_PATH = CLIP_PATH.concat(['Envelopes', 0, 'Envelopes'])
 const NAME_PATH = CLIP_PATH.concat(['Name', 0])
 
 export function save (sender, filename, { paths, height, zoom }) {
-    const contents = fs.readFileSync(CLIP_FILENAME, 'utf-8')
-
-    xml2js.parseString(contents, (err, clip) => {
+    xml2js.parseString(TEMPLATE, (err, clip) => {
         let builder = new xml2js.Builder()
         let envelopes = _.get(clip, ENVELOPES_PATH)
         let name = _.get(clip, NAME_PATH)
