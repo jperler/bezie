@@ -22,7 +22,7 @@ const shouldBuildAll = argv.all || false;
 
 const DEFAULT_OPTS = {
   dir: './',
-  name: 'Electron',
+  name: appName,
   asar: shouldUseAsar,
   ignore: [
     '^/test($|/)',
