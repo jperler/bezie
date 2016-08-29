@@ -27,6 +27,7 @@ const DEFAULT_OPTS = {
   ignore: [
     '^/test($|/)',
     '^/release($|/)',
+    '^/app/.*.js',
     '^/main.development.js'
   ].concat(devDeps.map(name => `/node_modules/${name}($|/)`))
   .concat(
