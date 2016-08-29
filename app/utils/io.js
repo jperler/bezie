@@ -46,7 +46,7 @@ export function save (sender, filename, { paths, height, zoom }) {
             envelopes[0].ClipEnvelope.push({
                 EnvelopeTarget: [{
                     PointeeId: {
-                        $ : { Value: i + AUTOMATION_OFFSET },
+                        $: { Value: i + AUTOMATION_OFFSET },
                     },
                 }],
                 Automation: [{ Events: events }],
