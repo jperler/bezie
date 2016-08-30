@@ -3,6 +3,7 @@ import Automator from './automator'
 import PathSelector from './pathSelector'
 import { ipcRenderer } from 'electron'
 import * as io from '../utils/io'
+import { ButtonToolbar, Button } from 'react-bootstrap'
 
 class Bezie extends Component {
     componentDidMount () {
@@ -13,10 +14,37 @@ class Bezie extends Component {
     render () {
         return (
             <div className="bezie">
-                <div className="push-bottom-small">
+                <div className="push-bottom">
                     <PathSelector {...this.props} />
                 </div>
                 <Automator {...this.props} />
+                <div className="push-top">
+                    <div className="pull-left">
+                        <ButtonToolbar>
+                            <Button bsSize="xsmall">Reverse</Button>
+                            <Button bsSize="xsmall">Inverse</Button>
+                            <Button bsSize="xsmall">Reset</Button>
+                        </ButtonToolbar>
+                    </div>
+                    <div className="pull-right">
+                        <ButtonToolbar>
+                            <Button bsSize="xsmall">Grid</Button>
+                            <Button bsSize="xsmall">Snap</Button>
+                            <Button bsSize="xsmall">Triplet</Button>
+                            <Button bsSize="xsmall"><i className="fa fa-minus" /></Button>
+                            <Button bsSize="xsmall"><i className="fa fa-plus" /></Button>
+                            <span
+                                className="push-left"
+                                style={{
+                                    fontFamily: 'monospace',
+                                    lineHeight: '22px',
+                                }}
+                            >
+                                1/4
+                            </span>
+                        </ButtonToolbar>
+                    </div>
+                </div>
             </div>
         )
     }

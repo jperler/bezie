@@ -43,7 +43,6 @@ class PathSelector extends Component {
             <DropdownButton
                 bsSize="xsmall"
                 title={getTitle({ i: pathIdx })}
-                id="dropdown-size-extra-small"
             >
                 {items}
             </DropdownButton>

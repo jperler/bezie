@@ -5,6 +5,7 @@ body {
     background-color: #444;
     overflow-y: hidden;
     margin: 10px !important;
+    font-family: Arial, Helvetica, Helvetica Neue;
 }
 
 ::-webkit-scrollbar {
@@ -69,20 +70,17 @@ circle.curve {
 .push-top { margin-top: 10px; }
 .push-bottom-small { margin-bottom: 5px; }
 .push-bottom { margin-bottom: 10px; }
-
-/* Flatten das boostrap */
-.well, .navbar-inner, .popover, .btn, .tooltip, input, select, textarea, pre, .progress, .modal, .add-on, .alert, .table-bordered, .nav>.active>a, .dropdown-menu, .tooltip-inner, .badge, .label, .img-polaroid {
-    -moz-box-shadow: none !important;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
-    background-image: none !important;
-    outline: none;
-}
+.pull-right { float: right; }
+.pull-left { float: right; }
+.clearfix { clear: both; }
 
 .dropdown-menu li a {
     padding: 1px 5px;
 }
 
-.btn {
+.btn:focus {
+    outline: 0 !important;
+}
+.btn i {
     text-shadow: none;
 }
