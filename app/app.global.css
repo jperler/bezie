@@ -7,18 +7,6 @@ body {
     margin: 10px !important;
 }
 
-.bezie {
-    width: 100%;
-    overflow: hidden;
-    overflow-x: auto;
-    background: #333;
-    background-image: linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0),
-        rgba(0, 0, 0, .3)
-    );
-}
-
 ::-webkit-scrollbar {
     height: 10px;
 }
@@ -31,15 +19,6 @@ body {
 ::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.8);
     border-radius: 10px;
-}
-
-.dragging {
-    cursor: move !important;
-}
-
-svg {
-    outline: none;
-    background: rgba(0,0,0, .2);
 }
 
 rect {
@@ -82,6 +61,15 @@ circle.curve {
     display: none;
 }
 
+.push-right-small { margin-right: 5px; }
+.push-right { margin-right: 10px; }
+.push-left-small { margin-left: 5px; }
+.push-left { margin-left: 10px; }
+.push-top-small { margin-top: 5px; }
+.push-top { margin-top: 10px; }
+.push-bottom-small { margin-bottom: 5px; }
+.push-bottom { margin-bottom: 10px; }
+
 /* Flatten das boostrap */
 .well, .navbar-inner, .popover, .btn, .tooltip, input, select, textarea, pre, .progress, .modal, .add-on, .alert, .table-bordered, .nav>.active>a, .dropdown-menu, .tooltip-inner, .badge, .label, .img-polaroid {
     -moz-box-shadow: none !important;
@@ -89,4 +77,12 @@ circle.curve {
     box-shadow: none !important;
     background-image: none !important;
     outline: none;
+}
+
+.dropdown-menu li a {
+    padding: 1px 5px;
+}
+
+.btn {
+    text-shadow: none;
 }
