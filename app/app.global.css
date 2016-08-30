@@ -84,3 +84,8 @@ circle.curve {
 .btn i {
     text-shadow: none;
 }
+
+.noselect {
+    -webkit-user-select: none;
+    cursor: default;
+}

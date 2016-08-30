@@ -34,13 +34,10 @@ class Bezie extends Component {
                             <Button bsSize="xsmall"><i className="fa fa-minus" /></Button>
                             <Button bsSize="xsmall"><i className="fa fa-plus" /></Button>
                             <span
-                                className="push-left"
-                                style={{
-                                    fontFamily: 'monospace',
-                                    lineHeight: '22px',
-                                }}
+                                className="push-left noselect"
+                                style={{ fontFamily: 'monospace', lineHeight: '22px' }}
                             >
-                                1/4
+                                1/8
                             </span>
                         </ButtonToolbar>
                     </div>
