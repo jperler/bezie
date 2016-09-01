@@ -30,8 +30,8 @@ class Bezie extends Component {
                     </div>
                     <div className="pull-right">
                         <ButtonToolbar>
-                            <Button bsSize="xsmall">Grid</Button>
-                            <Button bsSize="xsmall">Snap</Button>
+                            <Button className="active" bsSize="xsmall">Grid</Button>
+                            <Button className="active" bsSize="xsmall">Snap</Button>
                             <Button bsSize="xsmall">Triplet</Button>
                             <Button bsSize="xsmall"><i className="fa fa-minus" /></Button>
                             <Button bsSize="xsmall"><i className="fa fa-plus" /></Button>
