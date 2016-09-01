@@ -11,6 +11,16 @@ export class X extends Component {
         xAxisTickRange: PropTypes.array.isRequired,
     }
 
+    shouldComponentUpdate (nextProps) {
+        return (
+            nextProps.width !== this.props.width ||
+            nextProps.height !== this.props.height ||
+            nextProps.interval !== this.props.interval ||
+            nextProps.bars !== this.props.bars ||
+            nextProps.zoom !== this.props.zoom
+        )
+    }
+
     componentDidMount () { this.updateAxis() }
     componentDidUpdate () { this.updateAxis() }
 
@@ -58,7 +68,18 @@ export class Y extends Component {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
         interval: PropTypes.object.isRequired,
+        zoom: PropTypes.object.isRequired,
         yAxisTickRange: PropTypes.array.isRequired,
+    }
+
+    shouldComponentUpdate (nextProps) {
+        return (
+            nextProps.width !== this.props.width ||
+            nextProps.height !== this.props.height ||
+            nextProps.interval !== this.props.interval ||
+            nextProps.bars !== this.props.bars ||
+            nextProps.zoom !== this.props.zoom
+        )
     }
 
     componentDidMount () { this.updateAxis() }

@@ -13,16 +13,10 @@ class PathSelector extends Component {
 
         const getTitle = ({ i }) => (
             <span>
-                <span className="fa-stack push-right">
-                    <i
-                        className="fa fa-circle fa-stack-2x"
-                        style={{ color: 'rgba(0,0,0,.7)' }}
-                    />
-                    <i
-                        className="fa fa-circle push-right-small fa-stack-1x"
-                        style={{ color: colors[i] }}
-                    />
-                </span>
+                <i
+                    className="fa fa-circle push-right"
+                    style={{ color: colors[i] }}
+                />
                 {labels[i]}
             </span>
         )
@@ -33,7 +27,6 @@ class PathSelector extends Component {
                 eventKey={i}
                 onClick={() => this.onChangePath(i)}
                 key={`path-select-${i}`}
-                style={{ fontSize: 12 }}
             >
                 {getTitle({ i })}
             </MenuItem>
@@ -42,6 +35,7 @@ class PathSelector extends Component {
         return (
             <DropdownButton
                 bsSize="xsmall"
+                bsStyle="primary"
                 title={getTitle({ i: pathIdx })}
                 id="pathSelector"
             >

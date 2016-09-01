@@ -15,15 +15,17 @@ class Bezie extends Component {
         return (
             <div className="bezie">
                 <div className="push-bottom">
-                    <PathSelector {...this.props} />
+                    <ButtonToolbar>
+                        <PathSelector {...this.props} />
+                        <Button bsSize="xsmall" onClick={this.props.resetPath}>Reset</Button>
+                        <Button bsSize="xsmall">Reverse</Button>
+                        <Button bsSize="xsmall">Inverse</Button>
+                    </ButtonToolbar>
                 </div>
                 <Automator {...this.props} />
                 <div className="push-top">
                     <div className="pull-left">
                         <ButtonToolbar>
-                            <Button bsSize="xsmall">Reverse</Button>
-                            <Button bsSize="xsmall">Inverse</Button>
-                            <Button bsSize="xsmall">Reset</Button>
                         </ButtonToolbar>
                     </div>
                     <div className="pull-right">

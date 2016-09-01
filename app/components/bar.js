@@ -3,6 +3,10 @@ import classNames from 'classnames'
 import styles from './bar.css'
 
 class Bar extends Component {
+    shouldComponentUpdate () {
+        return false
+    }
+
     render () {
         const {
             width,

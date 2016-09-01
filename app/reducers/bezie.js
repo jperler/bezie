@@ -4,6 +4,7 @@ import {
     REMOVE_POINT,
     UPDATE_POINT,
     CHANGE_PATH,
+    RESET_PATH,
 } from '../actions/bezie'
 import Immutable from 'seamless-immutable'
 import _ from 'lodash'
@@ -36,6 +37,7 @@ export default function bezie (state = initialState, action) {
         case REMOVE_POINT: return handleRemovePoint(state, payload)
         case UPDATE_POINT: return handleUpdatePoint(state, payload)
         case CHANGE_PATH: return handleChangePath(state, payload)
+        case RESET_PATH: return handleResetPath(state, payload)
         default: return state
     }
 }
@@ -72,4 +74,13 @@ function handleChangePath (state, payload) {
     return state
         .set('pathIdx', payload.index)
         .setIn(['paths', payload.index], path)
+}
+
+function handleResetPath (state, payload) {
+    const height = utils.getHeight(state)
+    const width = utils.getWidth(state)
+    return state.setIn(['paths', state.pathIdx], [
+        { x: 0, y: height },
+        { x: width, y: height },
+    ])
 }
