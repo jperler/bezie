@@ -96,12 +96,12 @@ class Automator extends Component {
                     ref="svg"
                 >
                     <g transform={`translate(${margin.left}, ${margin.top})`}>
-                        <g>{elements.bars}</g>
+                        {elements.bars}
                         <Axis.X {...this.props} />
                         <Axis.Y {...this.props} />
                         <rect height={height} width={width} ref="rect" />
-                        <g>{elements.paths}</g>
-                        <g>{elements.points}</g>
+                        {elements.paths}
+                        {elements.points}
                     </g>
                 </svg>
             </div>

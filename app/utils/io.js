@@ -14,15 +14,26 @@ const CLIP_PATH = [
 ]
 const ENVELOPES_PATH = CLIP_PATH.concat(['Envelopes', 0, 'Envelopes'])
 const NAME_PATH = CLIP_PATH.concat(['Name', 0])
+const LOOP_PATH = CLIP_PATH.concat(['Loop', 0])
+const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 
-export function save (sender, filename, { paths, height, zoom }) {
+export function save (sender, filename, { paths, height, zoom, bars }) {
     xml2js.parseString(TEMPLATE, (err, clip) => {
         let builder = new xml2js.Builder()
         let envelopes = _.get(clip, ENVELOPES_PATH)
         let name = _.get(clip, NAME_PATH)
+        let currentEnd = _.get(clip, CURRENT_END_PATH)
+        let loop = _.get(clip, LOOP_PATH)
+        const length = bars * 4
 
         // Set name
         name.$ = { Value: path.parse(filename).name }
+
+        // Set bars
+        currentEnd.$ = { Value: length }
+        loop.LoopEnd[0].$ = { Value: length }
+        loop.OutMarker[0].$ = { Value: length }
+        loop.HiddenLoopEnd[0].$ = { Value: length }
 
         // Remove empty string
         envelopes.pop()
