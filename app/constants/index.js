@@ -3,11 +3,11 @@ export const PPQ = 96
 
 export const colors = [
     '#FF0000',
+    '#FF6600',
+    '#FFFF00',
+    '#00FF00',
     '#00FFFF',
     '#FF00FF',
-    '#00FF00',
-    '#FFFF00',
-    '#9D00FF',
 ]
 
 export const labels = [

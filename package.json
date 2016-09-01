@@ -96,6 +96,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "bootswatch": "^3.3.7",
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.1",
     "d3": "3.5.10",

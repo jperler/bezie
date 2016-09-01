@@ -12,9 +12,9 @@ class PathSelector extends Component {
         const { pathIdx } = this.props
 
         const getTitle = ({ i }) => (
-            <span>
+            <span className="push-right-small">
                 <i
-                    className="fa fa-circle push-right"
+                    className="fa fa-stop push-right push-left-small"
                     style={{ color: colors[i] }}
                 />
                 {labels[i]}
@@ -35,7 +35,6 @@ class PathSelector extends Component {
         return (
             <DropdownButton
                 bsSize="xsmall"
-                bsStyle="primary"
                 title={getTitle({ i: pathIdx })}
                 id="pathSelector"
             >
