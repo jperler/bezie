@@ -1,3 +1,5 @@
+import Immutable from 'seamless-immutable'
+import _ from 'lodash'
 import {
     TOGGLE_SNAP,
     ADD_POINT,
@@ -6,8 +8,6 @@ import {
     CHANGE_PATH,
     RESET_PATH,
 } from '../actions/bezie'
-import Immutable from 'seamless-immutable'
-import _ from 'lodash'
 import * as utils from '../utils'
 
 const initialState = Immutable({
@@ -23,7 +23,7 @@ export default function bezie (state = initialState, action) {
     const { payload } = action
     const { pathIdx, paths } = state
     if (pathIdx === 0 && paths[pathIdx].length === 0) {
-        let path = paths[pathIdx].asMutable()
+        const path = paths[pathIdx].asMutable()
         const height = utils.getHeight(state)
         const width = utils.getWidth(state)
         if (!path.length) {
@@ -37,7 +37,7 @@ export default function bezie (state = initialState, action) {
         case REMOVE_POINT: return handleRemovePoint(state, payload)
         case UPDATE_POINT: return handleUpdatePoint(state, payload)
         case CHANGE_PATH: return handleChangePath(state, payload)
-        case RESET_PATH: return handleResetPath(state, payload)
+        case RESET_PATH: return handleResetPath(state)
         default: return state
     }
 }
@@ -47,19 +47,19 @@ function handleToggleSnap (state) {
 }
 
 function handleAddPoint (state, payload) {
-    let path = state.paths[state.pathIdx].asMutable()
+    const path = state.paths[state.pathIdx].asMutable()
     path.splice(payload.index, 0, { x: payload.x, y: payload.y })
     return state.setIn(['paths', state.pathIdx], path)
 }
 
 function handleRemovePoint (state, payload) {
-    let path = state.paths[state.pathIdx].asMutable()
+    const path = state.paths[state.pathIdx].asMutable()
     path.splice(payload.index, 1)
     return state.setIn(['paths', state.pathIdx], path)
 }
 
 function handleUpdatePoint (state, payload) {
-    let path = state.paths[state.pathIdx].asMutable()
+    const path = state.paths[state.pathIdx].asMutable()
     path[payload.index] = { x: payload.x, y: payload.y }
     return state.setIn(['paths', state.pathIdx], path)
 }
@@ -67,7 +67,7 @@ function handleUpdatePoint (state, payload) {
 function handleChangePath (state, payload) {
     const height = utils.getHeight(state)
     const width = utils.getWidth(state)
-    let path = state.paths[payload.index].asMutable()
+    const path = state.paths[payload.index].asMutable()
     if (!path.length) {
         path.push({ x: 0, y: height }, { x: width, y: height })
     }
@@ -76,7 +76,7 @@ function handleChangePath (state, payload) {
         .setIn(['paths', payload.index], path)
 }
 
-function handleResetPath (state, payload) {
+function handleResetPath (state) {
     const height = utils.getHeight(state)
     const width = utils.getWidth(state)
     return state.setIn(['paths', state.pathIdx], [

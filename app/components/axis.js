@@ -1,15 +1,16 @@
 import React, { Component, PropTypes } from 'react'
-import * as utils from '../utils'
-import ReactDom from 'react-dom'
 
 export class X extends Component {
     static propTypes = {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
         interval: PropTypes.object.isRequired,
+        zoom: PropTypes.object.isRequired,
         bars: PropTypes.number.isRequired,
         xAxisTickRange: PropTypes.array.isRequired,
     }
+
+    componentDidMount () { this.updateAxis() }
 
     shouldComponentUpdate (nextProps) {
         return (
@@ -21,23 +22,20 @@ export class X extends Component {
         )
     }
 
-    componentDidMount () { this.updateAxis() }
     componentDidUpdate () { this.updateAxis() }
 
     updateAxis () {
-        let {
+        const {
             height,
             width,
-            interval,
-            bars,
             xAxisTickRange,
          } = this.props
 
-        let scale = d3.scale.linear()
+        const scale = d3.scale.linear()
             .domain([0, width])
             .range([0, width])
 
-        let xAxis = d3.svg.axis()
+        const xAxis = d3.svg.axis()
             .scale(scale)
             .orient('bottom')
             .innerTickSize(-height)
@@ -45,11 +43,11 @@ export class X extends Component {
             .tickValues(xAxisTickRange)
             .tickFormat(() => '')
 
-        d3.select(this.refs.axis).call(xAxis)
+        d3.select(this.axis).call(xAxis)
     }
 
     render () {
-        let { height } = this.props
+        const { height } = this.props
 
         return (
             <g
@@ -57,7 +55,7 @@ export class X extends Component {
                 stroke="#FFF"
                 strokeOpacity=".1"
                 transform={`translate(0, ${height})`}
-                ref="axis"
+                ref={ref => this.axis = ref}
             />
         )
     }
@@ -67,10 +65,13 @@ export class Y extends Component {
     static propTypes = {
         width: PropTypes.number.isRequired,
         height: PropTypes.number.isRequired,
+        bars: PropTypes.number.isRequired,
         interval: PropTypes.object.isRequired,
         zoom: PropTypes.object.isRequired,
         yAxisTickRange: PropTypes.array.isRequired,
     }
+
+    componentDidMount () { this.updateAxis() }
 
     shouldComponentUpdate (nextProps) {
         return (
@@ -82,22 +83,20 @@ export class Y extends Component {
         )
     }
 
-    componentDidMount () { this.updateAxis() }
     componentDidUpdate () { this.updateAxis() }
 
     updateAxis () {
-        let {
+        const {
             height,
             width,
-            interval,
             yAxisTickRange,
          } = this.props
 
-        let scale = d3.scale.linear()
+        const scale = d3.scale.linear()
             .domain([0, height])
             .range([height, 0])
 
-        let axis = d3.svg.axis()
+        const axis = d3.svg.axis()
             .scale(scale)
             .orient('left')
             .innerTickSize(-width)
@@ -105,7 +104,7 @@ export class Y extends Component {
             .tickValues(yAxisTickRange)
             .tickFormat(() => '')
 
-        d3.select(this.refs.axis).call(axis)
+        d3.select(this.axis).call(axis)
     }
 
     render () {
@@ -114,7 +113,7 @@ export class Y extends Component {
                 className="y axis"
                 stroke="#FFF"
                 strokeOpacity=".1"
-                ref="axis"
+                ref={ref => this.axis = ref}
             />
         )
     }

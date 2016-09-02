@@ -3,6 +3,13 @@ import classNames from 'classnames'
 import styles from './bar.css'
 
 class Bar extends Component {
+    static propTypes = {
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
+        bars: PropTypes.number.isRequired,
+        index: PropTypes.number.isRequired,
+    }
+
     shouldComponentUpdate () {
         return false
     }

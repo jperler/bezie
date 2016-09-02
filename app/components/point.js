@@ -1,16 +1,15 @@
 import React, { Component, PropTypes } from 'react'
 import classNames from 'classnames'
-import _ from 'lodash'
 
 class Point extends Component {
     static propTypes = {
-        onMouseDown: React.PropTypes.func.isRequired,
-        onDoubleClick: React.PropTypes.func.isRequired,
-        x: React.PropTypes.number,
-        y: React.PropTypes.number,
-        selected: React.PropTypes.bool,
-        dragging: React.PropTypes.bool,
-        color: React.PropTypes.string.isRequired,
+        onMouseDown: PropTypes.func.isRequired,
+        onDoubleClick: PropTypes.func.isRequired,
+        x: PropTypes.number,
+        y: PropTypes.number,
+        selected: PropTypes.bool,
+        dragging: PropTypes.bool,
+        color: PropTypes.string.isRequired,
     }
 
     shouldComponentUpdate (nextProps) {
@@ -27,12 +26,10 @@ class Point extends Component {
             onMouseDown,
             onDoubleClick,
             selected,
-            dragging,
             x,
             y,
             color,
         } = this.props
-        const classes = classNames({ selected })
 
         return (
             <circle

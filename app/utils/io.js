@@ -19,11 +19,11 @@ const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 
 export function save (sender, filename, { paths, height, zoom, bars }) {
     xml2js.parseString(TEMPLATE, (err, clip) => {
-        let builder = new xml2js.Builder()
-        let envelopes = _.get(clip, ENVELOPES_PATH)
-        let name = _.get(clip, NAME_PATH)
-        let currentEnd = _.get(clip, CURRENT_END_PATH)
-        let loop = _.get(clip, LOOP_PATH)
+        const builder = new xml2js.Builder()
+        const envelopes = _.get(clip, ENVELOPES_PATH)
+        const name = _.get(clip, NAME_PATH)
+        const currentEnd = _.get(clip, CURRENT_END_PATH)
+        const loop = _.get(clip, LOOP_PATH)
         const length = bars * 4
 
         // Set name
@@ -40,12 +40,12 @@ export function save (sender, filename, { paths, height, zoom, bars }) {
         envelopes.push({ ClipEnvelope: [] })
 
         // Set automation
-        _.each(paths, (path, i) => {
-            let events = [{
-                FloatEvent: [{ $: { Time: INITIAL_AUTOMATION, Value: 0 }}]
+        _.each(paths, (points, i) => {
+            const events = [{
+                FloatEvent: [{ $: { Time: INITIAL_AUTOMATION, Value: 0 } }]
             }]
 
-            _.each(path, point => {
+            _.each(points, point => {
                 events[0].FloatEvent.push({
                     $: {
                         Time: point.x / zoom.x / PPQ,

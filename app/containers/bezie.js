@@ -1,4 +1,3 @@
-import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import Bezie from '../components/bezie'
 import * as bezieActions from '../actions/bezie'

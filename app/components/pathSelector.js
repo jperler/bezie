@@ -8,6 +8,10 @@ class PathSelector extends Component {
         changePath: PropTypes.func.isRequired,
     }
 
+    onChangePath (i) {
+        this.props.changePath({ index: i })
+    }
+
     render () {
         const { pathIdx } = this.props
 
@@ -41,10 +45,6 @@ class PathSelector extends Component {
                 {items}
             </DropdownButton>
         )
-    }
-
-    onChangePath (i) {
-        this.props.changePath({ index: i })
     }
 }
 

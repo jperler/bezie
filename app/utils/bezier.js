@@ -1,12 +1,11 @@
-import Point from 'point'
 import _ from 'lodash'
-import * as utils from 'utils'
+import * as utils from '../utils'
 
 const CHUNKS = 2 ** 5
 const INTERVAL = 1 / CHUNKS
 
 export function interpolate (points, t) {
-    let n = points.length - 1
+    const n = points.length - 1
     let x = 0
     let y = 0
 
@@ -15,14 +14,14 @@ export function interpolate (points, t) {
         y += utils.binomial(n, i) * ((1 - t) ** (n - i)) * (t ** i) * points[i].y
     }
 
-    return new Point(x, y)
+    return { x, y }
 }
 
 export function getPoints (points) {
     if (!points.length) return []
-    return _.map(utils.rangeInclusive(0, 1, INTERVAL), t => {
-        return interpolate(points, t)
-    })
+    return _.map(utils.rangeInclusive(0, 1, INTERVAL), t => (
+        interpolate(points, t)
+    ))
 }
 
 // Returns the value of the control point with t = 0.5
