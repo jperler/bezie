@@ -1,15 +1,25 @@
 import React, { Component, PropTypes } from 'react'
+import { ipcRenderer } from 'electron'
+import { ButtonToolbar, Button } from 'react-bootstrap'
 import Automator from './automator'
 import PathSelector from './pathSelector'
-import { ipcRenderer } from 'electron'
 import * as io from '../utils/io'
-import { ButtonToolbar, Button } from 'react-bootstrap'
 
 class Bezie extends Component {
+    static propTypes = {
+        resetPath: PropTypes.func.isRequired,
+    }
+
     componentDidMount () {
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
     }
+
+    onSaveFile (sender, filename) {
+        io.save(sender, filename, this.props)
+    }
+
+    onOpenFile (filename) {} // eslint-disable-line no-unused-vars
 
     render () {
         return (
@@ -25,8 +35,7 @@ class Bezie extends Component {
                 <Automator {...this.props} />
                 <div className="push-top">
                     <div className="pull-left">
-                        <ButtonToolbar>
-                        </ButtonToolbar>
+                        <ButtonToolbar />
                     </div>
                     <div className="pull-right">
                         <ButtonToolbar>
@@ -48,12 +57,6 @@ class Bezie extends Component {
         )
     }
 
-    onSaveFile (sender, filename) {
-        io.save(sender, filename, this.props)
-    }
-
-    onOpenFile (filename) {}
 }
 
 export default Bezie
-
