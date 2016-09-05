@@ -81,6 +81,7 @@ circle.curve {
 .btn:focus {
     outline: 0 !important;
 }
+
 .btn i {
     text-shadow: none;
 }
@@ -92,15 +93,4 @@ circle.curve {
 
 .monospace {
     font-family: monospace;
-}
-
-.contextMenu {
-    border-radius: 5px;
-    font-size: 12px;
-    float: left;
-    background: rgba(0,0,0,.2);
-    margin-left: 5px;
-    height: 30px;
-    line-height: 22px;
-    padding: 4px 5px 0 5px;
 }

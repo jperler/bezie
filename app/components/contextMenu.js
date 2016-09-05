@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import * as utils from '../utils'
+import styles from './contextMenu.css'
 
 class ContextMenu extends Component {
     static propTypes = {
@@ -29,7 +30,7 @@ class ContextMenu extends Component {
         }
 
         return (
-            <div className="contextMenu">
+            <div className={styles.menu}>
                 <DropdownButton bsSize="xsmall" title="Default" id="contextMenu">
                     <MenuItem bsSize="xsmall">Default</MenuItem>
                     <MenuItem bsSize="xsmall">Bezier</MenuItem>
