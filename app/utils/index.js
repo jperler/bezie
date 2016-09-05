@@ -9,6 +9,7 @@ export const factorial = _.memoize(n => (_.includes([0, 1], n) ? 1 : n * factori
 export const binomial = (n, i) => (i === 0 ? 1 : factorial(n) / (factorial(i) * factorial(n - i)))
 export const getHeight = ({ zoom }) => CONTROL_MAX * zoom.y
 export const getWidth = ({ bars, zoom }) => PPQ * 4 * bars * zoom.x
+export const numberFormat = (n) => Math.round(n * 100) / 100
 
 export const getInsertIndex = (points, x) => (
     _.indexOf(points, _.last(_.filter(points, point => x > point.x))) + 1
@@ -17,4 +18,9 @@ export const getInsertIndex = (points, x) => (
 export const getGridPoint = (point, xRange, yRange) => ({
     x: _.minBy(xRange, tick => Math.abs(point.x - tick)),
     y: _.minBy(yRange, tick => Math.abs(point.y - tick)),
+})
+
+export const normalizePoint = ({ point, height, zoom }) => ({
+    x: point.x / zoom.x / PPQ,
+    y: (height - point.y) / zoom.y,
 })

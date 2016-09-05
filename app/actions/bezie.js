@@ -3,6 +3,7 @@ export const ADD_POINT = 'ADD_POINT'
 export const REMOVE_POINT = 'REMOVE_POINT'
 export const UPDATE_POINT = 'UPDATE_POINT'
 export const CHANGE_PATH = 'CHANGE_PATH'
+export const CHANGE_SELECTED = 'CHANGE_SELECTED'
 export const RESET_PATH = 'RESET_PATH'
 
 export function toggleSnap () {
@@ -39,9 +40,16 @@ export function changePath ({ index }) {
     }
 }
 
-export function resetPath ({ index }) {
+export function changeSelected ({ index }) {
+    return {
+        type: CHANGE_SELECTED,
+        payload: { index },
+    }
+}
+
+export function resetPath () {
     return {
         type: RESET_PATH,
-        payload: { index },
+        payload: {},
     }
 }

@@ -6,9 +6,11 @@ class PathSelector extends Component {
     static propTypes = {
         pathIdx: PropTypes.number.isRequired,
         changePath: PropTypes.func.isRequired,
+        changeSelected: PropTypes.func.isRequired,
     }
 
     onChangePath (i) {
+        this.props.changeSelected({ index: null })
         this.props.changePath({ index: i })
     }
 
@@ -38,7 +40,7 @@ class PathSelector extends Component {
 
         return (
             <DropdownButton
-                bsSize="xsmall"
+                bsSize="small"
                 title={getTitle({ i: pathIdx })}
                 id="pathSelector"
             >

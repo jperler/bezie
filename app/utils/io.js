@@ -2,8 +2,8 @@ import fs from 'fs'
 import path from 'path'
 import xml2js from 'xml2js'
 import zlib from 'zlib'
-import { PPQ } from '../constants'
 import { TEMPLATE } from '../constants/clip'
+import * as utils from '../utils'
 
 const AUTOMATION_OFFSET = 331
 const INITIAL_AUTOMATION = -63072000
@@ -46,10 +46,11 @@ export function save (sender, filename, { paths, height, zoom, bars }) {
             }]
 
             _.each(points, point => {
+                const normalized = utils.normalizePoint({ point, height, zoom })
                 events[0].FloatEvent.push({
                     $: {
-                        Time: point.x / zoom.x / PPQ,
-                        Value: (height - point.y) / zoom.y,
+                        Time: normalized.x,
+                        Value: normalized.y,
                     },
                 })
             })

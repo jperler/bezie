@@ -15,10 +15,12 @@ class Automator extends Component {
         height: PropTypes.number.isRequired,
         bars: PropTypes.number.isRequired,
         pathIdx: PropTypes.number.isRequired,
+        selectedIdx: PropTypes.number,
         addPoint: PropTypes.func.isRequired,
         removePoint: PropTypes.func.isRequired,
         updatePoint: PropTypes.func.isRequired,
         changePath: PropTypes.func.isRequired,
+        changeSelected: PropTypes.func.isRequired,
         paths: PropTypes.array.isRequired,
         xAxisTickRange: PropTypes.array.isRequired,
         yAxisTickRange: PropTypes.array.isRequired,
@@ -28,7 +30,6 @@ class Automator extends Component {
         super()
         this.state = {
             draggedIdx: null,
-            selectedIdx: null,
         }
     }
 
@@ -42,12 +43,14 @@ class Automator extends Component {
     }
 
     onMouseDownPoint (i) {
-        this.setState({ draggedIdx: i, selectedIdx: i })
+        this.setState({ draggedIdx: i })
+        this.props.changeSelected({ index: i })
     }
 
     onDoubleClickPoint (i) {
-        this.setState({ draggedIdx: null, selectedIdx: null })
+        this.setState({ draggedIdx: null })
         this.props.removePoint({ index: i })
+        this.props.changeSelected({ index: null })
     }
 
     onMouseUp () {
@@ -92,23 +95,20 @@ class Automator extends Component {
     }
 
     onMouseDownRect () {
-        const { paths, pathIdx, addPoint } = this.props
+        const { paths, pathIdx, addPoint, changeSelected } = this.props
         const [x, y] = d3.mouse(this.rect)
         const path = paths[pathIdx]
         const index = utils.getInsertIndex(path, x)
 
         addPoint({ index, x, y })
-
-        this.setState({
-            draggedIdx: index,
-            selectedIdx: index,
-        })
+        changeSelected({ index })
+        this.setState({ draggedIdx: index })
     }
 
     render () {
         const margin = { top: 6, right: 6, bottom: 6, left: 6 }
-        const { bars, width, height, paths, pathIdx } = this.props
-        const { draggedIdx, selectedIdx } = this.state
+        const { bars, width, height, paths, pathIdx, selectedIdx } = this.props
+        const { draggedIdx } = this.state
         const innerPath = utils.takeInner(paths[pathIdx])
         const classes = classNames(styles.automator, {
             [styles.dragging]: !!draggedIdx

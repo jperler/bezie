@@ -6,6 +6,7 @@ import {
     REMOVE_POINT,
     UPDATE_POINT,
     CHANGE_PATH,
+    CHANGE_SELECTED,
     RESET_PATH,
 } from '../actions/bezie'
 import * as utils from '../utils'
@@ -16,6 +17,7 @@ const initialState = Immutable({
     zoom: { x: 1, y: 2 },
     interval: { x: 8, y: 10 },
     pathIdx: 0,
+    selectedIdx: null,
     paths: _.fill(Array(6), []),
 })
 
@@ -37,6 +39,7 @@ export default function bezie (state = initialState, action) {
         case REMOVE_POINT: return handleRemovePoint(state, payload)
         case UPDATE_POINT: return handleUpdatePoint(state, payload)
         case CHANGE_PATH: return handleChangePath(state, payload)
+        case CHANGE_SELECTED: return handleChangeSelected(state, payload)
         case RESET_PATH: return handleResetPath(state)
         default: return state
     }
@@ -83,4 +86,8 @@ function handleResetPath (state) {
         { x: 0, y: height },
         { x: width, y: height },
     ])
+}
+
+function handleChangeSelected (state, payload) {
+    return state.set('selectedIdx', payload.index)
 }
