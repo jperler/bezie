@@ -26,8 +26,8 @@ export function getPoints (points) {
 
 // Returns the value of the control point with t = 0.5
 export function getControl (p0, p1, p2) {
-    return new Point(
-        2 * p1.x - p0.x / 2 - p2.x / 2,
-        2 * p1.y - p0.y / 2 - p2.y / 2
-    )
+    return {
+        x: 2 * p1.x - p0.x / 2 - p2.x / 2,
+        y: 2 * p1.y - p0.y / 2 - p2.y / 2
+    }
 }

@@ -9,7 +9,7 @@ class PathSelector extends Component {
         changeSelected: PropTypes.func.isRequired,
     }
 
-    onChangePath (i) {
+    onPathSelect (i) {
         this.props.changeSelected({ index: null })
         this.props.changePath({ index: i })
     }
@@ -31,7 +31,6 @@ class PathSelector extends Component {
             <MenuItem
                 bsSize="small"
                 eventKey={i}
-                onClick={() => this.onChangePath(i)}
                 key={`path-select-${i}`}
             >
                 {getTitle({ i })}
@@ -43,6 +42,7 @@ class PathSelector extends Component {
                 bsSize="small"
                 title={getTitle({ i: pathIdx })}
                 id="pathSelector"
+                onSelect={::this.onPathSelect}
             >
                 {items}
             </DropdownButton>

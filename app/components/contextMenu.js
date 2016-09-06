@@ -10,6 +10,11 @@ class ContextMenu extends Component {
         zoom: PropTypes.object.isRequired,
         height: PropTypes.number.isRequired,
         paths: PropTypes.array.isRequired,
+        changeType: PropTypes.func.isRequired,
+    }
+
+    onTypeSelect (type) {
+        this.props.changeType({ type })
     }
 
     render () {
@@ -31,9 +36,14 @@ class ContextMenu extends Component {
 
         return (
             <div className={styles.menu}>
-                <DropdownButton bsSize="xsmall" title="Default" id="contextMenu">
-                    <MenuItem bsSize="xsmall">Default</MenuItem>
-                    <MenuItem bsSize="xsmall">Bezier</MenuItem>
+                <DropdownButton
+                    bsSize="xsmall"
+                    title="Default"
+                    id="contextMenu"
+                    onSelect={::this.onTypeSelect}
+                >
+                    <MenuItem bsSize="xsmall" eventKey="default">Default</MenuItem>
+                    <MenuItem bsSize="xsmall" eventKey="bezier">Bezier</MenuItem>
                 </DropdownButton>
                 <span className="push-left-small monospace noselect">
                     {`[${formatted.x}, ${formatted.y}]`}

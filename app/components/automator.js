@@ -59,7 +59,7 @@ class Automator extends Component {
 
     onMouseMove () {
         if (!this.state.draggedIdx) return undefined
-        let [x, y] = d3.mouse(this.rect)
+        const [x, y] = d3.mouse(this.rect)
         const {
             updatePoint,
             width,
@@ -77,20 +77,25 @@ class Automator extends Component {
         const gridPoint = snap ?
             utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
             mousePoint
-        const left = path[draggedIdx - 1]
-        const right = path[draggedIdx + 1]
+
+        const left = draggedPoint.isControl ? draggedPoint.left : path[draggedIdx - 1]
+        const right = draggedPoint.isControl ? draggedPoint.right : path[draggedIdx + 1]
 
         const minX = draggedIdx === 0 ? 0 : Math.max(0, left.x)
         const maxX = draggedIdx < path.length - 1 ?
             Math.min(width, gridPoint.x, right.x) :
             Math.min(width, gridPoint.x)
 
-        x = Math.max(minX, maxX)
-        y = Math.max(0, Math.min(height, gridPoint.y))
+        const nextX = Math.max(minX, maxX)
+        const nextY = Math.max(0, Math.min(height, gridPoint.y))
 
         // Only call update action when the point's coordinates have changed
-        if (!_.isEqual(draggedPoint.x, x) || !_.isEqual(draggedPoint.y, y)) {
-            updatePoint({ index: draggedIdx, x, y })
+        if (!_.isEqual(draggedPoint.x, nextX) || !_.isEqual(draggedPoint.y, nextY)) {
+            updatePoint({
+                index: draggedIdx,
+                x: nextX,
+                y: nextY,
+            })
         }
     }
 
@@ -121,16 +126,29 @@ class Automator extends Component {
         const elements = {}
 
         elements.points = innerPath.map((point, i) => (
-            <Point
-                onMouseDown={() => this.onMouseDownPoint(i + 1)}
-                onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
-                selected={i + 1 === selectedIdx}
-                dragging={i + 1 === draggedIdx}
-                x={point.x}
-                y={point.y}
-                key={`point-${i}`}
-                color={colors[pathIdx]}
-            />
+            !point.isCurve ?
+                <Point
+                    onMouseDown={() => this.onMouseDownPoint(i + 1)}
+                    onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
+                    selected={i + 1 === selectedIdx}
+                    dragging={i + 1 === draggedIdx}
+                    x={point.x}
+                    y={point.y}
+                    key={`point-${i}`}
+                    color={colors[pathIdx]}
+                />
+                :
+                <circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={2}
+                    fill={colors[pathIdx]}
+                    key={`point-${i}`}
+                    style={{
+                        fillOpacity: 1,
+                        cursor: 'default',
+                    }}
+                />
         ))
 
         elements.paths = paths.map((path, i) => (
