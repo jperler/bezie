@@ -1,4 +1,5 @@
 .menu {
+    min-width: 200px;
     border-radius: 5px;
     font-size: 12px;
     float: left;

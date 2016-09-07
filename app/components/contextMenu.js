@@ -48,7 +48,7 @@ class ContextMenu extends Component {
                 <span className="push-left-small monospace noselect">
                     {`[${formatted.x}, ${formatted.y}]`}
                 </span>
-                <a href="javascript:void(0)" className="push-left">
+                <a href="javascript:void(0)" className="pull-right push-left">
                     <i className="fa fa-close" />
                 </a>
             </div>

@@ -24,3 +24,5 @@ export const normalizePoint = ({ point, height, zoom }) => ({
     x: point.x / zoom.x / PPQ,
     y: (height - point.y) / zoom.y,
 })
+
+export const getPoint = (path, id) => _.find(path, p => p.id === id)

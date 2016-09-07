@@ -78,8 +78,17 @@ class Automator extends Component {
             utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
             mousePoint
 
-        const left = draggedPoint.isControl ? draggedPoint.left : path[draggedIdx - 1]
-        const right = draggedPoint.isControl ? draggedPoint.right : path[draggedIdx + 1]
+        let left = draggedPoint.isControl ?
+            utils.getPoint(path, draggedPoint.left) :
+            path[draggedIdx - 1]
+        let right = draggedPoint.isControl ?
+            utils.getPoint(path, draggedPoint.right) :
+            path[draggedIdx + 1]
+
+        const controlLeft = _.find(path, p => p.isControl && p.left === draggedPoint.id)
+        const controlRight = _.find(path, p => p.isControl && p.right === draggedPoint.id)
+        if (controlRight) left = controlRight
+        if (controlLeft) right = controlLeft
 
         const minX = draggedIdx === 0 ? 0 : Math.max(0, left.x)
         const maxX = draggedIdx < path.length - 1 ?
@@ -95,6 +104,10 @@ class Automator extends Component {
                 index: draggedIdx,
                 x: nextX,
                 y: nextY,
+                controlLeft,
+                controlRight,
+                left,
+                right,
             })
         }
     }
@@ -104,6 +117,16 @@ class Automator extends Component {
         const [x, y] = d3.mouse(this.rect)
         const path = paths[pathIdx]
         const index = utils.getInsertIndex(path, x)
+        const inBounds = _.find(path, p => (
+            p.isControl &&
+            utils.inRangeInclusive(
+                x,
+                utils.getPoint(path, p.left).x,
+                utils.getPoint(path, p.right).x,
+            )
+        ))
+
+        if (inBounds) return undefined
 
         addPoint({ index, x, y })
         changeSelected({ index })

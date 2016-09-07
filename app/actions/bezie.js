@@ -27,10 +27,11 @@ export function removePoint ({ index }) {
     }
 }
 
-export function updatePoint ({ index, x, y }) {
+export function updatePoint (options) {
+    const { index, x, y, controlLeft, controlRight, left, right } = options
     return {
         type: UPDATE_POINT,
-        payload: { index, x, y },
+        payload: { index, x, y, controlLeft, controlRight, left, right },
     }
 }
 

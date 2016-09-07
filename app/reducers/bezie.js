@@ -28,11 +28,7 @@ export default function bezie (state = initialState, action) {
     const { pathIdx, paths } = state
     if (pathIdx === 0 && paths[pathIdx].length === 0) {
         const path = paths[pathIdx].asMutable()
-        const height = utils.getHeight(state)
-        const width = utils.getWidth(state)
-        if (!path.length) {
-            path.push({ x: 0, y: height }, { x: width, y: height })
-        }
+        if (!path.length) initPath(path, state)
         state = state.setIn(['paths', pathIdx], path)
     }
     switch (action.type) {
@@ -54,7 +50,11 @@ function handleToggleSnap (state) {
 
 function handleAddPoint (state, payload) {
     const path = state.paths[state.pathIdx].asMutable()
-    path.splice(payload.index, 0, { x: payload.x, y: payload.y })
+    path.splice(payload.index, 0, {
+        x: payload.x,
+        y: payload.y,
+        id: _.uniqueId('point'),
+    })
     return state.setIn(['paths', state.pathIdx], path)
 }
 
@@ -67,35 +67,49 @@ function handleRemovePoint (state, payload) {
 function handleUpdatePoint (state, payload) {
     const path = _.get(state.paths, state.pathIdx)
     const point = _.get(path, payload.index).asMutable()
+    const {
+        index,
+        x,
+        y,
+        left,
+        right,
+        controlLeft,
+        controlRight,
+    } = payload
 
-    const controlLeft = _.find(path, p => p.isControl && p.left === point)
-    const controlRight = _.find(path, p => p.isControl && p.right === point)
+    _.extend(point, { x, y })
 
-    _.extend(point, { x: payload.x, y: payload.y })
+    state = state.setIn(['paths', state.pathIdx, index], point)
 
     if (point.isControl) {
-        return handleSetCurve([point.left, point, point.right], state)
-    } else if (controlLeft) {
-        console.log('controlLEft')
-        return handleSetCurve([point, controlLeft, controlLeft.right], state, {
-            updateSelected: false,
-        })
-    } else if (controlRight) {
-        return handleSetCurve([controlRight.left, controlRight, point], state, {
-            updateSelected: false,
-        })
+        state = setCurve([left, point, right], state)
+    } else if (controlRight || controlLeft) {
+        if (controlRight) {
+            state = setCurve([
+                utils.getPoint(path, controlRight.left),
+                controlRight,
+                point,
+            ], state, {
+                updateSelected: false,
+            })
+        }
+        if (controlLeft) {
+            state = setCurve([
+                point,
+                controlLeft,
+                utils.getPoint(path, controlLeft.right),
+            ], state, {
+                updateSelected: false,
+            })
+        }
     }
 
-    return state.setIn(['paths', state.pathIdx, payload.index], point)
+    return state
 }
 
 function handleChangePath (state, payload) {
-    const height = utils.getHeight(state)
-    const width = utils.getWidth(state)
     const path = state.paths[payload.index].asMutable()
-    if (!path.length) {
-        path.push({ x: 0, y: height }, { x: width, y: height })
-    }
+    if (!path.length) initPath(path, state)
     return state
         .set('pathIdx', payload.index)
         .setIn(['paths', payload.index], path)
@@ -121,7 +135,20 @@ function handleChangeType (state, payload) {
     }
 }
 
-function handleSetCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
+function handleSetBezier (state) {
+    const { paths, pathIdx, selectedIdx } = state
+    const path = paths[pathIdx]
+    const p0 = path[selectedIdx - 1]
+    const p1 = path[selectedIdx]
+    const p2 = path[selectedIdx + 1]
+    return setCurve([p0, p1, p2], state)
+}
+
+function handleSetDefault (state) {
+    return state
+}
+
+function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
     const { paths, pathIdx, selectedIdx } = state
     const height = utils.getHeight(state)
     const path = paths[pathIdx].asMutable()
@@ -134,8 +161,8 @@ function handleSetCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
 
     _.extend(mid, {
         isControl: true,
-        left: p0,
-        right: p2,
+        left: p0.id,
+        right: p2.id,
     })
 
     innerCurve.map(p => {
@@ -148,8 +175,8 @@ function handleSetCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
     })
 
     if (p1.isControl) {
-        const leftIdx = path.indexOf(p0)
-        const rightIdx = path.indexOf(p2)
+        const leftIdx = _.findIndex(path, p => p.id === p0.id)
+        const rightIdx = _.findIndex(path, p => p.id === p2.id)
         path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...innerCurve)
     } else {
         path.splice(i, 1, ...innerCurve)
@@ -162,15 +189,12 @@ function handleSetCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
     return state.setIn(['paths', pathIdx], path)
 }
 
-function handleSetBezier (state) {
-    const { paths, pathIdx, selectedIdx } = state
-    const path = paths[pathIdx]
-    const p0 = path[selectedIdx - 1]
-    const p1 = path[selectedIdx]
-    const p2 = path[selectedIdx + 1]
-    return handleSetCurve([p0, p1, p2], state)
-}
+function initPath (path, state) {
+    const height = utils.getHeight(state)
+    const width = utils.getWidth(state)
 
-function handleSetDefault (state) {
-    return state
+    path.push(
+        { x: 0, y: height, id: _.uniqueId('point') },
+        { x: width, y: height, id: _.uniqueId('point') }
+    )
 }
