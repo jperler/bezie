@@ -14,7 +14,7 @@ import * as utils from '../utils'
 import * as bezier from '../utils/bezier'
 
 const initialState = Immutable({
-    snap: false,
+    snap: true,
     bars: 4,
     zoom: { x: 1, y: 2 },
     interval: { x: 8, y: 10 },
