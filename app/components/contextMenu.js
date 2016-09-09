@@ -38,12 +38,24 @@ class ContextMenu extends Component {
             <div className={styles.menu}>
                 <DropdownButton
                     bsSize="xsmall"
-                    title="Default"
+                    title={selected.isControl ? 'Bezier' : 'Default'}
                     id="contextMenu"
                     onSelect={::this.onTypeSelect}
                 >
-                    <MenuItem bsSize="xsmall" eventKey="default">Default</MenuItem>
-                    <MenuItem bsSize="xsmall" eventKey="bezier">Bezier</MenuItem>
+                    <MenuItem
+                        bsSize="xsmall"
+                        disabled={!selected.isControl}
+                        eventKey="default"
+                    >
+                        Default
+                    </MenuItem>
+                    <MenuItem
+                        bsSize="xsmall"
+                        disabled={selected.isControl}
+                        eventKey="bezier"
+                    >
+                        Bezier
+                    </MenuItem>
                 </DropdownButton>
                 <span className="push-left-small monospace noselect">
                     {`[${formatted.x}, ${formatted.y}]`}

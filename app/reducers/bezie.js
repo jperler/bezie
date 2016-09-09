@@ -141,11 +141,35 @@ function handleSetBezier (state) {
     const p0 = path[selectedIdx - 1]
     const p1 = path[selectedIdx]
     const p2 = path[selectedIdx + 1]
+
     return setCurve([p0, p1, p2], state)
 }
 
 function handleSetDefault (state) {
+    const { paths, pathIdx, selectedIdx } = state
+    const path = paths[pathIdx].asMutable()
+    const point = path[selectedIdx]
+    const leftIdx = _.findIndex(path, p => p.id === point.left)
+    const rightIdx = _.findIndex(path, p => p.id === point.right)
+    const toRemove = []
+
+    for (let i = leftIdx; i < rightIdx; i++) {
+        if (path[i].isCurve) toRemove.push(i)
+    }
+
+    _.pullAt(path, toRemove)
+
+    const nextIdx = _.findIndex(path, p => p.id === point.id)
+    const nextPoint = point.merge({
+        isControl: false,
+        left: undefined,
+        right: undefined,
+    })
+
     return state
+        .set('selectedIdx', nextIdx)
+        .setIn(['paths', pathIdx], path)
+        .setIn(['paths', pathIdx, nextIdx], nextPoint)
 }
 
 function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
@@ -163,6 +187,7 @@ function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
         isControl: true,
         left: p0.id,
         right: p2.id,
+        id: _.uniqueId('point'),
     })
 
     innerCurve.map(p => {
