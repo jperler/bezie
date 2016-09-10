@@ -50,7 +50,6 @@ class Automator extends Component {
     onDoubleClickPoint (i) {
         this.setState({ draggedIdx: null })
         this.props.removePoint({ index: i })
-        this.props.changeSelected({ index: null })
     }
 
     onMouseUp () {
@@ -113,7 +112,7 @@ class Automator extends Component {
     }
 
     onMouseDownRect () {
-        const { paths, pathIdx, addPoint, changeSelected } = this.props
+        const { paths, pathIdx, addPoint } = this.props
         const [x, y] = d3.mouse(this.rect)
         const path = paths[pathIdx]
         const index = utils.getInsertIndex(path, x)
@@ -128,9 +127,8 @@ class Automator extends Component {
 
         if (inBounds) return undefined
 
-        addPoint({ index, x, y })
-        changeSelected({ index })
         this.setState({ draggedIdx: index })
+        addPoint({ index, x, y })
     }
 
     render () {

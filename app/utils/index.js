@@ -26,3 +26,6 @@ export const normalizePoint = ({ point, height, zoom }) => ({
 })
 
 export const getPoint = (path, id) => _.find(path, p => p.id === id)
+export const isEndpoint = (path, point) => (
+    !!path.find(p => _.includes([p.left, p.right], point.id))
+)

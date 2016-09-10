@@ -55,13 +55,28 @@ function handleAddPoint (state, payload) {
         y: payload.y,
         id: _.uniqueId('point'),
     })
-    return state.setIn(['paths', state.pathIdx], path)
+    return state
+        .set('selectedIdx', payload.index)
+        .setIn(['paths', state.pathIdx], path)
 }
 
 function handleRemovePoint (state, payload) {
     const path = state.paths[state.pathIdx].asMutable()
-    path.splice(payload.index, 1)
-    return state.setIn(['paths', state.pathIdx], path)
+    const point = path[payload.index]
+
+    if (utils.isEndpoint(path, point)) return state
+
+    if (point.isControl) {
+        const leftIdx = _.findIndex(path, p => p.id === point.left)
+        const rightIdx = _.findIndex(path, p => p.id === point.right)
+        path.splice(leftIdx + 1, rightIdx - leftIdx - 1)
+    } else {
+        path.splice(payload.index, 1)
+    }
+
+    return state
+        .set('selectedIdx', null)
+        .setIn(['paths', state.pathIdx], path)
 }
 
 function handleUpdatePoint (state, payload) {
@@ -145,31 +160,24 @@ function handleSetBezier (state) {
     return setCurve([p0, p1, p2], state)
 }
 
+
 function handleSetDefault (state) {
     const { paths, pathIdx, selectedIdx } = state
     const path = paths[pathIdx].asMutable()
     const point = path[selectedIdx]
     const leftIdx = _.findIndex(path, p => p.id === point.left)
     const rightIdx = _.findIndex(path, p => p.id === point.right)
-    const toRemove = []
-
-    for (let i = leftIdx; i < rightIdx; i++) {
-        if (path[i].isCurve) toRemove.push(i)
-    }
-
-    _.pullAt(path, toRemove)
-
-    const nextIdx = _.findIndex(path, p => p.id === point.id)
     const nextPoint = point.merge({
         isControl: false,
-        left: undefined,
-        right: undefined,
+        left: null,
+        right: null,
     })
 
+    path.splice(leftIdx + 1, rightIdx - leftIdx - 1, nextPoint)
+
     return state
-        .set('selectedIdx', nextIdx)
+        .set('selectedIdx', leftIdx + 1)
         .setIn(['paths', pathIdx], path)
-        .setIn(['paths', pathIdx, nextIdx], nextPoint)
 }
 
 function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
