@@ -48,7 +48,7 @@ class Bezie extends Component {
                     <div className="pull-right">
                         <ButtonToolbar>
                             <Button className="active" bsSize="small">Grid</Button>
-                            <Button className="active" bsSize="small">Snap</Button>
+                            <Button onClick={this.props.toggleSnap} className={this.props.snap ? 'active' : ''} bsSize="small">Snap</Button>
                             <Button bsSize="small">Triplet</Button>
                             <Button bsSize="small"><i className="fa fa-minus" /></Button>
                             <Button bsSize="small"><i className="fa fa-plus" /></Button>
