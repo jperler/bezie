@@ -20,7 +20,7 @@ const initialState = Immutable({
     interval: { x: 8, y: 10 },
     pathIdx: 0,
     selectedIdx: null,
-    paths: _.fill(Array(6), []),
+    paths: _.fill(Array(7), []),
 })
 
 export default function bezie (state = initialState, action) {

@@ -34,7 +34,7 @@ circle,
 }
 
 circle.selected {
-    stroke: #00FF00;
+    fill-opacity: 1;
 }
 
 .line {

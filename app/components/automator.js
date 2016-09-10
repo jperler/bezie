@@ -178,7 +178,7 @@ class Automator extends Component {
                 d={line(path)}
                 key={`path-${i}`}
                 stroke={colors[i]}
-                strokeOpacity={i === pathIdx ? 1 : 0.2}
+                strokeOpacity={i === pathIdx ? 1 : 0.3}
                 fill={i === pathIdx ? colors[i] : 'none'}
             />
         ))

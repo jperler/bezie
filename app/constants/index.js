@@ -2,12 +2,13 @@ export const CONTROL_MAX = 127
 export const PPQ = 96
 
 export const colors = [
-    '#FF0000',
+    '#FD1C03',
     '#FF6600',
     '#FFFF00',
     '#00FF00',
     '#00FFFF',
-    '#FF00FF',
+    '#0062FF',
+    '#CC00FF',
 ]
 
 export const labels = [
@@ -17,4 +18,5 @@ export const labels = [
     '4 - Foot Pedal',
     '5 - Portamento Time',
     '6 - Data Entry',
+    '7 - Volume',
 ]

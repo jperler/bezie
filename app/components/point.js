@@ -40,6 +40,7 @@ class Point extends Component {
                 cx={x}
                 cy={y}
                 stroke={color}
+                fill={color}
             />
         )
     }
