@@ -64,12 +64,10 @@ class Bezie extends Component {
                                 <i className="fa fa-plus" />
                             </Button>
                             <span
-                                className="pull-left monospace noselect"
+                                className="pull-left monospace push-left noselect"
                                 style={{
                                     fontFamily: 'monospace',
                                     lineHeight: '30px',
-                                    width: 50,
-                                    textAlign: 'right',
                                 }}
                             >
                                 1/{this.props.interval.x}
