@@ -6,6 +6,7 @@ import * as utils from '../utils'
 function mapStateToProps (state) {
     return {
         snap: state.bezie.snap,
+        triplet: state.bezie.triplet,
         bars: state.bezie.bars,
         zoom: state.bezie.zoom,
         interval: state.bezie.interval,

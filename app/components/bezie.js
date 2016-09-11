@@ -48,16 +48,16 @@ class Bezie extends Component {
                     <div className="pull-right">
                         <ButtonToolbar>
                             <Button onClick={this.props.toggleSnap} className={this.props.snap ? 'active' : ''} bsSize="small">Snap</Button>
-                            <Button bsSize="small">Triplet</Button>
+                            <Button onClick={this.props.toggleTriplet} className={this.props.triplet ? 'active' : ''} bsSize="small">Triplet</Button>
                             <Button
-                                disabled={this.props.interval.x === 1}
+                                disabled={this.props.triplet ? this.props.interval.x === 1.5 : this.props.interval.x === 1}
                                 bsSize="small"
                                 onClick={this.props.decreaseXInterval}
                             >
                                 <i className="fa fa-minus" />
                             </Button>
                             <Button
-                                disabled={this.props.interval.x === 128}
+                                disabled={this.props.triplet ? this.props.interval.x === 192 : this.props.interval.x === 128}
                                 bsSize="small"
                                 onClick={this.props.increaseXInterval}
                             >
@@ -70,7 +70,7 @@ class Bezie extends Component {
                                     lineHeight: '30px',
                                 }}
                             >
-                                1/{this.props.interval.x}
+                                1/{this.props.triplet ? this.props.interval.x / 1.5 : this.props.interval.x}{this.props.triplet && 'T'}
                             </span>
                         </ButtonToolbar>
                     </div>

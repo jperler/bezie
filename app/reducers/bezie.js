@@ -2,6 +2,7 @@ import Immutable from 'seamless-immutable'
 import _ from 'lodash'
 import {
     TOGGLE_SNAP,
+    TOGGLE_TRIPLET,
     ADD_POINT,
     REMOVE_POINT,
     UPDATE_POINT,
@@ -18,6 +19,7 @@ import * as bezier from '../utils/bezier'
 const initialState = Immutable({
     snap: true,
     bars: 4,
+    triplet: false,
     zoom: { x: 1, y: 2 },
     interval: { x: 8, y: 10 },
     pathIdx: 0,
@@ -35,6 +37,7 @@ export default function bezie (state = initialState, action) {
     }
     switch (action.type) {
         case TOGGLE_SNAP: return handleToggleSnap(state)
+        case TOGGLE_TRIPLET: return handleToggleTriplet(state)
         case ADD_POINT: return handleAddPoint(state, payload)
         case REMOVE_POINT: return handleRemovePoint(state, payload)
         case UPDATE_POINT: return handleUpdatePoint(state, payload)
@@ -190,6 +193,15 @@ function handleIncreaseXInterval (state) {
 
 function handleDecreaseXInterval (state) {
     return state.setIn(['interval', 'x'], state.interval.x / 2)
+}
+
+function handleToggleTriplet (state) {
+    const { triplet, interval } = state
+    const nextInterval = triplet ? interval.x / 1.5 : interval.x * 1.5
+
+    return state
+        .set('triplet', !triplet)
+        .setIn(['interval', 'x'], nextInterval)
 }
 
 function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {

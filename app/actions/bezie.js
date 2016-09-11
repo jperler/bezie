@@ -1,4 +1,5 @@
 export const TOGGLE_SNAP = 'TOGGLE_SNAP'
+export const TOGGLE_TRIPLET= 'TOGGLE_TRIPLET'
 export const ADD_POINT = 'ADD_POINT'
 export const REMOVE_POINT = 'REMOVE_POINT'
 export const UPDATE_POINT = 'UPDATE_POINT'
@@ -12,6 +13,12 @@ export const DECREASE_X_INTERVAL = 'DECREASE_X_INTERVAL'
 export function toggleSnap () {
     return {
         type: TOGGLE_SNAP,
+    }
+}
+
+export function toggleTriplet () {
+    return {
+        type: TOGGLE_TRIPLET,
     }
 }
 
