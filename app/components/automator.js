@@ -172,16 +172,28 @@ class Automator extends Component {
                 />
         ))
 
-        elements.paths = paths.map((path, i) => (
+        elements.paths = paths.map((path, i) => {
+            if (i === pathIdx) return undefined
+            return (
+                <path
+                    className="line"
+                    d={line(path)}
+                    key={`path-${i}`}
+                    stroke={colors[i]}
+                    strokeOpacity={0.3}
+                    fill={'none'}
+                />
+            )
+        }).concat([
             <path
                 className="line"
-                d={line(path)}
-                key={`path-${i}`}
-                stroke={colors[i]}
-                strokeOpacity={i === pathIdx ? 1 : 0.3}
-                fill={i === pathIdx ? colors[i] : 'none'}
+                d={line(paths[pathIdx])}
+                key={`path-${pathIdx}`}
+                stroke={colors[pathIdx]}
+                strokeOpacity={1}
+                fill={colors[pathIdx]}
             />
-        ))
+        ])
 
         elements.bars = _.range(bars).map(i => (
             <Bar

@@ -20,6 +20,7 @@ class ContextMenu extends Component {
     render () {
         const { selectedIdx, pathIdx, paths, zoom, height } = this.props
         const selected = _.get(paths, [pathIdx, selectedIdx])
+        const path = paths[pathIdx]
 
         if (!selected) return <span />
 
@@ -34,6 +35,8 @@ class ContextMenu extends Component {
             y: utils.numberFormat(normalized.y),
         }
 
+        const isEndpoint = utils.isEndpoint(path, selected)
+
         return (
             <div className={styles.menu}>
                 <DropdownButton
@@ -44,14 +47,14 @@ class ContextMenu extends Component {
                 >
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={!selected.isControl}
+                        disabled={!selected.isControl || isEndpoint}
                         eventKey="default"
                     >
                         Default
                     </MenuItem>
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={selected.isControl}
+                        disabled={selected.isControl || isEndpoint}
                         eventKey="bezier"
                     >
                         Bezier
