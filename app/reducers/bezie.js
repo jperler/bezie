@@ -9,6 +9,8 @@ import {
     CHANGE_SELECTED,
     CHANGE_TYPE,
     RESET_PATH,
+    INCREASE_X_INTERVAL,
+    DECREASE_X_INTERVAL,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as bezier from '../utils/bezier'
@@ -40,6 +42,8 @@ export default function bezie (state = initialState, action) {
         case CHANGE_SELECTED: return handleChangeSelected(state, payload)
         case CHANGE_TYPE: return handleChangeType(state, payload)
         case RESET_PATH: return handleResetPath(state)
+        case INCREASE_X_INTERVAL: return handleIncreaseXInterval(state)
+        case DECREASE_X_INTERVAL: return handleDecreaseXInterval(state)
         default: return state
     }
 }
@@ -178,6 +182,14 @@ function handleSetDefault (state) {
     return state
         .set('selectedIdx', leftIdx + 1)
         .setIn(['paths', pathIdx], path)
+}
+
+function handleIncreaseXInterval (state) {
+    return state.setIn(['interval', 'x'], state.interval.x * 2)
+}
+
+function handleDecreaseXInterval (state) {
+    return state.setIn(['interval', 'x'], state.interval.x / 2)
 }
 
 function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {

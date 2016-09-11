@@ -49,13 +49,30 @@ class Bezie extends Component {
                         <ButtonToolbar>
                             <Button onClick={this.props.toggleSnap} className={this.props.snap ? 'active' : ''} bsSize="small">Snap</Button>
                             <Button bsSize="small">Triplet</Button>
-                            <Button bsSize="small"><i className="fa fa-minus" /></Button>
-                            <Button bsSize="small"><i className="fa fa-plus" /></Button>
-                            <span
-                                className="pull-left monospace push-left noselect"
-                                style={{ fontFamily: 'monospace', lineHeight: '30px' }}
+                            <Button
+                                disabled={this.props.interval.x === 1}
+                                bsSize="small"
+                                onClick={this.props.decreaseXInterval}
                             >
-                                1/8
+                                <i className="fa fa-minus" />
+                            </Button>
+                            <Button
+                                disabled={this.props.interval.x === 128}
+                                bsSize="small"
+                                onClick={this.props.increaseXInterval}
+                            >
+                                <i className="fa fa-plus" />
+                            </Button>
+                            <span
+                                className="pull-left monospace noselect"
+                                style={{
+                                    fontFamily: 'monospace',
+                                    lineHeight: '30px',
+                                    width: 50,
+                                    textAlign: 'right',
+                                }}
+                            >
+                                1/{this.props.interval.x}
                             </span>
                         </ButtonToolbar>
                     </div>

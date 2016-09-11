@@ -6,6 +6,8 @@ export const CHANGE_PATH = 'CHANGE_PATH'
 export const CHANGE_SELECTED = 'CHANGE_SELECTED'
 export const CHANGE_TYPE = 'CHANGE_TYPE'
 export const RESET_PATH = 'RESET_PATH'
+export const INCREASE_X_INTERVAL = 'INCREASE_X_INTERVAL'
+export const DECREASE_X_INTERVAL = 'DECREASE_X_INTERVAL'
 
 export function toggleSnap () {
     return {
@@ -61,4 +63,12 @@ export function resetPath () {
         type: RESET_PATH,
         payload: {},
     }
+}
+
+export function increaseXInterval () {
+    return { type: INCREASE_X_INTERVAL, payload: {} }
+}
+
+export function decreaseXInterval () {
+    return { type: DECREASE_X_INTERVAL, payload: {} }
 }
