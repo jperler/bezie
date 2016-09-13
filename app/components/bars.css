@@ -1,0 +1,9 @@
+.even {
+    fill: #888;
+    fill-opacity: .8;
+}
+
+.odd {
+    fill: #222;
+    fill-opacity: .8;
+}

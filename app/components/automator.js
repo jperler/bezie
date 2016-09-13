@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import styles from './automator.css'
 import * as utils from '../utils'
 import * as Axis from './axis'
-import Bar from './bar'
+import Bars from './bars'
 import Point from './point'
 import { colors } from '../constants'
 
@@ -195,16 +195,6 @@ class Automator extends Component {
             />
         ])
 
-        elements.bars = _.range(bars).map(i => (
-            <Bar
-                width={width}
-                height={height}
-                bars={bars}
-                index={i}
-                key={`bar-${i}`}
-            />
-        ))
-
         return (
             <div className={classes}>
                 <svg
@@ -213,7 +203,7 @@ class Automator extends Component {
                     height={height + margin.top + margin.bottom}
                 >
                     <g transform={`translate(${margin.left}, ${margin.top})`}>
-                        {elements.bars}
+                        <Bars width={width} height={height} bars={bars} />
                         <Axis.X {...this.props} />
                         <Axis.Y {...this.props} />
                         <rect height={height} width={width} ref={ref => this.rect = ref} />

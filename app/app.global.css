@@ -51,17 +51,6 @@ circle.curve {
     fill-opacity: 1;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    shape-rendering: crispEdges;
-}
-
-.axis path.domain,
-.axis text {
-    display: none;
-}
-
 .push-right-small { margin-right: 5px; }
 .push-right { margin-right: 10px; }
 .push-left-small { margin-left: 5px; }
