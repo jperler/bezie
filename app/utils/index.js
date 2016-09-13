@@ -5,11 +5,15 @@ export const rangeInclusive = (start, end, skip) => _.range(start, end + skip, s
 export const inRangeInclusive = (n, start, end) => _.inRange(n, start, end + 1)
 export const takeInner = arr => arr.slice(1, arr.length - 1)
 export const getEnum = arr => _.zipObject(arr, arr)
-export const factorial = _.memoize(n => (_.includes([0, 1], n) ? 1 : n * factorial(n - 1)))
-export const binomial = (n, i) => (i === 0 ? 1 : factorial(n) / (factorial(i) * factorial(n - i)))
 export const getHeight = ({ zoom }) => CONTROL_MAX * zoom.y
 export const getWidth = ({ bars, zoom }) => PPQ * 4 * bars * zoom.x
 export const numberFormat = (n) => Math.round(n * 100) / 100
+export const binomial = (n, k) => {
+    let coeff = 1
+    for (let i = n - k + 1; i <= n; i++) coeff *= i
+    for (let i = 1; i <= k; i++) coeff /= i
+    return coeff
+}
 
 export const getInsertIndex = (points, x) => (
     _.indexOf(points, _.last(_.filter(points, point => x > point.x))) + 1
