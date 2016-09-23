@@ -10,6 +10,8 @@ import {
     CHANGE_SELECTED,
     CHANGE_TYPE,
     RESET_PATH,
+    REVERSE_PATH,
+    INVERT_PATH,
     INCREASE_X_INTERVAL,
     DECREASE_X_INTERVAL,
 } from '../actions/bezie'
@@ -45,6 +47,8 @@ export default function bezie (state = initialState, action) {
         case CHANGE_SELECTED: return handleChangeSelected(state, payload)
         case CHANGE_TYPE: return handleChangeType(state, payload)
         case RESET_PATH: return handleResetPath(state)
+        case REVERSE_PATH: return handleReversePath(state)
+        case INVERT_PATH: return handleInvertPath(state)
         case INCREASE_X_INTERVAL: return handleIncreaseXInterval(state)
         case DECREASE_X_INTERVAL: return handleDecreaseXInterval(state)
         default: return state
@@ -138,12 +142,39 @@ function handleChangePath (state, payload) {
 }
 
 function handleResetPath (state) {
-    const height = utils.getHeight(state)
+    const path = []
+
+    initPath(path, state)
+
+    return state
+        .set('selectedIdx', null)
+        .setIn(['paths', state.pathIdx], path)
+}
+
+function handleReversePath (state) {
     const width = utils.getWidth(state)
-    return state.setIn(['paths', state.pathIdx], [
-        { x: 0, y: height },
-        { x: width, y: height },
-    ])
+    const path = state.paths[state.pathIdx].asMutable()
+    const nextPath = path.reverse().map(point => (
+        point.merge({
+            x: width - point.x,
+            left: point.right,
+            right: point.left,
+        })
+    ))
+
+    return state
+        .set('selectedIdx', path.length - state.selectedIdx - 1)
+        .setIn(['paths', state.pathIdx], nextPath)
+}
+
+function handleInvertPath (state) {
+    const height = utils.getHeight(state)
+    const path = state.paths[state.pathIdx]
+    const nextPath = path.map(point => (
+        point.set('y', height - point.y)
+    ))
+
+    return state.setIn(['paths', state.pathIdx], nextPath)
 }
 
 function handleChangeSelected (state, payload) {

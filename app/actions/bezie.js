@@ -1,5 +1,5 @@
 export const TOGGLE_SNAP = 'TOGGLE_SNAP'
-export const TOGGLE_TRIPLET= 'TOGGLE_TRIPLET'
+export const TOGGLE_TRIPLET = 'TOGGLE_TRIPLET'
 export const ADD_POINT = 'ADD_POINT'
 export const REMOVE_POINT = 'REMOVE_POINT'
 export const UPDATE_POINT = 'UPDATE_POINT'
@@ -7,6 +7,8 @@ export const CHANGE_PATH = 'CHANGE_PATH'
 export const CHANGE_SELECTED = 'CHANGE_SELECTED'
 export const CHANGE_TYPE = 'CHANGE_TYPE'
 export const RESET_PATH = 'RESET_PATH'
+export const REVERSE_PATH = 'REVERSE_PATH'
+export const INVERT_PATH = 'INVERT_PATH'
 export const INCREASE_X_INTERVAL = 'INCREASE_X_INTERVAL'
 export const DECREASE_X_INTERVAL = 'DECREASE_X_INTERVAL'
 
@@ -66,10 +68,15 @@ export function changeType ({ type }) {
 }
 
 export function resetPath () {
-    return {
-        type: RESET_PATH,
-        payload: {},
-    }
+    return { type: RESET_PATH }
+}
+
+export function reversePath () {
+    return { type: REVERSE_PATH }
+}
+
+export function invertPath () {
+    return { type: INVERT_PATH }
 }
 
 export function increaseXInterval () {

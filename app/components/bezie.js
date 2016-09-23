@@ -9,6 +9,8 @@ import * as io from '../utils/io'
 class Bezie extends Component {
     static propTypes = {
         resetPath: PropTypes.func.isRequired,
+        reversePath: PropTypes.func.isRequired,
+        invertPath: PropTypes.func.isRequired,
         changeSelected: PropTypes.func.isRequired,
     }
 
@@ -24,8 +26,15 @@ class Bezie extends Component {
     onOpenFile (filename) {} // eslint-disable-line no-unused-vars
 
     onResetClick () {
-        this.props.changeSelected({ index: null })
         this.props.resetPath()
+    }
+
+    onReverseClick () {
+        this.props.reversePath()
+    }
+
+    onInverseClick () {
+        this.props.invertPath()
     }
 
     render () {
@@ -35,8 +44,8 @@ class Bezie extends Component {
                     <ButtonToolbar>
                         <PathSelector {...this.props} />
                         <Button bsSize="small" onClick={::this.onResetClick}>Reset</Button>
-                        <Button bsSize="small">Reverse</Button>
-                        <Button bsSize="small">Inverse</Button>
+                        <Button bsSize="small" onClick={::this.onReverseClick}>Reverse</Button>
+                        <Button bsSize="small" onClick={::this.onInverseClick}>Inverse</Button>
                         <ContextMenu {...this.props} />
                     </ButtonToolbar>
                 </div>
