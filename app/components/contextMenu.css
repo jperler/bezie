@@ -1,5 +1,4 @@
 .menu {
-    min-width: 200px;
     border-radius: 5px;
     font-size: 12px;
     float: left;
@@ -10,5 +9,9 @@
     padding: 4px 5px 0 5px;
 }
 
-.menu a { color: #444; }
+.menu a {
+    color: #444;
+    -webkit-user-select: none;
+}
+
 .menu a:hover { color: #666; }

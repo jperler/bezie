@@ -19,9 +19,7 @@ class ContextMenu extends Component {
     }
 
     onRemovePointClick () {
-        this.props.removePoint({
-            index: this.props.selectedIdx,
-        })
+        this.props.removePoint({ index: this.props.selectedIdx })
     }
 
     render () {
@@ -67,18 +65,18 @@ class ContextMenu extends Component {
                         Bezier
                     </MenuItem>
                 </DropdownButton>
-                <span className="push-left-small monospace noselect">
-                    {`[${formatted.x}, ${formatted.y}]`}
-                </span>
                 {!isEndpoint &&
                     <a
                         href="javascript:void(0)"
-                        className="pull-right push-left"
+                        className="push-left"
                         onClick={::this.onRemovePointClick}
                     >
-                        <i className="fa fa-close" />
+                        Remove
                     </a>
                 }
+                <span className="push-left monospace noselect">
+                    {`[${formatted.x}, ${formatted.y}]`}
+                </span>
             </div>
         )
     }
