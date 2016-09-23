@@ -11,10 +11,17 @@ class ContextMenu extends Component {
         height: PropTypes.number.isRequired,
         paths: PropTypes.array.isRequired,
         changeType: PropTypes.func.isRequired,
+        removePoint: PropTypes.func.isRequired,
     }
 
     onTypeSelect (type) {
         this.props.changeType({ type })
+    }
+
+    onRemovePointClick () {
+        this.props.removePoint({
+            index: this.props.selectedIdx,
+        })
     }
 
     render () {
@@ -63,9 +70,15 @@ class ContextMenu extends Component {
                 <span className="push-left-small monospace noselect">
                     {`[${formatted.x}, ${formatted.y}]`}
                 </span>
-                <a href="javascript:void(0)" className="pull-right push-left">
-                    <i className="fa fa-close" />
-                </a>
+                {!isEndpoint &&
+                    <a
+                        href="javascript:void(0)"
+                        className="pull-right push-left"
+                        onClick={::this.onRemovePointClick}
+                    >
+                        <i className="fa fa-close" />
+                    </a>
+                }
             </div>
         )
     }
