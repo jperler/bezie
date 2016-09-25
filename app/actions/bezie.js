@@ -12,77 +12,19 @@ export const INVERT_PATH = 'INVERT_PATH'
 export const INCREASE_X_INTERVAL = 'INCREASE_X_INTERVAL'
 export const DECREASE_X_INTERVAL = 'DECREASE_X_INTERVAL'
 
-export function toggleSnap () {
-    return {
-        type: TOGGLE_SNAP,
-    }
-}
-
-export function toggleTriplet () {
-    return {
-        type: TOGGLE_TRIPLET,
-    }
-}
-
-export function addPoint ({ index, x, y }) {
-    return {
-        type: ADD_POINT,
-        payload: { index, x, y },
-    }
-}
-
-export function removePoint ({ index }) {
-    return {
-        type: REMOVE_POINT,
-        payload: { index },
-    }
-}
-
-export function updatePoint (options) {
-    const { index, x, y, controlLeft, controlRight, left, right } = options
-    return {
-        type: UPDATE_POINT,
-        payload: { index, x, y, controlLeft, controlRight, left, right },
-    }
-}
-
-export function changePath ({ index }) {
-    return {
-        type: CHANGE_PATH,
-        payload: { index },
-    }
-}
-
-export function changeSelected ({ index }) {
-    return {
-        type: CHANGE_SELECTED,
-        payload: { index },
-    }
-}
-
-export function changeType ({ type }) {
-    return {
-        type: CHANGE_TYPE,
-        payload: { type },
-    }
-}
-
-export function resetPath () {
-    return { type: RESET_PATH }
-}
-
-export function reversePath () {
-    return { type: REVERSE_PATH }
-}
-
-export function invertPath () {
-    return { type: INVERT_PATH }
-}
-
-export function increaseXInterval () {
-    return { type: INCREASE_X_INTERVAL, payload: {} }
-}
-
-export function decreaseXInterval () {
-    return { type: DECREASE_X_INTERVAL, payload: {} }
-}
+export const addPoint = ({ index, x, y }) => ({ type: ADD_POINT, payload: { index, x, y } })
+export const removePoint = ({ index }) => ({ type: REMOVE_POINT, payload: { index } })
+export const changePath = ({ index }) => ({ type: CHANGE_PATH, payload: { index } })
+export const changeSelected = ({ index }) => ({ type: CHANGE_SELECTED, payload: { index } })
+export const changeType = ({ type }) => ({ type: CHANGE_TYPE, payload: { type } })
+export const toggleSnap = () => ({ type: TOGGLE_SNAP })
+export const toggleTriplet = () => ({ type: TOGGLE_TRIPLET })
+export const resetPath = () => ({ type: RESET_PATH })
+export const reversePath = () => ({ type: REVERSE_PATH })
+export const invertPath = () => ({ type: INVERT_PATH })
+export const increaseXInterval = () => ({ type: INCREASE_X_INTERVAL })
+export const decreaseXInterval = () => ({ type: DECREASE_X_INTERVAL })
+export const updatePoint = ({ index, x, y, controlLeft, controlRight, left, right }) => ({
+    type: UPDATE_POINT,
+    payload: { index, x, y, controlLeft, controlRight, left, right },
+})
