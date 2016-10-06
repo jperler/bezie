@@ -108,7 +108,23 @@ function handleUpdatePoint (state, payload) {
     state = state.setIn(['paths', state.pathIdx, index], point)
 
     if (point.isControl) {
-        state = setCurve([left, point, right], state)
+        if (utils.getPoint(path, point.left).isControl) {
+            // Dragging right control
+            state = setCurve([
+                utils.getPoint(path, left.left),
+                utils.getPoint(path, point.left),
+                point,
+                right,
+            ], state, { index: 2 })
+        } else if (utils.getPoint(path, point.right).isControl) {
+            // Dragging left control
+            state = setCurve([
+                left,
+                point,
+                utils.getPoint(path, point.right),
+                utils.getPoint(path, right.right),
+            ], state, { index: 1 })
+        }
     } else if (controlRight || controlLeft) {
         if (controlRight) {
             state = setCurve([
@@ -195,7 +211,7 @@ function handleSetBezier (state) {
     const p1 = path[selectedIdx]
     const p2 = path[selectedIdx + 1]
 
-    return setCurve([p0, p1, p2], state)
+    return setCurve([p0, p1, p1, p2], state)
 }
 
 
@@ -235,42 +251,96 @@ function handleToggleTriplet (state) {
         .setIn(['interval', 'x'], nextInterval)
 }
 
-function setCurve ([p0, p1, p2], state, { updateSelected = true } = {}) {
+function setCurve ([p0, p1, p2, p3], state, options = {}) {
     const { paths, pathIdx, selectedIdx } = state
     const height = utils.getHeight(state)
     const path = paths[pathIdx].asMutable()
     const i = selectedIdx
-    const control = bezier.getControl(p0, p1, p2)
-    const curve = bezier.getPoints([p0, control, p2])
+    const steps = 32
+
+    if (_.isUndefined(options.updateSelected)) options.updateSelected = true
+
+    if (p1 === p2) {
+        const a = bezier.getControl(p0, p1, p3)
+        const b = bezier.getPoints([p0, a, p3], steps)
+        const li = 1 / 4 * steps
+        const ri = 3 / 4 * steps
+
+        p1 = b[li]
+        p2 = b[ri]
+    }
+
+    const control = bezier.getCubicControlPoints(p0, p1, p2, p3)
+    const curve = bezier.getPoints([p0, control[0], control[1], p3], steps)
     const innerCurve = utils.takeInner(curve)
-    const midIdx = Math.floor(curve.length / 2)
+    const midIdx = 1 / 2 * steps
     const mid = curve[midIdx]
 
+    /*
     _.extend(mid, {
         isControl: true,
         left: p0.id,
         right: p2.id,
         id: _.uniqueId('point'),
     })
+    */
+
+    const id1 = _.uniqueId('point')
+    const id2 = _.uniqueId('point')
+
+    _.extend(curve[steps * 1 / 4], {
+        isControl: true,
+        id: id1,
+        left: p0.id,
+        right: id2,
+    })
+
+    _.extend(curve[steps * 3 / 4], {
+        isControl: true,
+        id: id2,
+        left: id1,
+        right: p3.id,
+    })
 
     innerCurve.map(p => {
-        if (p.isControl) return
-        p.isCurve = true
+        if (!p.isControl) {
+            _.extend(p, {
+                isCurve: true,
+                id: _.uniqueId('point'),
+            })
+        }
+
         if (p.y > height) p.y = height
         if (p.y < 0) p.y = 0
         if (p.x < p0.x) p.x = p0.x
-        if (p.x > p2.x) p.x = p2.x
+        if (p.x > p3.x) p.x = p3.x
     })
 
-    if (p1.isControl) {
+    // Dragging p2
+    // Ensure curve is valid
+    if (options.index === 2) {
+        for (let j = steps * 1 / 4, len = steps * 3 / 4; j <= len; j++) {
+            if (curve[j].x < curve[j - 1].x) curve[j].x = curve[j - 1].x
+        }
+    }
+
+    // Dragging p1
+    // Ensure curve is valid
+    if (options.index === 1) {
+        for (let j = steps * 3 / 4; j > 0; j--) {
+            if (curve[j].x > curve[j + 1].x) curve[j].x = curve[j + 1].x
+        }
+    }
+
+    if (p1.isControl || p2.isControl) {
         const leftIdx = _.findIndex(path, p => p.id === p0.id)
-        const rightIdx = _.findIndex(path, p => p.id === p2.id)
+        const rightIdx = _.findIndex(path, p => p.id === p3.id)
         path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...innerCurve)
     } else {
         path.splice(i, 1, ...innerCurve)
     }
 
-    if (updateSelected) {
+    if (options.updateSelected) {
         state = state.set('selectedIdx', path.indexOf(mid))
     }
 
