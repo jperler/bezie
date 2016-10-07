@@ -43,3 +43,11 @@ export function getCubicControlPoints (p0, p1, p2, p3) {
         },
     ]
 }
+
+// Returns whether or not a given set of points is valid
+export function isValid (points) {
+    for (let i = 0; i < points.length - 1; i++) {
+        if (points[i].x > points[i + 1].x) return false
+    }
+    return true
+}

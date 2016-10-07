@@ -128,21 +128,19 @@ function handleUpdatePoint (state, payload) {
     } else if (controlRight || controlLeft) {
         if (controlRight) {
             state = setCurve([
+                utils.getPoint(path, utils.getPoint(path, controlRight.left).left),
                 utils.getPoint(path, controlRight.left),
                 controlRight,
                 point,
-            ], state, {
-                updateSelected: false,
-            })
+            ], state, { updateSelected: false })
         }
         if (controlLeft) {
             state = setCurve([
                 point,
                 controlLeft,
                 utils.getPoint(path, controlLeft.right),
-            ], state, {
-                updateSelected: false,
-            })
+                utils.getPoint(path, utils.getPoint(path, controlLeft.right).right),
+            ], state, { updateSelected: false })
         }
     }
 
@@ -316,19 +314,30 @@ function setCurve ([p0, p1, p2, p3], state, options = {}) {
         if (p.x > p3.x) p.x = p3.x
     })
 
-    // Dragging p2
-    // Ensure curve is valid
-    if (options.index === 2) {
-        for (let j = steps * 1 / 4, len = steps * 3 / 4; j <= len; j++) {
-            if (curve[j].x < curve[j - 1].x) curve[j].x = curve[j - 1].x
+    const li = steps * 1 / 4 - 1
+    const ri = steps * 3 / 4 - 1
+
+    // First quadrant
+    if (!bezier.isValid(innerCurve.slice(0, li))) {
+        for (let j = 0; j < li; j++) {
+            innerCurve[j].x = curve[0].x
+            innerCurve[j].y = curve[0].y
         }
     }
 
-    // Dragging p1
-    // Ensure curve is valid
-    if (options.index === 1) {
-        for (let j = steps * 3 / 4; j > 0; j--) {
-            if (curve[j].x > curve[j + 1].x) curve[j].x = curve[j + 1].x
+    // Second quadrant
+    if (!bezier.isValid(innerCurve.slice(li, ri))) {
+        for (let j = li; j < ri; j++) {
+            innerCurve[j].x = innerCurve[li].x
+            innerCurve[j].y = innerCurve[li].y
+        }
+    }
+
+    // Third quadrant
+    if (!bezier.isValid(innerCurve.slice(ri, steps - 2))) {
+        for (let j = ri; j < steps - 1; j++) {
+            innerCurve[j].x = innerCurve[ri].x
+            innerCurve[j].y = innerCurve[ri].y
         }
     }
 
@@ -341,7 +350,13 @@ function setCurve ([p0, p1, p2, p3], state, options = {}) {
     }
 
     if (options.updateSelected) {
-        state = state.set('selectedIdx', path.indexOf(mid))
+        if (options.index === 1) {
+            state = state.set('selectedIdx', path.indexOf(curve[steps * 1 / 4]))
+        } else if (options.index === 2) {
+            state = state.set('selectedIdx', path.indexOf(curve[steps * 3 / 4]))
+        } else {
+            state = state.set('selectedIdx', path.indexOf(mid))
+        }
     }
 
     return state.setIn(['paths', pathIdx], path)
