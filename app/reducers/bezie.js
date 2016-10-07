@@ -110,7 +110,7 @@ function handleUpdatePoint (state, payload) {
     if (point.isControl) {
         if (utils.getPoint(path, point.left).isControl) {
             // Dragging right control
-            state = setCurve([
+            state = setBezier([
                 utils.getPoint(path, left.left),
                 utils.getPoint(path, point.left),
                 point,
@@ -118,7 +118,7 @@ function handleUpdatePoint (state, payload) {
             ], state, { index: 2 })
         } else if (utils.getPoint(path, point.right).isControl) {
             // Dragging left control
-            state = setCurve([
+            state = setBezier([
                 left,
                 point,
                 utils.getPoint(path, point.right),
@@ -127,7 +127,7 @@ function handleUpdatePoint (state, payload) {
         }
     } else if (controlRight || controlLeft) {
         if (controlRight) {
-            state = setCurve([
+            state = setBezier([
                 utils.getPoint(path, utils.getPoint(path, controlRight.left).left),
                 utils.getPoint(path, controlRight.left),
                 controlRight,
@@ -135,7 +135,7 @@ function handleUpdatePoint (state, payload) {
             ], state, { updateSelected: false })
         }
         if (controlLeft) {
-            state = setCurve([
+            state = setBezier([
                 point,
                 controlLeft,
                 utils.getPoint(path, controlLeft.right),
@@ -209,7 +209,7 @@ function handleSetBezier (state) {
     const p1 = path[selectedIdx]
     const p2 = path[selectedIdx + 1]
 
-    return setCurve([p0, p1, p1, p2], state)
+    return setBezier([p0, p1, p1, p2], state)
 }
 
 
@@ -249,7 +249,14 @@ function handleToggleTriplet (state) {
         .setIn(['interval', 'x'], nextInterval)
 }
 
-function setCurve ([p0, p1, p2, p3], state, options = {}) {
+function setBezier (points, state, options) {
+    if (points.length === 3) return setQuadraticBezier(points, state, options)
+    if (points.length === 4) return setCubicBezier(points, state, options)
+}
+
+function setQuadraticBezier () {}
+
+function setCubicBezier ([p0, p1, p2, p3], state, options = {}) {
     const { paths, pathIdx, selectedIdx } = state
     const height = utils.getHeight(state)
     const path = paths[pathIdx].asMutable()
