@@ -10,7 +10,8 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     const path = paths[pathIdx].asMutable()
     const i = selectedIdx
     const steps = options.steps || 32
-    const updateSelected = options.updateSelected || true
+    const updateSelected = !_.isUndefined(options.updateSelected) ?
+        options.updateSelected : true
     const li = 1 / 4 * steps
     const ri = 3 / 4 * steps
 

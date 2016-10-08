@@ -9,7 +9,8 @@ export function setBezier ([p0, p1, p2], state, options) {
     const path = paths[pathIdx].asMutable()
     const i = selectedIdx
     const steps = options.steps || 32
-    const updateSelected = options.updateSelected || true
+    const updateSelected = !_.isUndefined(options.updateSelected) ?
+        options.updateSelected : true
     const control = getControl(p0, p1, p2)
     const curve = bezier.getPoints([p0, control, p2], steps)
     const innerCurve = utils.takeInner(curve)

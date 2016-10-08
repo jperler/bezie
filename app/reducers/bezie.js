@@ -239,8 +239,9 @@ function handleChangeSelected (state, payload) {
 
 function handleChangeType (state, payload) {
     switch (payload.type) {
-        case 'quadratic_bezier': return handleSetBezier(state, 'quadratic')
-        case 'cubic_bezier': return handleSetBezier(state, 'cubic')
+        case curveTypes.quadratic:
+        case curveTypes.cubic:
+            return handleSetBezier(state, payload.type)
         default: return handleSetDefault(state)
     }
 }
