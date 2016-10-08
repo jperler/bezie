@@ -210,6 +210,8 @@ function handleResetPath (state) {
 function handleReversePath (state) {
     const width = utils.getWidth(state)
     const path = state.paths[state.pathIdx].asMutable()
+    const nextSelectedIdx = _.isNumber(state.selectedIdx) ?
+        path.length - state.selectedIdx - 1 : null
     const nextPath = path.reverse().map(point => (
         point.merge({
             x: width - point.x,
@@ -219,7 +221,7 @@ function handleReversePath (state) {
     ))
 
     return state
-        .set('selectedIdx', path.length - state.selectedIdx - 1)
+        .set('selectedIdx', nextSelectedIdx)
         .setIn(['paths', state.pathIdx], nextPath)
 }
 
