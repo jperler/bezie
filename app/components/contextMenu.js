@@ -60,9 +60,16 @@ class ContextMenu extends Component {
                     <MenuItem
                         bsSize="xsmall"
                         disabled={selected.isControl || isEndpoint}
-                        eventKey="bezier"
+                        eventKey="quadratic_bezier"
                     >
-                        Bezier
+                        Quadratic Bezier
+                    </MenuItem>
+                    <MenuItem
+                        bsSize="xsmall"
+                        disabled={selected.isControl || isEndpoint}
+                        eventKey="cubic_bezier"
+                    >
+                        Cubic Bezier
                     </MenuItem>
                 </DropdownButton>
                 {!isEndpoint &&

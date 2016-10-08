@@ -16,7 +16,9 @@ import {
     DECREASE_X_INTERVAL,
 } from '../actions/bezie'
 import * as utils from '../utils'
-import * as bezier from '../utils/bezier'
+import * as cubic from '../utils/cubic'
+import * as quadratic from '../utils/quadratic'
+import { curveTypes } from '../constants'
 
 const initialState = Immutable({
     snap: true,
@@ -78,8 +80,26 @@ function handleRemovePoint (state, payload) {
     if (utils.isEndpoint(path, point)) return state
 
     if (point.isControl) {
-        const leftIdx = _.findIndex(path, p => p.id === point.left)
-        const rightIdx = _.findIndex(path, p => p.id === point.right)
+        let leftIdx
+        let rightIdx
+        if (point.type === curveTypes.quadratic) {
+            leftIdx = _.findIndex(path, p => p.id === point.left)
+            rightIdx = _.findIndex(path, p => p.id === point.right)
+        } else {
+            const left = utils.getPoint(path, point.left)
+            const right = utils.getPoint(path, point.right)
+
+            if (left.isControl) {
+                // Removing with p1 selected
+                leftIdx = _.findIndex(path, p => p.id === left.left)
+                rightIdx = _.findIndex(path, p => p.id === point.right)
+            } else {
+                // Removing with p0 selected
+                leftIdx = _.findIndex(path, p => p.id === point.left)
+                rightIdx = _.findIndex(path, p => p.id === right.right)
+            }
+        }
+
         path.splice(leftIdx + 1, rightIdx - leftIdx - 1)
     } else {
         path.splice(payload.index, 1)
@@ -108,39 +128,61 @@ function handleUpdatePoint (state, payload) {
     state = state.setIn(['paths', state.pathIdx, index], point)
 
     if (point.isControl) {
-        if (utils.getPoint(path, point.left).isControl) {
-            // Dragging right control
-            state = setBezier([
-                utils.getPoint(path, left.left),
-                utils.getPoint(path, point.left),
-                point,
-                right,
-            ], state, { index: 2 })
-        } else if (utils.getPoint(path, point.right).isControl) {
-            // Dragging left control
-            state = setBezier([
-                left,
-                point,
-                utils.getPoint(path, point.right),
-                utils.getPoint(path, right.right),
-            ], state, { index: 1 })
+        if (point.type === curveTypes.quadratic) {
+            state = setBezier([left, point, right], state)
+        } else {
+            if (utils.getPoint(path, point.left).isControl) {
+                // Dragging p1
+                state = setBezier([
+                    utils.getPoint(path, left.left),
+                    utils.getPoint(path, point.left),
+                    point,
+                    right,
+                ], state, { index: 2 })
+            } else if (utils.getPoint(path, point.right).isControl) {
+                // Dragging p0
+                state = setBezier([
+                    left,
+                    point,
+                    utils.getPoint(path, point.right),
+                    utils.getPoint(path, right.right),
+                ], state, { index: 1 })
+            }
         }
     } else if (controlRight || controlLeft) {
+        // Dragging the right endpoint of a curve
         if (controlRight) {
-            state = setBezier([
-                utils.getPoint(path, utils.getPoint(path, controlRight.left).left),
-                utils.getPoint(path, controlRight.left),
-                controlRight,
-                point,
-            ], state, { updateSelected: false })
+            if (controlRight.type === curveTypes.quadratic) {
+                state = setBezier([
+                    utils.getPoint(path, controlRight.left),
+                    controlRight,
+                    point,
+                ], state, { updateSelected: false })
+            } else {
+                state = setBezier([
+                    utils.getPoint(path, utils.getPoint(path, controlRight.left).left),
+                    utils.getPoint(path, controlRight.left),
+                    controlRight,
+                    point,
+                ], state, { updateSelected: false })
+            }
         }
+        // Dragging the left endpoint of a curve
         if (controlLeft) {
-            state = setBezier([
-                point,
-                controlLeft,
-                utils.getPoint(path, controlLeft.right),
-                utils.getPoint(path, utils.getPoint(path, controlLeft.right).right),
-            ], state, { updateSelected: false })
+            if (controlLeft.type === curveTypes.quadratic) {
+                state = setBezier([
+                    point,
+                    controlLeft,
+                    utils.getPoint(path, controlLeft.right),
+                ], state, { updateSelected: false })
+            } else {
+                state = setBezier([
+                    point,
+                    controlLeft,
+                    utils.getPoint(path, controlLeft.right),
+                    utils.getPoint(path, utils.getPoint(path, controlLeft.right).right),
+                ], state, { updateSelected: false })
+            }
         }
     }
 
@@ -197,19 +239,22 @@ function handleChangeSelected (state, payload) {
 
 function handleChangeType (state, payload) {
     switch (payload.type) {
-        case 'bezier': return handleSetBezier(state)
+        case 'quadratic_bezier': return handleSetBezier(state, 'quadratic')
+        case 'cubic_bezier': return handleSetBezier(state, 'cubic')
         default: return handleSetDefault(state)
     }
 }
 
-function handleSetBezier (state) {
+function handleSetBezier (state, type) {
     const { paths, pathIdx, selectedIdx } = state
     const path = paths[pathIdx]
     const p0 = path[selectedIdx - 1]
     const p1 = path[selectedIdx]
     const p2 = path[selectedIdx + 1]
+    const points = type === 'cubic' ?
+        [p0, p1, p1, p2] : [p0, p1, p2]
 
-    return setBezier([p0, p1, p1, p2], state)
+    return setBezier(points, state)
 }
 
 
@@ -217,8 +262,26 @@ function handleSetDefault (state) {
     const { paths, pathIdx, selectedIdx } = state
     const path = paths[pathIdx].asMutable()
     const point = path[selectedIdx]
-    const leftIdx = _.findIndex(path, p => p.id === point.left)
-    const rightIdx = _.findIndex(path, p => p.id === point.right)
+
+    let leftIdx
+    let rightIdx
+    if (point.type === curveTypes.quadratic) {
+        leftIdx = _.findIndex(path, p => p.id === point.left)
+        rightIdx = _.findIndex(path, p => p.id === point.right)
+    } else {
+        const left = utils.getPoint(path, point.left)
+        const right = utils.getPoint(path, point.right)
+        if (left.isControl) {
+            // Setting default with p1 selected
+            leftIdx = _.findIndex(path, p => p.id === left.left)
+            rightIdx = _.findIndex(path, p => p.id === point.right)
+        } else {
+            // Setting default with p0 selected
+            leftIdx = _.findIndex(path, p => p.id === point.left)
+            rightIdx = _.findIndex(path, p => p.id === right.right)
+        }
+    }
+
     const nextPoint = point.merge({
         isControl: false,
         left: null,
@@ -249,124 +312,12 @@ function handleToggleTriplet (state) {
         .setIn(['interval', 'x'], nextInterval)
 }
 
-function setBezier (points, state, options) {
-    if (points.length === 3) return setQuadraticBezier(points, state, options)
-    if (points.length === 4) return setCubicBezier(points, state, options)
-}
-
-function setQuadraticBezier () {}
-
-function setCubicBezier ([p0, p1, p2, p3], state, options = {}) {
-    const { paths, pathIdx, selectedIdx } = state
-    const height = utils.getHeight(state)
-    const path = paths[pathIdx].asMutable()
-    const i = selectedIdx
-    const steps = 32
-
-    if (_.isUndefined(options.updateSelected)) options.updateSelected = true
-
-    if (p1 === p2) {
-        const a = bezier.getControl(p0, p1, p3)
-        const b = bezier.getPoints([p0, a, p3], steps)
-        const li = 1 / 4 * steps
-        const ri = 3 / 4 * steps
-
-        p1 = b[li]
-        p2 = b[ri]
+function setBezier (points, state, options = {}) {
+    switch (points.length) {
+        case 3: return quadratic.setBezier(points, state, options)
+        case 4: return cubic.setBezier(points, state, options)
+        default: return state
     }
-
-    const control = bezier.getCubicControlPoints(p0, p1, p2, p3)
-    const curve = bezier.getPoints([p0, control[0], control[1], p3], steps)
-    const innerCurve = utils.takeInner(curve)
-    const midIdx = 1 / 2 * steps
-    const mid = curve[midIdx]
-
-    /*
-    _.extend(mid, {
-        isControl: true,
-        left: p0.id,
-        right: p2.id,
-        id: _.uniqueId('point'),
-    })
-    */
-
-    const id1 = _.uniqueId('point')
-    const id2 = _.uniqueId('point')
-
-    _.extend(curve[steps * 1 / 4], {
-        isControl: true,
-        id: id1,
-        left: p0.id,
-        right: id2,
-    })
-
-    _.extend(curve[steps * 3 / 4], {
-        isControl: true,
-        id: id2,
-        left: id1,
-        right: p3.id,
-    })
-
-    innerCurve.map(p => {
-        if (!p.isControl) {
-            _.extend(p, {
-                isCurve: true,
-                id: _.uniqueId('point'),
-            })
-        }
-
-        if (p.y > height) p.y = height
-        if (p.y < 0) p.y = 0
-        if (p.x < p0.x) p.x = p0.x
-        if (p.x > p3.x) p.x = p3.x
-    })
-
-    const li = steps * 1 / 4 - 1
-    const ri = steps * 3 / 4 - 1
-
-    // First quadrant
-    if (!bezier.isValid(innerCurve.slice(0, li))) {
-        for (let j = 0; j < li; j++) {
-            innerCurve[j].x = curve[0].x
-            innerCurve[j].y = curve[0].y
-        }
-    }
-
-    // Second quadrant
-    if (!bezier.isValid(innerCurve.slice(li, ri))) {
-        for (let j = li; j < ri; j++) {
-            innerCurve[j].x = innerCurve[li].x
-            innerCurve[j].y = innerCurve[li].y
-        }
-    }
-
-    // Third quadrant
-    if (!bezier.isValid(innerCurve.slice(ri, steps - 2))) {
-        for (let j = ri; j < steps - 1; j++) {
-            innerCurve[j].x = innerCurve[ri].x
-            innerCurve[j].y = innerCurve[ri].y
-        }
-    }
-
-    if (p1.isControl || p2.isControl) {
-        const leftIdx = _.findIndex(path, p => p.id === p0.id)
-        const rightIdx = _.findIndex(path, p => p.id === p3.id)
-        path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...innerCurve)
-    } else {
-        path.splice(i, 1, ...innerCurve)
-    }
-
-    if (options.updateSelected) {
-        if (options.index === 1) {
-            state = state.set('selectedIdx', path.indexOf(curve[steps * 1 / 4]))
-        } else if (options.index === 2) {
-            state = state.set('selectedIdx', path.indexOf(curve[steps * 3 / 4]))
-        } else {
-            state = state.set('selectedIdx', path.indexOf(mid))
-        }
-    }
-
-    return state.setIn(['paths', pathIdx], path)
 }
 
 function initPath (path, state) {
