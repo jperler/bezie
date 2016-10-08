@@ -42,17 +42,19 @@ class ContextMenu extends Component {
         }
 
         const isEndpoint = utils.isEndpoint(path, selected)
-        const getBezierType = p => (
-            p.type === curveTypes.quadratic ? 'Quadratic Bezier' : 'Cubic Bezier'
+        const defaultDisplay = isEndpoint ? 'Endpoint' : 'Default'
+        const getBezierDisplay = type => (
+            type === curveTypes.quadratic ? 'Quadratic Bezier' : 'Cubic Bezier'
         )
 
         return (
             <div className={styles.menu}>
                 <DropdownButton
                     bsSize="xsmall"
-                    title={selected.isControl ? getBezierType(selected) : 'Default'}
+                    title={selected.isControl ? getBezierDisplay(selected.type) : defaultDisplay}
                     id="contextMenu"
                     onSelect={::this.onTypeSelect}
+                    disabled={isEndpoint}
                 >
                     <MenuItem
                         bsSize="xsmall"
@@ -66,14 +68,14 @@ class ContextMenu extends Component {
                         disabled={selected.isControl || isEndpoint}
                         eventKey={curveTypes.quadratic}
                     >
-                        Quadratic Bezier
+                        {getBezierDisplay(curveTypes.quadratic)}
                     </MenuItem>
                     <MenuItem
                         bsSize="xsmall"
                         disabled={selected.isControl || isEndpoint}
                         eventKey={curveTypes.cubic}
                     >
-                        Cubic Bezier
+                        {getBezierDisplay(curveTypes.cubic)}
                     </MenuItem>
                 </DropdownButton>
                 {!isEndpoint &&
