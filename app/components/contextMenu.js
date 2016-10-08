@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
+import { curveTypes } from '../constants'
 import * as utils from '../utils'
 import styles from './contextMenu.css'
 
@@ -41,14 +42,19 @@ class ContextMenu extends Component {
         }
 
         const isEndpoint = utils.isEndpoint(path, selected)
+        const defaultDisplay = isEndpoint ? 'Endpoint' : 'Default'
+        const getBezierDisplay = type => (
+            type === curveTypes.quadratic ? 'Quadratic Bezier' : 'Cubic Bezier'
+        )
 
         return (
             <div className={styles.menu}>
                 <DropdownButton
                     bsSize="xsmall"
-                    title={selected.isControl ? 'Bezier' : 'Default'}
+                    title={selected.isControl ? getBezierDisplay(selected.type) : defaultDisplay}
                     id="contextMenu"
                     onSelect={::this.onTypeSelect}
+                    disabled={isEndpoint}
                 >
                     <MenuItem
                         bsSize="xsmall"
@@ -60,9 +66,16 @@ class ContextMenu extends Component {
                     <MenuItem
                         bsSize="xsmall"
                         disabled={selected.isControl || isEndpoint}
-                        eventKey="bezier"
+                        eventKey={curveTypes.quadratic}
                     >
-                        Bezier
+                        {getBezierDisplay(curveTypes.quadratic)}
+                    </MenuItem>
+                    <MenuItem
+                        bsSize="xsmall"
+                        disabled={selected.isControl || isEndpoint}
+                        eventKey={curveTypes.cubic}
+                    >
+                        {getBezierDisplay(curveTypes.cubic)}
                     </MenuItem>
                 </DropdownButton>
                 {!isEndpoint &&

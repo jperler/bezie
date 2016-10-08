@@ -20,3 +20,8 @@ export const labels = [
     '6 - Data Entry',
     '7 - Volume',
 ]
+
+export const curveTypes = {
+    quadratic: 'quadratic',
+    cubic: 'cubic',
+}
