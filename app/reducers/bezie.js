@@ -287,6 +287,7 @@ function handleSetDefault (state) {
         isControl: false,
         left: null,
         right: null,
+        type: null,
     })
 
     path.splice(leftIdx + 1, rightIdx - leftIdx - 1, nextPoint)
