@@ -74,7 +74,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     }
 
     if (updateSelected) {
-        if (options.index === 1) {
+        if (!options.index || options.index === 1) {
             state = state.set('selectedIdx', path.indexOf(curve[steps * 1 / 4]))
         } else if (options.index === 2) {
             state = state.set('selectedIdx', path.indexOf(curve[steps * 3 / 4]))
