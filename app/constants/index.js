@@ -21,7 +21,8 @@ export const labels = [
     '7 - Volume',
 ]
 
-export const curveTypes = {
+export const pointTypes = {
     quadratic: 'quadratic',
     cubic: 'cubic',
+    saw: 'saw',
 }

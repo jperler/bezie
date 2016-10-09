@@ -6,7 +6,7 @@ import * as utils from '../utils'
 import * as Axis from './axis'
 import Bars from './bars'
 import Point from './point'
-import { colors } from '../constants'
+import { colors, pointTypes } from '../constants'
 
 class Automator extends Component {
     static propTypes = {
@@ -117,7 +117,7 @@ class Automator extends Component {
         const path = paths[pathIdx]
         const index = utils.getInsertIndex(path, x)
         const inBounds = _.find(path, p => (
-            p.isControl &&
+            _.includes(pointTypes, p.type) &&
             utils.inRangeInclusive(
                 x,
                 utils.getPoint(path, p.left).x,
@@ -146,31 +146,23 @@ class Automator extends Component {
 
         const elements = {}
 
-        elements.points = innerPath.map((point, i) => (
-            !point.isCurve ?
-                <Point
-                    onMouseDown={() => this.onMouseDownPoint(i + 1)}
-                    onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
-                    selected={i + 1 === selectedIdx}
-                    dragging={i + 1 === draggedIdx}
-                    x={point.x}
-                    y={point.y}
-                    key={`point-${i}`}
-                    color={colors[pathIdx]}
-                />
-                :
-                <circle
-                    cx={point.x}
-                    cy={point.y}
-                    r={2}
-                    fill={colors[pathIdx]}
-                    key={`point-${i}`}
-                    style={{
-                        fillOpacity: 1,
-                        cursor: 'default',
-                    }}
-                />
-        ))
+        // Don't filter out points so all the indexes are aligned
+        elements.points = _.compact(innerPath.map((point, i) => {
+            if (!point.hidden) {
+                return (
+                    <Point
+                        onMouseDown={() => this.onMouseDownPoint(i + 1)}
+                        onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
+                        selected={i + 1 === selectedIdx}
+                        dragging={i + 1 === draggedIdx}
+                        x={point.x}
+                        y={point.y}
+                        key={`point-${i}`}
+                        color={colors[pathIdx]}
+                    />
+                )
+            }
+        }))
 
         elements.paths = paths.map((path, i) => {
             if (i === pathIdx) return undefined

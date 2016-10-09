@@ -2,14 +2,14 @@ import _ from 'lodash'
 import * as bezier from '../utils/bezier'
 import * as utils from '../utils'
 import * as quadratic from '../utils/quadratic'
-import { curveTypes } from '../constants'
+import { pointTypes } from '../constants'
 
 export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     const { paths, pathIdx, selectedIdx } = state
     const height = utils.getHeight(state)
     const path = paths[pathIdx].asMutable()
     const i = selectedIdx
-    const steps = options.steps || 32
+    const steps = options.steps || 64
     const updateSelected = !_.isUndefined(options.updateSelected) ?
         options.updateSelected : true
     const li = 1 / 4 * steps
@@ -34,7 +34,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
 
     _.extend(curve[li], {
         isControl: true,
-        type: curveTypes.cubic,
+        type: pointTypes.cubic,
         id: id1,
         left: p0.id,
         right: id2,
@@ -42,7 +42,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
 
     _.extend(curve[ri], {
         isControl: true,
-        type: curveTypes.cubic,
+        type: pointTypes.cubic,
         id: id2,
         left: id1,
         right: p3.id,
@@ -51,7 +51,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     innerCurve.map(p => {
         if (!p.isControl) {
             _.extend(p, {
-                isCurve: true,
+                hidden: true,
                 id: _.uniqueId('point'),
             })
         }
