@@ -147,7 +147,7 @@ class Automator extends Component {
         const elements = {}
 
         elements.points = innerPath.map((point, i) => (
-            !point.isCurve ?
+            !point.displayOnly ?
                 <Point
                     onMouseDown={() => this.onMouseDownPoint(i + 1)}
                     onDoubleClick={() => this.onDoubleClickPoint(i + 1)}

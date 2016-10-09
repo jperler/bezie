@@ -26,7 +26,7 @@ export function setBezier ([p0, p1, p2], state, options) {
 
     innerCurve.map(p => {
         if (p.isControl) return
-        p.isCurve = true
+        p.displayOnly = true
         if (p.y > height) p.y = height
         if (p.y < 0) p.y = 0
         if (p.x < p0.x) p.x = p0.x

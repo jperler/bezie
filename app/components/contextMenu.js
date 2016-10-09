@@ -77,6 +77,13 @@ class ContextMenu extends Component {
                     >
                         {getBezierDisplay(curveTypes.cubic)}
                     </MenuItem>
+                    <MenuItem
+                        bsSize="xsmall"
+                        disabled={selected.isControl || isEndpoint}
+                        eventKey="saw"
+                    >
+                        Saw
+                    </MenuItem>
                 </DropdownButton>
                 {!isEndpoint &&
                     <a

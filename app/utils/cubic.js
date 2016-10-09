@@ -51,7 +51,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     innerCurve.map(p => {
         if (!p.isControl) {
             _.extend(p, {
-                isCurve: true,
+                displayOnly: true,
                 id: _.uniqueId('point'),
             })
         }

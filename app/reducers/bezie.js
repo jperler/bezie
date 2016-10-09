@@ -127,6 +127,10 @@ function handleUpdatePoint (state, payload) {
 
     state = state.setIn(['paths', state.pathIdx, index], point)
 
+    if (point.type === 'saw') {
+        return handleSetSaw(state)
+    }
+
     if (point.isControl) {
         if (point.type === curveTypes.quadratic) {
             state = setBezier([left, point, right], state)
@@ -243,12 +247,14 @@ function handleChangeType (state, payload) {
     switch (payload.type) {
         case curveTypes.quadratic:
         case curveTypes.cubic:
-            return handleSetBezier(state, payload.type)
+            return handleSetBezier(state, payload)
+        case 'saw':
+            return handleSetSaw(state, payload)
         default: return handleSetDefault(state)
     }
 }
 
-function handleSetBezier (state, type) {
+function handleSetBezier (state, { type }) {
     const { paths, pathIdx, selectedIdx } = state
     const path = paths[pathIdx]
     const p0 = path[selectedIdx - 1]
@@ -297,6 +303,49 @@ function handleSetDefault (state) {
     return state
         .set('selectedIdx', leftIdx + 1)
         .setIn(['paths', pathIdx], path)
+}
+
+function handleSetSaw (state) {
+    const path = state.paths[state.pathIdx].asMutable()
+    const selected = path[state.selectedIdx]
+
+    let leftIdx
+    let rightIdx
+    if (selected.type === 'saw' && selected.left && selected.right) {
+        leftIdx = _.findIndex(path, p => p.id === selected.left)
+        rightIdx = _.findIndex(path, p => p.id === selected.right)
+    } else {
+        leftIdx = state.selectedIdx - 1
+        rightIdx = state.selectedIdx + 1
+    }
+
+    const left = path[leftIdx]
+    const right = path[rightIdx]
+    let delta = selected.x - left.x
+    const points = []
+    const width = utils.getWidth(state)
+    // Limit saw waves to 32 intervals
+    const minDelta = width / state.bars / 32
+
+    if (delta < minDelta) delta = minDelta
+    if (selected.x === right.x) return state
+
+    _.map(_.range(selected.x, right.x, delta), (x, i) => {
+        points.push({
+            x,
+            y: i % 2 === 0 ? selected.y : left.y,
+            id: _.uniqueId('point'),
+            displayOnly: i > 0,
+            type: i === 0 ? 'saw' : null,
+            left: left.id,
+            right: right.id,
+        })
+    })
+
+    path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...points)
+
+    return state
+        .setIn(['paths', state.pathIdx], path)
 }
 
 function handleIncreaseXInterval (state) {
