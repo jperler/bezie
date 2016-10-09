@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { CONTROL_MAX, PPQ, curveTypes } from '../constants'
+import { CONTROL_MAX, PPQ, pointTypes } from '../constants'
 
 export const rangeInclusive = (start, end, skip) => _.range(start, end + skip, skip)
 export const inRangeInclusive = (n, start, end) => _.inRange(n, start, end + 1)
@@ -31,6 +31,6 @@ export const normalizePoint = ({ point, height, zoom }) => ({
 
 export const getPoint = (path, id) => _.find(path, p => p.id === id)
 export const isEndpoint = (path, point) => {
-    if (_.has(point, 'type') && _.includes(curveTypes, point.type)) return false
+    if (_.has(point, 'type') && _.includes(pointTypes, point.type)) return false
     return !!path.find(p => _.includes([p.left, p.right], point.id))
 }

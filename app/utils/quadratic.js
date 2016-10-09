@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import * as bezier from '../utils/bezier'
 import * as utils from '../utils'
-import { curveTypes } from '../constants'
+import { pointTypes } from '../constants'
 
 export function setBezier ([p0, p1, p2], state, options) {
     const { paths, pathIdx, selectedIdx } = state
@@ -18,7 +18,7 @@ export function setBezier ([p0, p1, p2], state, options) {
 
     _.extend(mid, {
         isControl: true,
-        type: curveTypes.quadratic,
+        type: pointTypes.quadratic,
         left: p0.id,
         right: p2.id,
         id: _.uniqueId('point'),

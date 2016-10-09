@@ -18,7 +18,7 @@ import {
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
-import { curveTypes } from '../constants'
+import { pointTypes } from '../constants'
 
 const initialState = Immutable({
     snap: true,
@@ -79,10 +79,10 @@ function handleRemovePoint (state, payload) {
 
     if (utils.isEndpoint(path, point)) return state
 
-    if (point.isControl) {
+    if (_.includes(pointTypes, point.type)) {
         let leftIdx
         let rightIdx
-        if (point.type === curveTypes.quadratic) {
+        if (point.type === pointTypes.quadratic || point.type === pointTypes.saw) {
             leftIdx = _.findIndex(path, p => p.id === point.left)
             rightIdx = _.findIndex(path, p => p.id === point.right)
         } else {
@@ -132,7 +132,7 @@ function handleUpdatePoint (state, payload) {
     }
 
     if (point.isControl) {
-        if (point.type === curveTypes.quadratic) {
+        if (point.type === pointTypes.quadratic) {
             state = setBezier([left, point, right], state)
         } else {
             if (utils.getPoint(path, point.left).isControl) {
@@ -156,7 +156,7 @@ function handleUpdatePoint (state, payload) {
     } else if (controlRight || controlLeft) {
         // Dragging the right endpoint of a curve
         if (controlRight) {
-            if (controlRight.type === curveTypes.quadratic) {
+            if (controlRight.type === pointTypes.quadratic) {
                 state = setBezier([
                     utils.getPoint(path, controlRight.left),
                     controlRight,
@@ -173,7 +173,7 @@ function handleUpdatePoint (state, payload) {
         }
         // Dragging the left endpoint of a curve
         if (controlLeft) {
-            if (controlLeft.type === curveTypes.quadratic) {
+            if (controlLeft.type === pointTypes.quadratic) {
                 state = setBezier([
                     point,
                     controlLeft,
@@ -245,11 +245,10 @@ function handleChangeSelected (state, payload) {
 
 function handleChangeType (state, payload) {
     switch (payload.type) {
-        case curveTypes.quadratic:
-        case curveTypes.cubic:
+        case pointTypes.quadratic:
+        case pointTypes.cubic:
             return handleSetBezier(state, payload)
-        case 'saw':
-            return handleSetSaw(state, payload)
+        case pointTypes.saw: return handleSetSaw(state, payload)
         default: return handleSetDefault(state)
     }
 }
@@ -274,10 +273,11 @@ function handleSetDefault (state) {
 
     let leftIdx
     let rightIdx
-    if (point.type === curveTypes.quadratic) {
+    if (_.includes([pointTypes.quadratic, pointTypes.saw], point.type)) {
         leftIdx = _.findIndex(path, p => p.id === point.left)
         rightIdx = _.findIndex(path, p => p.id === point.right)
     } else {
+        // Setting default on a cubic bezier
         const left = utils.getPoint(path, point.left)
         const right = utils.getPoint(path, point.right)
         if (left.isControl) {

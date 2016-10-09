@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
-import { curveTypes } from '../constants'
+import { pointTypes } from '../constants'
 import * as utils from '../utils'
 import styles from './contextMenu.css'
 
@@ -42,44 +42,49 @@ class ContextMenu extends Component {
         }
 
         const isEndpoint = utils.isEndpoint(path, selected)
-        const defaultDisplay = isEndpoint ? 'Endpoint' : 'Default'
-        const getBezierDisplay = type => (
-            type === curveTypes.quadratic ? 'Quadratic Bezier' : 'Cubic Bezier'
-        )
+        const isDefault = !_.includes(pointTypes, selected.type)
+        const getPointDisplay = type => {
+            switch (type) {
+                case pointTypes.quadratic: return 'Bezier 1'
+                case pointTypes.cubic: return 'Bezier 2'
+                case pointTypes.saw: return 'Saw'
+                default: return isEndpoint ? 'Endpoint' : 'Default'
+            }
+        }
 
         return (
             <div className={styles.menu}>
                 <DropdownButton
                     bsSize="xsmall"
-                    title={selected.isControl ? getBezierDisplay(selected.type) : defaultDisplay}
+                    title={getPointDisplay(selected.type)}
                     id="contextMenu"
                     onSelect={::this.onTypeSelect}
                     disabled={isEndpoint}
                 >
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={!selected.isControl || isEndpoint}
+                        disabled={isDefault || isEndpoint}
                         eventKey="default"
                     >
                         Default
                     </MenuItem>
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={selected.isControl || isEndpoint}
-                        eventKey={curveTypes.quadratic}
+                        disabled={!isDefault || isEndpoint}
+                        eventKey={pointTypes.quadratic}
                     >
-                        {getBezierDisplay(curveTypes.quadratic)}
+                        {getPointDisplay(pointTypes.quadratic)}
                     </MenuItem>
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={selected.isControl || isEndpoint}
-                        eventKey={curveTypes.cubic}
+                        disabled={!isDefault || isEndpoint}
+                        eventKey={pointTypes.cubic}
                     >
-                        {getBezierDisplay(curveTypes.cubic)}
+                        {getPointDisplay(pointTypes.cubic)}
                     </MenuItem>
                     <MenuItem
                         bsSize="xsmall"
-                        disabled={selected.isControl || isEndpoint}
+                        disabled={!isDefault || isEndpoint}
                         eventKey="saw"
                     >
                         Saw

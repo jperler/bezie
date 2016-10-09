@@ -6,7 +6,7 @@ import * as utils from '../utils'
 import * as Axis from './axis'
 import Bars from './bars'
 import Point from './point'
-import { colors } from '../constants'
+import { colors, pointTypes } from '../constants'
 
 class Automator extends Component {
     static propTypes = {
@@ -117,7 +117,7 @@ class Automator extends Component {
         const path = paths[pathIdx]
         const index = utils.getInsertIndex(path, x)
         const inBounds = _.find(path, p => (
-            p.isControl &&
+            _.includes(pointTypes, p.type) &&
             utils.inRangeInclusive(
                 x,
                 utils.getPoint(path, p.left).x,
