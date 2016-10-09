@@ -321,13 +321,12 @@ function handleSetSaw (state) {
 
     const left = path[leftIdx]
     const right = path[rightIdx]
-    let delta = selected.x - left.x
-    const points = []
     const width = utils.getWidth(state)
-    // Limit saw waves to 32 intervals
-    const minDelta = width / state.bars / 32
+    // Enforce a maximum of 64 peaks per bar
+    const min = width / state.bars / 128
+    const delta = _.max([min, selected.x - left.x])
+    const points = []
 
-    if (delta < minDelta) delta = minDelta
     if (selected.x === right.x) return state
 
     _.map(_.range(selected.x, right.x, delta), (x, i) => {
@@ -335,7 +334,7 @@ function handleSetSaw (state) {
             x,
             y: i % 2 === 0 ? selected.y : left.y,
             id: _.uniqueId('point'),
-            displayOnly: i > 0,
+            hidden: i > 0,
             type: i === 0 ? 'saw' : null,
             left: left.id,
             right: right.id,

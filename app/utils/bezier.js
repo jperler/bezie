@@ -14,7 +14,7 @@ export function interpolate (points, t) {
     return { x, y }
 }
 
-export function getPoints (points, steps = 16) {
+export function getPoints (points, steps) {
     if (!points.length) return []
     const interval = 1 / steps
     return _.map(utils.rangeInclusive(0, 1, interval), t => (

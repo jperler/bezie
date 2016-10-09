@@ -9,7 +9,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     const height = utils.getHeight(state)
     const path = paths[pathIdx].asMutable()
     const i = selectedIdx
-    const steps = options.steps || 32
+    const steps = options.steps || 64
     const updateSelected = !_.isUndefined(options.updateSelected) ?
         options.updateSelected : true
     const li = 1 / 4 * steps
@@ -51,7 +51,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     innerCurve.map(p => {
         if (!p.isControl) {
             _.extend(p, {
-                displayOnly: true,
+                hidden: true,
                 id: _.uniqueId('point'),
             })
         }
