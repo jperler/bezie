@@ -25,4 +25,5 @@ export const pointTypes = {
     quadratic: 'quadratic',
     cubic: 'cubic',
     saw: 'saw',
+    sine: 'sine',
 }
