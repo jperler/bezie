@@ -342,7 +342,7 @@ function handleSetSaw (state) {
             y: i % 2 === 0 ? selected.y : left.y,
             id: _.uniqueId('point'),
             hidden: i > 0,
-            type: i === 0 ? 'saw' : null,
+            type: i === 0 ? pointTypes.saw : null,
             left: left.id,
             right: right.id,
         })
@@ -386,6 +386,7 @@ function handleSetSine (state) {
     const steps = 32
     const p1 = quadratic.getControl(left, selected, firstRight)
     const bezierPoints = bezier.getPoints([left, p1, firstRight], steps)
+    let activeId
 
     _.map(_.range(selected.x, right.x, delta), (x, i) => {
         _.each(bezierPoints, (point, j) => {
@@ -393,6 +394,9 @@ function handleSetSine (state) {
             let nextY = i % 2 === 0 ? point.y : -point.y + left.y * 2
             if (nextY > height) nextY = height
             if (nextY < 0) nextY = 0
+
+            const id = _.uniqueId('point')
+            if (active) activeId = id
 
             if (point.x + (delta * i) < right.x) {
                 points.push(_.extend({}, point, {
@@ -402,15 +406,17 @@ function handleSetSine (state) {
                     left: active ? left.id : null,
                     right: active ? right.id : null,
                     hidden: !active,
-                    id: _.uniqueId('point'),
+                    id,
                 }))
             }
         })
     })
 
     path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...points)
+    const nextSelectedIdx = _.findIndex(path, p => p.id === activeId)
 
     return state
+        .set('selectedIdx', nextSelectedIdx)
         .setIn(['paths', state.pathIdx], path)
 }
 
