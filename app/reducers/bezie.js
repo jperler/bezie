@@ -18,6 +18,7 @@ import {
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
+import * as bezier from '../utils/bezier'
 import { pointTypes } from '../constants'
 
 const initialState = Immutable({
@@ -82,10 +83,11 @@ function handleRemovePoint (state, payload) {
     if (_.includes(pointTypes, point.type)) {
         let leftIdx
         let rightIdx
-        if (point.type === pointTypes.quadratic || point.type === pointTypes.saw) {
+        if (point.type !== pointTypes.cubic) {
             leftIdx = _.findIndex(path, p => p.id === point.left)
             rightIdx = _.findIndex(path, p => p.id === point.right)
         } else {
+            // Cubic types are special since they have two controllable points
             const left = utils.getPoint(path, point.left)
             const right = utils.getPoint(path, point.right)
 
@@ -127,8 +129,12 @@ function handleUpdatePoint (state, payload) {
 
     state = state.setIn(['paths', state.pathIdx, index], point)
 
-    if (point.type === 'saw') {
+    if (point.type === pointTypes.saw) {
         return handleSetSaw(state)
+    }
+
+    if (point.type === pointTypes.sine) {
+        return handleSetSine(state)
     }
 
     if (point.isControl) {
@@ -249,6 +255,7 @@ function handleChangeType (state, payload) {
         case pointTypes.cubic:
             return handleSetBezier(state, payload)
         case pointTypes.saw: return handleSetSaw(state, payload)
+        case pointTypes.sine: return handleSetSine(state, payload)
         default: return handleSetDefault(state)
     }
 }
@@ -273,7 +280,7 @@ function handleSetDefault (state) {
 
     let leftIdx
     let rightIdx
-    if (_.includes([pointTypes.quadratic, pointTypes.saw], point.type)) {
+    if (point.type !== pointTypes.cubic) {
         leftIdx = _.findIndex(path, p => p.id === point.left)
         rightIdx = _.findIndex(path, p => p.id === point.right)
     } else {
@@ -338,6 +345,66 @@ function handleSetSaw (state) {
             type: i === 0 ? 'saw' : null,
             left: left.id,
             right: right.id,
+        })
+    })
+
+    path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...points)
+
+    return state
+        .setIn(['paths', state.pathIdx], path)
+}
+
+function handleSetSine (state) {
+    const path = state.paths[state.pathIdx].asMutable()
+    const selected = path[state.selectedIdx]
+
+    let leftIdx
+    let rightIdx
+    if (selected.type === pointTypes.sine && selected.left && selected.right) {
+        leftIdx = _.findIndex(path, p => p.id === selected.left)
+        rightIdx = _.findIndex(path, p => p.id === selected.right)
+    } else {
+        leftIdx = state.selectedIdx - 1
+        rightIdx = state.selectedIdx + 1
+    }
+
+    const left = path[leftIdx]
+    const right = path[rightIdx]
+    const width = utils.getWidth(state)
+    const min = width / state.bars / 32
+    const delta = _.max([min, (selected.x - left.x) * 2])
+    const points = []
+
+    if (selected.x === right.x) return state
+
+    const firstRight = {
+        x: selected.x + (selected.x - left.x),
+        y: left.y,
+    }
+
+    const height = utils.getHeight(state)
+    const steps = 32
+    const p1 = quadratic.getControl(left, selected, firstRight)
+    const bezierPoints = bezier.getPoints([left, p1, firstRight], steps)
+
+    _.map(_.range(selected.x, right.x, delta), (x, i) => {
+        _.each(bezierPoints, (point, j) => {
+            const active = j + i === steps / 2 && i === 0
+            let nextY = i % 2 === 0 ? point.y : -point.y + left.y * 2
+            if (nextY > height) nextY = height
+            if (nextY < 0) nextY = 0
+
+            if (point.x + (delta * i) < right.x) {
+                points.push(_.extend({}, point, {
+                    x: point.x + (delta * i),
+                    y: nextY,
+                    type: active ? pointTypes.sine : null,
+                    left: active ? left.id : null,
+                    right: active ? right.id : null,
+                    hidden: !active,
+                    id: _.uniqueId('point'),
+                }))
+            }
         })
     })
 

@@ -77,10 +77,10 @@ class Automator extends Component {
             utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
             mousePoint
 
-        let left = draggedPoint.isControl ?
+        let left = _.includes(pointTypes, draggedPoint.type) ?
             utils.getPoint(path, draggedPoint.left) :
             path[draggedIdx - 1]
-        let right = draggedPoint.isControl ?
+        let right = _.includes(pointTypes, draggedPoint.type) ?
             utils.getPoint(path, draggedPoint.right) :
             path[draggedIdx + 1]
 
