@@ -12,6 +12,8 @@ import {
     RESET_PATH,
     REVERSE_PATH,
     INVERT_PATH,
+    COPY_PATH,
+    PASTE_PATH,
     INCREASE_X_INTERVAL,
     DECREASE_X_INTERVAL,
 } from '../actions/bezie'
@@ -29,6 +31,7 @@ const initialState = Immutable({
     interval: { x: 8, y: 10 },
     pathIdx: 0,
     selectedIdx: null,
+    clipboard: { path: null },
     paths: _.fill(Array(7), []),
 })
 
@@ -54,6 +57,8 @@ export default function bezie (state = initialState, action) {
         case INVERT_PATH: return handleInvertPath(state)
         case INCREASE_X_INTERVAL: return handleIncreaseXInterval(state)
         case DECREASE_X_INTERVAL: return handleDecreaseXInterval(state)
+        case COPY_PATH: return handleCopyPath(state)
+        case PASTE_PATH: return handlePastePath(state)
         default: return state
     }
 }
@@ -435,6 +440,19 @@ function handleToggleTriplet (state) {
     return state
         .set('triplet', !triplet)
         .setIn(['interval', 'x'], nextInterval)
+}
+
+function handleCopyPath (state) {
+    const { paths, pathIdx } = state
+    return state.setIn(['clipboard', 'path'], paths[pathIdx])
+}
+
+function handlePastePath (state) {
+    const { pathIdx } = state
+
+    return state
+        .setIn(['paths', pathIdx], state.clipboard.path)
+        .setIn(['clipboard', 'path'], null)
 }
 
 function setBezier (points, state, options = {}) {

@@ -11,8 +11,11 @@ class Bezie extends Component {
         resetPath: PropTypes.func.isRequired,
         reversePath: PropTypes.func.isRequired,
         invertPath: PropTypes.func.isRequired,
+        copyPath: PropTypes.func.isRequired,
+        pastePath: PropTypes.func.isRequired,
         changeSelected: PropTypes.func.isRequired,
         bars: PropTypes.number.isRequired,
+        clipboard: PropTypes.object.isRequired,
     }
 
     componentDidMount () {
@@ -38,6 +41,14 @@ class Bezie extends Component {
         this.props.invertPath()
     }
 
+    onCopyClick () {
+        this.props.copyPath()
+    }
+
+    onPasteClick () {
+        this.props.pastePath()
+    }
+
     render () {
         return (
             <div className="bezie">
@@ -45,9 +56,18 @@ class Bezie extends Component {
                     <div className="pull-left">
                         <ButtonToolbar>
                             <PathSelector {...this.props} />
-                            <Button bsSize="small" onClick={::this.onResetClick}>Reset</Button>
-                            <Button bsSize="small" onClick={::this.onReverseClick}>Reverse</Button>
-                            <Button bsSize="small" onClick={::this.onInverseClick}>Inverse</Button>
+                            <Button title="Reset" bsSize="small" onClick={::this.onResetClick}><i className="fa fa-refresh" /></Button>
+                            <Button title="Reverse" bsSize="small" onClick={::this.onReverseClick}><i className="fa fa-arrows-h" /></Button>
+                            <Button title="Inverse" bsSize="small" onClick={::this.onInverseClick}><i className="fa fa-arrows-v" /></Button>
+                            <Button title="Copy" bsSize="small" onClick={::this.onCopyClick}><i className="fa fa-copy" /></Button>
+                            <Button
+                                bsSize="small"
+                                title="Paste"
+                                onClick={::this.onPasteClick}
+                                disabled={_.isNull(this.props.clipboard.path)}
+                            >
+                                <i className="fa fa-paste" />
+                            </Button>
                             <ContextMenu {...this.props} />
                         </ButtonToolbar>
                     </div>

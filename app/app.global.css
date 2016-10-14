@@ -2,7 +2,7 @@ body {
     position: relative;
     color: white;
     height: 100vh;
-    background-color: #444;
+    background: linear-gradient(to left, #232526 , #414345);
     overflow-y: hidden;
     margin: 10px !important;
     font-family: Arial, Helvetica, Helvetica Neue;
