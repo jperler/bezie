@@ -45,7 +45,10 @@ export class Y extends Component {
     }
 
     shouldComponentUpdate (nextProps) {
-        return !_.isEqual(this.props.yAxisTickRange, nextProps.yAxisTickRange)
+        return (
+            !_.isEqual(this.props.yAxisTickRange, nextProps.yAxisTickRange) ||
+            !_.isEqual(this.props.width, nextProps.width)
+        )
     }
 
     render () {

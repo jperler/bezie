@@ -13,6 +13,8 @@ export const INCREASE_X_INTERVAL = 'INCREASE_X_INTERVAL'
 export const DECREASE_X_INTERVAL = 'DECREASE_X_INTERVAL'
 export const COPY_PATH = 'COPY_PATH'
 export const PASTE_PATH = 'PASTE_PATH'
+export const INCREASE_BARS = 'INCREASE_BARS'
+export const DECREASE_BARS = 'DECREASE_BARS'
 
 export const addPoint = ({ index, x, y }) => ({ type: ADD_POINT, payload: { index, x, y } })
 export const removePoint = ({ index }) => ({ type: REMOVE_POINT, payload: { index } })
@@ -28,6 +30,8 @@ export const copyPath = () => ({ type: COPY_PATH })
 export const pastePath = () => ({ type: PASTE_PATH })
 export const increaseXInterval = () => ({ type: INCREASE_X_INTERVAL })
 export const decreaseXInterval = () => ({ type: DECREASE_X_INTERVAL })
+export const increaseBars = () => ({ type: INCREASE_BARS })
+export const decreaseBars = () => ({ type: DECREASE_BARS })
 export const updatePoint = ({ index, x, y, controlLeft, controlRight, left, right }) => ({
     type: UPDATE_POINT,
     payload: { index, x, y, controlLeft, controlRight, left, right },

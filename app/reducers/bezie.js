@@ -16,12 +16,18 @@ import {
     PASTE_PATH,
     INCREASE_X_INTERVAL,
     DECREASE_X_INTERVAL,
+    INCREASE_BARS,
+    DECREASE_BARS,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
 import * as bezier from '../utils/bezier'
-import { pointTypes } from '../constants'
+import {
+    pointTypes,
+    MIN_BARS,
+    MAX_BARS,
+} from '../constants'
 
 const initialState = Immutable({
     snap: true,
@@ -59,6 +65,8 @@ export default function bezie (state = initialState, action) {
         case DECREASE_X_INTERVAL: return handleDecreaseXInterval(state)
         case COPY_PATH: return handleCopyPath(state)
         case PASTE_PATH: return handlePastePath(state)
+        case INCREASE_BARS: return handleIncreaseBars(state)
+        case DECREASE_BARS: return handleDecreaseBars(state)
         default: return state
     }
 }
@@ -453,6 +461,47 @@ function handlePastePath (state) {
     return state
         .setIn(['paths', pathIdx], state.clipboard.path)
         .setIn(['clipboard', 'path'], null)
+}
+
+function handleIncreaseBars (state) {
+    const { bars, zoom } = state
+    const paths = state.paths.asMutable({ deep: true })
+    const nextBars = bars + 1
+    const nextWidth = utils.getWidth({ bars: nextBars, zoom })
+
+    if (bars === MAX_BARS) return state
+
+    const nextPaths = _.map(paths, path => {
+        if (!path.length) return path
+        return path.concat([_.extend(path.pop(), { x: nextWidth })])
+    })
+
+    return state
+        .setIn(['clipboard', 'path'], null)
+        .setIn(['paths'], nextPaths)
+        .set('bars', nextBars)
+}
+
+function handleDecreaseBars (state) {
+    const { bars, zoom } = state
+    const paths = state.paths.asMutable({ deep: true })
+    const nextBars = bars - 1
+    const nextWidth = utils.getWidth({ bars: nextBars, zoom })
+
+    if (bars === MIN_BARS) return state
+
+    const nextPaths = _.map(paths, path => {
+        if (!path.length) return path
+        return path
+            .concat([_.extend(path.pop(), { x: nextWidth })])
+            // Remove any points that are out of bounds
+            .filter(point => point.x <= nextWidth)
+    })
+
+    return state
+        .setIn(['clipboard', 'path'], null)
+        .set('paths', nextPaths)
+        .set('bars', nextBars)
 }
 
 function setBezier (points, state, options = {}) {

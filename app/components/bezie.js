@@ -11,6 +11,8 @@ class Bezie extends Component {
         resetPath: PropTypes.func.isRequired,
         reversePath: PropTypes.func.isRequired,
         invertPath: PropTypes.func.isRequired,
+        increaseBars: PropTypes.func.isRequired,
+        decreaseBars: PropTypes.func.isRequired,
         copyPath: PropTypes.func.isRequired,
         pastePath: PropTypes.func.isRequired,
         changeSelected: PropTypes.func.isRequired,
@@ -49,6 +51,14 @@ class Bezie extends Component {
         this.props.pastePath()
     }
 
+    onIncreaseBarsClick () {
+        this.props.increaseBars()
+    }
+
+    onDecreaseBarsClick () {
+        this.props.decreaseBars()
+    }
+
     render () {
         return (
             <div className="bezie">
@@ -73,8 +83,8 @@ class Bezie extends Component {
                     </div>
                     <div className="pull-right">
                         <ButtonToolbar>
-                            <Button bsSize="small"><i className="fa fa-minus" /></Button>
-                            <Button bsSize="small"><i className="fa fa-plus" /></Button>
+                            <Button bsSize="small" onClick={::this.onDecreaseBarsClick}><i className="fa fa-minus" /></Button>
+                            <Button bsSize="small" onClick={::this.onIncreaseBarsClick}><i className="fa fa-plus" /></Button>
                             <span
                                 className="monospace noselect push-left"
                                 style={{ lineHeight: '30px' }}
