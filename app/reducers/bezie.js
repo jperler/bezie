@@ -314,6 +314,10 @@ function handleSetDefault (state) {
         .setIn(['paths', pathIdx], path)
 }
 
+function handleIncreaseXInterval (state) {
+    return state.setIn(['interval', 'x'], state.interval.x * 2)
+}
+
 function handleDecreaseXInterval (state) {
     return state.setIn(['interval', 'x'], state.interval.x / 2)
 }

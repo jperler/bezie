@@ -5,6 +5,10 @@ import Automator from './automator'
 import ContextMenu from './contextMenu'
 import PathSelector from './pathSelector'
 import * as io from '../utils/io'
+import {
+    MIN_BARS,
+    MAX_BARS,
+} from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -59,6 +63,10 @@ class Bezie extends Component {
         this.props.decreaseBars()
     }
 
+    onZoomInClick () {}
+
+    onZoomOutClick () {}
+
     render () {
         return (
             <div className="bezie">
@@ -83,8 +91,10 @@ class Bezie extends Component {
                     </div>
                     <div className="pull-right">
                         <ButtonToolbar>
-                            <Button bsSize="small" onClick={::this.onDecreaseBarsClick}><i className="fa fa-minus" /></Button>
-                            <Button bsSize="small" onClick={::this.onIncreaseBarsClick}><i className="fa fa-plus" /></Button>
+                            <Button bsSize="small" onClick={::this.onZoomOutClick}><i className="fa fa-search-minus" /></Button>
+                            <Button bsSize="small" onClick={::this.onZoomInClick}><i className="fa fa-search-plus" /></Button>
+                            <Button disabled={this.props.bars === MIN_BARS} bsSize="small" onClick={::this.onDecreaseBarsClick}><i className="fa fa-minus" /></Button>
+                            <Button disabled={this.props.bars === MAX_BARS} bsSize="small" onClick={::this.onIncreaseBarsClick}><i className="fa fa-plus" /></Button>
                             <span
                                 className="monospace noselect push-left"
                                 style={{ lineHeight: '30px' }}
