@@ -22,7 +22,6 @@ import {
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
-import * as bezier from '../utils/bezier'
 import {
     pointTypes,
     MIN_BARS,
@@ -142,14 +141,6 @@ function handleUpdatePoint (state, payload) {
 
     state = state.setIn(['paths', state.pathIdx, index], point)
 
-    if (point.type === pointTypes.saw) {
-        return handleSetSaw(state)
-    }
-
-    if (point.type === pointTypes.sine) {
-        return handleSetSine(state)
-    }
-
     if (point.isControl) {
         if (point.type === pointTypes.quadratic) {
             state = setBezier([left, point, right], state)
@@ -267,8 +258,6 @@ function handleChangeType (state, payload) {
         case pointTypes.quadratic:
         case pointTypes.cubic:
             return handleSetBezier(state, payload)
-        case pointTypes.saw: return handleSetSaw(state, payload)
-        case pointTypes.sine: return handleSetSine(state, payload)
         default: return handleSetDefault(state)
     }
 }
@@ -323,118 +312,6 @@ function handleSetDefault (state) {
     return state
         .set('selectedIdx', leftIdx + 1)
         .setIn(['paths', pathIdx], path)
-}
-
-function handleSetSaw (state) {
-    const path = state.paths[state.pathIdx].asMutable()
-    const selected = path[state.selectedIdx]
-
-    let leftIdx
-    let rightIdx
-    if (selected.type === 'saw' && selected.left && selected.right) {
-        leftIdx = _.findIndex(path, p => p.id === selected.left)
-        rightIdx = _.findIndex(path, p => p.id === selected.right)
-    } else {
-        leftIdx = state.selectedIdx - 1
-        rightIdx = state.selectedIdx + 1
-    }
-
-    const left = path[leftIdx]
-    const right = path[rightIdx]
-    const width = utils.getWidth(state)
-    // Enforce a maximum of 64 peaks per bar
-    const min = width / state.bars / 128
-    const delta = _.max([min, selected.x - left.x])
-    const points = []
-
-    if (selected.x === right.x) return state
-
-    _.map(_.range(selected.x, right.x, delta), (x, i) => {
-        points.push({
-            x,
-            y: i % 2 === 0 ? selected.y : left.y,
-            id: _.uniqueId('point'),
-            hidden: i > 0,
-            type: i === 0 ? pointTypes.saw : null,
-            left: left.id,
-            right: right.id,
-        })
-    })
-
-    path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...points)
-
-    return state
-        .setIn(['paths', state.pathIdx], path)
-}
-
-function handleSetSine (state) {
-    const path = state.paths[state.pathIdx].asMutable()
-    const selected = path[state.selectedIdx]
-
-    let leftIdx
-    let rightIdx
-    if (selected.type === pointTypes.sine && selected.left && selected.right) {
-        leftIdx = _.findIndex(path, p => p.id === selected.left)
-        rightIdx = _.findIndex(path, p => p.id === selected.right)
-    } else {
-        leftIdx = state.selectedIdx - 1
-        rightIdx = state.selectedIdx + 1
-    }
-
-    const left = path[leftIdx]
-    const right = path[rightIdx]
-    const width = utils.getWidth(state)
-    const min = width / state.bars / 32
-    const delta = _.max([min, (selected.x - left.x) * 2])
-    const points = []
-
-    if (selected.x === right.x) return state
-
-    const firstRight = {
-        x: selected.x + (selected.x - left.x),
-        y: left.y,
-    }
-
-    const height = utils.getHeight(state)
-    const steps = 32
-    const p1 = quadratic.getControl(left, selected, firstRight)
-    const bezierPoints = bezier.getPoints([left, p1, firstRight], steps)
-    let activeId
-
-    _.map(_.range(selected.x, right.x, delta), (x, i) => {
-        _.each(bezierPoints, (point, j) => {
-            const active = j + i === steps / 2 && i === 0
-            let nextY = i % 2 === 0 ? point.y : -point.y + left.y * 2
-            if (nextY > height) nextY = height
-            if (nextY < 0) nextY = 0
-
-            const id = _.uniqueId('point')
-            if (active) activeId = id
-
-            if (point.x + (delta * i) < right.x) {
-                points.push(_.extend({}, point, {
-                    x: point.x + (delta * i),
-                    y: nextY,
-                    type: active ? pointTypes.sine : null,
-                    left: active ? left.id : null,
-                    right: active ? right.id : null,
-                    hidden: !active,
-                    id,
-                }))
-            }
-        })
-    })
-
-    path.splice(leftIdx + 1, rightIdx - leftIdx - 1, ...points)
-    const nextSelectedIdx = _.findIndex(path, p => p.id === activeId)
-
-    return state
-        .set('selectedIdx', nextSelectedIdx)
-        .setIn(['paths', state.pathIdx], path)
-}
-
-function handleIncreaseXInterval (state) {
-    return state.setIn(['interval', 'x'], state.interval.x * 2)
 }
 
 function handleDecreaseXInterval (state) {

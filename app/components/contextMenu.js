@@ -47,8 +47,6 @@ class ContextMenu extends Component {
             switch (type) {
                 case pointTypes.quadratic: return 'Bezier 1'
                 case pointTypes.cubic: return 'Bezier 2'
-                case pointTypes.saw: return 'Saw'
-                case pointTypes.sine: return 'Sine'
                 default: return isEndpoint ? 'Endpoint' : 'Default'
             }
         }
@@ -82,20 +80,6 @@ class ContextMenu extends Component {
                         eventKey={pointTypes.cubic}
                     >
                         {getPointDisplay(pointTypes.cubic)}
-                    </MenuItem>
-                    <MenuItem
-                        bsSize="xsmall"
-                        disabled={!isDefault || isEndpoint}
-                        eventKey={pointTypes.saw}
-                    >
-                        Saw
-                    </MenuItem>
-                    <MenuItem
-                        bsSize="xsmall"
-                        disabled={!isDefault || isEndpoint}
-                        eventKey={pointTypes.sine}
-                    >
-                        Sine
                     </MenuItem>
                 </DropdownButton>
                 {!isEndpoint &&
