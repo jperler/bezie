@@ -15,6 +15,8 @@ export const COPY_PATH = 'COPY_PATH'
 export const PASTE_PATH = 'PASTE_PATH'
 export const INCREASE_BARS = 'INCREASE_BARS'
 export const DECREASE_BARS = 'DECREASE_BARS'
+export const ZOOM_IN = 'ZOOM_IN'
+export const ZOOM_OUT = 'ZOOM_OUT'
 
 export const addPoint = ({ index, x, y }) => ({ type: ADD_POINT, payload: { index, x, y } })
 export const removePoint = ({ index }) => ({ type: REMOVE_POINT, payload: { index } })
@@ -32,6 +34,8 @@ export const increaseXInterval = () => ({ type: INCREASE_X_INTERVAL })
 export const decreaseXInterval = () => ({ type: DECREASE_X_INTERVAL })
 export const increaseBars = () => ({ type: INCREASE_BARS })
 export const decreaseBars = () => ({ type: DECREASE_BARS })
+export const zoomIn = () => ({ type: ZOOM_IN })
+export const zoomOut = () => ({ type: ZOOM_OUT })
 export const updatePoint = ({ index, x, y, controlLeft, controlRight, left, right }) => ({
     type: UPDATE_POINT,
     payload: { index, x, y, controlLeft, controlRight, left, right },

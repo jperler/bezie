@@ -18,6 +18,8 @@ import {
     DECREASE_X_INTERVAL,
     INCREASE_BARS,
     DECREASE_BARS,
+    ZOOM_IN,
+    ZOOM_OUT,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
@@ -26,6 +28,7 @@ import {
     pointTypes,
     MIN_BARS,
     MAX_BARS,
+    ZOOM_FACTOR,
 } from '../constants'
 
 const initialState = Immutable({
@@ -66,6 +69,8 @@ export default function bezie (state = initialState, action) {
         case PASTE_PATH: return handlePastePath(state)
         case INCREASE_BARS: return handleIncreaseBars(state)
         case DECREASE_BARS: return handleDecreaseBars(state)
+        case ZOOM_IN: return handleZoomIn(state)
+        case ZOOM_OUT: return handleZoomOut(state)
         default: return state
     }
 }
@@ -383,6 +388,45 @@ function handleDecreaseBars (state) {
         .setIn(['clipboard', 'path'], null)
         .set('paths', nextPaths)
         .set('bars', nextBars)
+}
+
+function handleZoomIn (state) {
+    const paths = state.paths.asMutable({ deep: true })
+    const prevZoom = state.zoom.x
+    const nextZoom = state.zoom.x + ZOOM_FACTOR
+    const nextPaths = _.map(paths, path => {
+        if (!path.length) return path
+        return path
+            .map(point => {
+                point.x = (point.x / prevZoom) * nextZoom
+                return point
+            })
+    })
+
+    return state
+        .setIn(['zoom', 'x'], nextZoom)
+        .set('paths', nextPaths)
+}
+
+function handleZoomOut (state) {
+    const paths = state.paths.asMutable({ deep: true })
+    const prevZoom = state.zoom.x
+    const nextZoom = state.zoom.x - ZOOM_FACTOR
+
+    if (nextZoom <= ZOOM_FACTOR) return state
+
+    const nextPaths = _.map(paths, path => {
+        if (!path.length) return path
+        return path
+            .map(point => {
+                point.x = (point.x / prevZoom) * nextZoom
+                return point
+            })
+    })
+
+    return state
+        .setIn(['zoom', 'x'], nextZoom)
+        .set('paths', nextPaths)
 }
 
 function setBezier (points, state, options = {}) {

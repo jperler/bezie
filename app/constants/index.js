@@ -1,7 +1,8 @@
 export const CONTROL_MAX = 127
 export const PPQ = 96
-export const MIN_BARS = 4
-export const MAX_BARS = 12
+export const MIN_BARS = 1
+export const MAX_BARS = 16
+export const ZOOM_FACTOR = 0.2
 
 export const colors = [
     '#FD1C03',
