@@ -4,12 +4,12 @@ import ReactDOM from 'react-dom'
 import storage from 'electron-json-storage'
 import {
     Button,
-    Modal,
     Form,
     FormGroup,
     Col,
     FormControl,
 } from 'react-bootstrap'
+import Modal, { Header, Title, Body } from 'react-bootstrap/lib/Modal'
 import { STORAGE_KEY } from '../constants'
 
 class LicenseForm extends Component {
@@ -38,10 +38,10 @@ class LicenseForm extends Component {
 
         return (
             <Modal show>
-                <Modal.Header>
-                    <Modal.Title>License</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+                <Header>
+                    <Title>License</Title>
+                </Header>
+                <Body>
                     {invalid && <p style={{ color: 'red' }}>Invalid Key: {license.key}</p>}
                     <p>
                         Please enter your license key below or purchase one from
@@ -85,7 +85,7 @@ class LicenseForm extends Component {
                             </Col>
                         </FormGroup>
                     </Form>
-                </Modal.Body>
+                </Body>
             </Modal>
         )
     }
