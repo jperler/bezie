@@ -3,6 +3,8 @@ export const PPQ = 96
 export const MIN_BARS = 1
 export const MAX_BARS = 16
 export const ZOOM_FACTOR = 0.2
+export const STORAGE_KEY = '5ecc381f0692823cb628ce3a15bce02c'
+export const SECRET = '7kZiZynrnduNI+KWSFr2bw=='
 
 export const colors = [
     '#FD1C03',

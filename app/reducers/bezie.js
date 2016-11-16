@@ -20,6 +20,7 @@ import {
     DECREASE_BARS,
     ZOOM_IN,
     ZOOM_OUT,
+    AUTHORIZE,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
@@ -30,6 +31,7 @@ import {
     MAX_BARS,
     ZOOM_FACTOR,
 } from '../constants'
+import decrypt from '../utils/license'
 
 const initialState = Immutable({
     snap: true,
@@ -41,6 +43,8 @@ const initialState = Immutable({
     selectedIdx: null,
     clipboard: { path: null },
     paths: _.fill(Array(7), []),
+    authorized: true, // Prevent flicker if license is valid
+    license: { email: null, key: null },
 })
 
 export default function bezie (state = initialState, action) {
@@ -51,6 +55,7 @@ export default function bezie (state = initialState, action) {
         if (!path.length) initPath(path, state)
         state = state.setIn(['paths', pathIdx], path)
     }
+
     switch (action.type) {
         case TOGGLE_SNAP: return handleToggleSnap(state)
         case TOGGLE_TRIPLET: return handleToggleTriplet(state)
@@ -71,6 +76,7 @@ export default function bezie (state = initialState, action) {
         case DECREASE_BARS: return handleDecreaseBars(state)
         case ZOOM_IN: return handleZoomIn(state)
         case ZOOM_OUT: return handleZoomOut(state)
+        case AUTHORIZE: return handleAuth(state, payload)
         default: return state
     }
 }
@@ -81,6 +87,9 @@ function handleToggleSnap (state) {
 
 function handleAddPoint (state, payload) {
     const path = state.paths[state.pathIdx].asMutable()
+
+    if (!state.authorized) return state
+
     path.splice(payload.index, 0, {
         x: payload.x,
         y: payload.y,
@@ -132,6 +141,9 @@ function handleRemovePoint (state, payload) {
 function handleUpdatePoint (state, payload) {
     const path = _.get(state.paths, state.pathIdx)
     const point = _.get(path, payload.index).asMutable()
+
+    if (!state.authorized) return state
+
     const {
         index,
         x,
@@ -427,6 +439,19 @@ function handleZoomOut (state) {
     return state
         .setIn(['zoom', 'x'], nextZoom)
         .set('paths', nextPaths)
+}
+
+function handleAuth (state, payload) {
+    const { email, key } = payload
+    let authorized = false
+
+    try {
+        authorized = decrypt(key) === email
+    } catch (e) {} // eslint-disable-line
+
+    return state
+        .set('authorized', authorized)
+        .set('license', { email, key })
 }
 
 function setBezier (points, state, options = {}) {

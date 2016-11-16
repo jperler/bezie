@@ -16,6 +16,8 @@ function mapStateToProps (state) {
         pathIdx: state.bezie.pathIdx,
         selectedIdx: state.bezie.selectedIdx,
         clipboard: state.bezie.clipboard,
+        license: state.bezie.license,
+        authorized: state.bezie.authorized,
         xAxisTickRange: getXAxisTickRange(state),
         yAxisTickRange: getYAxisTickRange(state),
     }

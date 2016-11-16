@@ -101,6 +101,7 @@
     "css-modules-require-hook": "^4.0.1",
     "d3": "3.5.10",
     "electron-debug": "^1.0.1",
+    "electron-json-storage": "^2.1.0",
     "font-awesome": "^4.6.3",
     "postcss": "^5.1.0",
     "react": "^15.3.1",

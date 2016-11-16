@@ -83,3 +83,11 @@ circle.curve {
 .monospace {
     font-family: monospace;
 }
+
+.modal-container {
+    position: relative;
+}
+
+.modal-container .modal, .modal-container .modal-backdrop {
+    position: absolute;
+}
