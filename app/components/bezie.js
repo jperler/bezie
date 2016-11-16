@@ -1,15 +1,13 @@
 import React, { Component, PropTypes } from 'react'
+import storage from 'electron-json-storage'
 import { ipcRenderer } from 'electron'
 import { ButtonToolbar, Button } from 'react-bootstrap'
 import Automator from './automator'
 import ContextMenu from './contextMenu'
 import PathSelector from './pathSelector'
+import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
-import {
-    MIN_BARS,
-    MAX_BARS,
-    ZOOM_FACTOR,
-} from '../constants'
+import { MIN_BARS, MAX_BARS, ZOOM_FACTOR, STORAGE_KEY } from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -33,11 +31,15 @@ class Bezie extends Component {
         increaseXInterval: PropTypes.func.isRequired,
         interval: PropTypes.object.isRequired,
         zoom: PropTypes.object.isRequired,
+        authorized: PropTypes.bool.isRequired,
+        license: PropTypes.object.isRequired,
     }
 
     componentDidMount () {
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
+
+        storage.get(STORAGE_KEY, () => this.props.authorize())
     }
 
     onSaveFile (sender, filename) {
@@ -57,8 +59,11 @@ class Bezie extends Component {
     onZoomOutClick () { this.props.zoomOut() }
 
     render () {
+        const { authorized, license } = this.props
+
         return (
             <div className="bezie">
+                {!authorized && <LicenseForm {...this.props} />}
                 <div className="push-bottom">
                     <div className="pull-left">
                         <ButtonToolbar>
@@ -125,7 +130,14 @@ class Bezie extends Component {
                 <Automator {...this.props} />
                 <div className="push-top">
                     <div className="pull-left">
-                        <ButtonToolbar />
+                        {authorized &&
+                            <p
+                                className="noselect"
+                                style={{ fontSize: 12, lineHeight: '30px', color: '#272829' }}
+                            >
+                                Registered to {license.email}
+                            </p>
+                        }
                     </div>
                     <div className="pull-right">
                         <ButtonToolbar>

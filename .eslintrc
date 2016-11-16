@@ -29,7 +29,8 @@
     "no-param-reassign": 0,
     "no-script-url": 0,
     "array-callback-return": 0,
-    "no-lonely-if": 0
+    "no-lonely-if": 0,
+    "react/no-find-dom-node": 0
   },
   "plugins": [
     "import",

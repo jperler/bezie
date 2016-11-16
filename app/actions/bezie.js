@@ -1,3 +1,6 @@
+import storage from 'electron-json-storage'
+import { STORAGE_KEY } from '../constants'
+
 export const TOGGLE_SNAP = 'TOGGLE_SNAP'
 export const TOGGLE_TRIPLET = 'TOGGLE_TRIPLET'
 export const ADD_POINT = 'ADD_POINT'
@@ -17,6 +20,7 @@ export const INCREASE_BARS = 'INCREASE_BARS'
 export const DECREASE_BARS = 'DECREASE_BARS'
 export const ZOOM_IN = 'ZOOM_IN'
 export const ZOOM_OUT = 'ZOOM_OUT'
+export const AUTHORIZE = 'AUTHORIZE'
 
 export const addPoint = ({ index, x, y }) => ({ type: ADD_POINT, payload: { index, x, y } })
 export const removePoint = ({ index }) => ({ type: REMOVE_POINT, payload: { index } })
@@ -36,7 +40,22 @@ export const increaseBars = () => ({ type: INCREASE_BARS })
 export const decreaseBars = () => ({ type: DECREASE_BARS })
 export const zoomIn = () => ({ type: ZOOM_IN })
 export const zoomOut = () => ({ type: ZOOM_OUT })
-export const updatePoint = ({ index, x, y, controlLeft, controlRight, left, right }) => ({
+
+export const authorize = () => (dispatch => {
+    storage.get(STORAGE_KEY, (error, payload) => {
+        if (!error) dispatch({ type: AUTHORIZE, payload })
+    })
+})
+
+export const updatePoint = ({
+    index,
+    x,
+    y,
+    controlLeft,
+    controlRight,
+    left,
+    right
+}) => ({
     type: UPDATE_POINT,
     payload: { index, x, y, controlLeft, controlRight, left, right },
 })
