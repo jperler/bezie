@@ -19,20 +19,12 @@ class LicenseForm extends Component {
         authorized: PropTypes.bool.isRequired,
     }
 
-    onReset () {
-        storage.remove(STORAGE_KEY, () => {
-            this.props.authorize()
-        })
-    }
-
     onSubmit () {
         const email = ReactDOM.findDOMNode(this.email).value
         const key = ReactDOM.findDOMNode(this.key).value
         const data = { email, key }
 
-        storage.set(STORAGE_KEY, data, () => {
-            this.props.authorize()
-        })
+        storage.set(STORAGE_KEY, data, () => this.props.authorize())
     }
 
     onPurchaseClick (e) {
