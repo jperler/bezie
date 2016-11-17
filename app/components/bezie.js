@@ -56,7 +56,9 @@ class Bezie extends Component {
         io.save(sender, filename, this.props)
     }
 
-    onOpenFile (filename) {} // eslint-disable-line no-unused-vars
+    onOpenFile (sender, filename) {
+        io.open(sender, filename, this.props)
+    }
 
     onResetClick () { this.props.resetPath() }
     onReverseClick () { this.props.reversePath() }
@@ -70,7 +72,7 @@ class Bezie extends Component {
     updateHeight () { this.props.updateHeight() }
 
     render () {
-        const { authorized, license } = this.props
+        const { authorized } = this.props
 
         return (
             <div className="bezie">

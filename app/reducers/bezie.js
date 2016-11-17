@@ -22,6 +22,7 @@ import {
     ZOOM_OUT,
     AUTHORIZE,
     UPDATE_HEIGHT,
+    BOOTSTRAP,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
@@ -79,6 +80,7 @@ export default function bezie (state = initialState, action) {
         case ZOOM_OUT: return handleZoomOut(state)
         case AUTHORIZE: return handleAuth(state, payload)
         case UPDATE_HEIGHT: return handleUpdateHeight(state)
+        case BOOTSTRAP: return handleBootstrap(state, payload)
         default: return state
     }
 }
@@ -470,6 +472,12 @@ function handleAuth (state, payload) {
     return state
         .set('authorized', authorized)
         .set('license', { email, key })
+}
+
+function handleBootstrap (state, payload) {
+    const attrs = _.keys(payload)
+    return state.merge(_.extend(payload, _.omit(initialState,
+        attrs.concat(['authorized', 'license']))))
 }
 
 function setBezier (points, state, options = {}) {

@@ -244,6 +244,9 @@ export const TEMPLATE = `
                                                 <Name Value="" />
                                                 <Bezie>
                                                     <PathData Value="" />
+                                                    <ZoomX Value="" />
+                                                    <ZoomY Value="" />
+                                                    <Bars Value="" />
                                                 </Bezie>
                                                 <Annotation Value="" />
                                                 <ColorIndex Value="40" />
