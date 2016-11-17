@@ -40,7 +40,6 @@ app.on('ready', async () => {
     width: 1024,
     height: 400,
     minHeight: 400,
-    maxHeight: 400,
     minWidth: 800,
   });
 
