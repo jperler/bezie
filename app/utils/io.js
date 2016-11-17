@@ -15,6 +15,7 @@ const CLIP_PATH = [
 const ENVELOPES_PATH = CLIP_PATH.concat(['Envelopes', 0, 'Envelopes'])
 const NAME_PATH = CLIP_PATH.concat(['Name', 0])
 const LOOP_PATH = CLIP_PATH.concat(['Loop', 0])
+const PATH_DATA_PATH = CLIP_PATH.concat(['Bezie', 0, 'PathData', 0])
 const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 
 export function save (sender, filename, { paths, height, zoom, bars }) {
@@ -22,12 +23,16 @@ export function save (sender, filename, { paths, height, zoom, bars }) {
         const builder = new xml2js.Builder()
         const envelopes = _.get(clip, ENVELOPES_PATH)
         const name = _.get(clip, NAME_PATH)
+        const pathData = _.get(clip, PATH_DATA_PATH)
         const currentEnd = _.get(clip, CURRENT_END_PATH)
         const loop = _.get(clip, LOOP_PATH)
         const length = bars * 4
 
         // Set name
         name.$ = { Value: path.parse(filename).name }
+
+        // Add paths
+        pathData.$ = { Value: Buffer.from(JSON.stringify(paths), 'utf8').toString('base64') }
 
         // Set bars
         currentEnd.$ = { Value: length }
