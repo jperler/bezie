@@ -33,13 +33,23 @@ class Bezie extends Component {
         zoom: PropTypes.object.isRequired,
         authorized: PropTypes.bool.isRequired,
         license: PropTypes.object.isRequired,
+        updateHeight: PropTypes.func.isRequired,
+        authorize: PropTypes.func.isRequired,
     }
 
     componentDidMount () {
+        const debouncedUpdateHeight = _.debounce(::this.updateHeight, 200)
+
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
 
         storage.get(STORAGE_KEY, () => this.props.authorize())
+        debouncedUpdateHeight()
+
+        window.addEventListener('resize', e => {
+            e.preventDefault()
+            debouncedUpdateHeight()
+        })
     }
 
     onSaveFile (sender, filename) {
@@ -57,6 +67,7 @@ class Bezie extends Component {
     onDecreaseBarsClick () { this.props.decreaseBars() }
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
+    updateHeight () { this.props.updateHeight() }
 
     render () {
         const { authorized, license } = this.props
@@ -129,16 +140,7 @@ class Bezie extends Component {
                 </div>
                 <Automator {...this.props} />
                 <div className="push-top">
-                    <div className="pull-left">
-                        {authorized &&
-                            <p
-                                className="noselect"
-                                style={{ fontSize: 12, lineHeight: '30px', color: '#272829' }}
-                            >
-                                Registered to {license.email}
-                            </p>
-                        }
-                    </div>
+                    <div className="pull-left" />
                     <div className="pull-right">
                         <ButtonToolbar>
                             <Button

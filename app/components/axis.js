@@ -9,7 +9,10 @@ export class X extends Component {
     }
 
     shouldComponentUpdate (nextProps) {
-        return !_.isEqual(this.props.xAxisTickRange, nextProps.xAxisTickRange)
+        return (
+            !_.isEqual(this.props.xAxisTickRange, nextProps.xAxisTickRange) ||
+            !_.isEqual(this.props.height, nextProps.height)
+        )
     }
 
     render () {

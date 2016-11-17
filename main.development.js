@@ -83,7 +83,7 @@ app.on('ready', async () => {
       }, {
         type: 'separator'
       }, {
-        label: 'Hide ElectronReact',
+        label: 'Hide',
         accelerator: 'Command+H',
         selector: 'hide:'
       },
