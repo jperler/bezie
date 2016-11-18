@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import * as bezier from '../utils/bezier'
 import * as utils from '../utils'
-import { pointTypes } from '../constants'
+import { pointTypes, SESSION_ID } from '../constants'
 
 export function setBezier ([p0, p1, p2], state, options) {
     const { paths, pathIdx, selectedIdx } = state
@@ -21,7 +21,7 @@ export function setBezier ([p0, p1, p2], state, options) {
         type: pointTypes.quadratic,
         left: p0.id,
         right: p2.id,
-        id: _.uniqueId('point'),
+        id: _.uniqueId(SESSION_ID),
     })
 
     innerCurve.map(p => {

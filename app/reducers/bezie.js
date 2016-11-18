@@ -32,6 +32,7 @@ import {
     MIN_BARS,
     MAX_BARS,
     ZOOM_FACTOR,
+    SESSION_ID,
 } from '../constants'
 import decrypt from '../utils/license'
 
@@ -97,8 +98,9 @@ function handleAddPoint (state, payload) {
     path.splice(payload.index, 0, {
         x: payload.x,
         y: payload.y,
-        id: _.uniqueId('point'),
+        id: _.uniqueId(SESSION_ID),
     })
+
     return state
         .set('selectedIdx', payload.index)
         .setIn(['paths', state.pathIdx], path)
@@ -493,7 +495,7 @@ function initPath (path, state) {
     const width = utils.getWidth(state)
 
     path.push(
-        { x: 0, y: height, id: _.uniqueId('point') },
-        { x: width, y: height, id: _.uniqueId('point') }
+        { x: 0, y: height, id: _.uniqueId(SESSION_ID) },
+        { x: width, y: height, id: _.uniqueId(SESSION_ID) }
     )
 }

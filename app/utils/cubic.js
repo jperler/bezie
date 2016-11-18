@@ -2,7 +2,7 @@ import _ from 'lodash'
 import * as bezier from '../utils/bezier'
 import * as utils from '../utils'
 import * as quadratic from '../utils/quadratic'
-import { pointTypes } from '../constants'
+import { pointTypes, SESSION_ID } from '../constants'
 
 export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     const { paths, pathIdx, selectedIdx } = state
@@ -29,8 +29,8 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
     const curve = bezier.getPoints([p0, control[0], control[1], p3], steps)
     const innerCurve = utils.takeInner(curve)
 
-    const id1 = _.uniqueId('point')
-    const id2 = _.uniqueId('point')
+    const id1 = _.uniqueId(SESSION_ID)
+    const id2 = _.uniqueId(SESSION_ID)
 
     _.extend(curve[li], {
         isControl: true,
@@ -52,7 +52,7 @@ export function setBezier ([p0, p1, p2, p3], state, options = {}) {
         if (!p.isControl) {
             _.extend(p, {
                 hidden: true,
-                id: _.uniqueId('point'),
+                id: _.uniqueId(SESSION_ID),
             })
         }
 
