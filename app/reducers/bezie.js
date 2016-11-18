@@ -22,6 +22,7 @@ import {
     ZOOM_OUT,
     AUTHORIZE,
     UPDATE_HEIGHT,
+    BOOTSTRAP,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
@@ -31,6 +32,7 @@ import {
     MIN_BARS,
     MAX_BARS,
     ZOOM_FACTOR,
+    SESSION_ID,
 } from '../constants'
 import decrypt from '../utils/license'
 
@@ -79,6 +81,7 @@ export default function bezie (state = initialState, action) {
         case ZOOM_OUT: return handleZoomOut(state)
         case AUTHORIZE: return handleAuth(state, payload)
         case UPDATE_HEIGHT: return handleUpdateHeight(state)
+        case BOOTSTRAP: return handleBootstrap(state, payload)
         default: return state
     }
 }
@@ -95,8 +98,9 @@ function handleAddPoint (state, payload) {
     path.splice(payload.index, 0, {
         x: payload.x,
         y: payload.y,
-        id: _.uniqueId('point'),
+        id: _.uniqueId(SESSION_ID),
     })
+
     return state
         .set('selectedIdx', payload.index)
         .setIn(['paths', state.pathIdx], path)
@@ -472,6 +476,12 @@ function handleAuth (state, payload) {
         .set('license', { email, key })
 }
 
+function handleBootstrap (state, payload) {
+    const attrs = _.keys(payload)
+    return state.merge(_.extend(payload, _.omit(initialState,
+        attrs.concat(['authorized', 'license']))))
+}
+
 function setBezier (points, state, options = {}) {
     switch (points.length) {
         case 3: return quadratic.setBezier(points, state, options)
@@ -485,7 +495,7 @@ function initPath (path, state) {
     const width = utils.getWidth(state)
 
     path.push(
-        { x: 0, y: height, id: _.uniqueId('point') },
-        { x: width, y: height, id: _.uniqueId('point') }
+        { x: 0, y: height, id: _.uniqueId(SESSION_ID) },
+        { x: width, y: height, id: _.uniqueId(SESSION_ID) }
     )
 }

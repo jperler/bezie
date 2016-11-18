@@ -242,6 +242,12 @@ export const TEMPLATE = `
                                                     <HiddenLoopEnd Value="4" />
                                                 </Loop>
                                                 <Name Value="" />
+                                                <Bezie>
+                                                    <PathData Value="" />
+                                                    <ZoomX Value="" />
+                                                    <ZoomY Value="" />
+                                                    <Bars Value="" />
+                                                </Bezie>
                                                 <Annotation Value="" />
                                                 <ColorIndex Value="40" />
                                                 <LaunchMode Value="0" />
