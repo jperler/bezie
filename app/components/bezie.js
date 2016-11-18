@@ -38,18 +38,10 @@ class Bezie extends Component {
     }
 
     componentDidMount () {
-        const debouncedUpdateHeight = _.debounce(::this.updateHeight, 200)
-
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
 
         storage.get(STORAGE_KEY, () => this.props.authorize())
-        debouncedUpdateHeight()
-
-        window.addEventListener('resize', e => {
-            e.preventDefault()
-            debouncedUpdateHeight()
-        })
     }
 
     onSaveFile (sender, filename) {
