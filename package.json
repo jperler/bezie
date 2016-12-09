@@ -8,17 +8,50 @@
     "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
     "test-watch": "npm test -- --watch",
     "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js ./test/e2e.js",
-    "lint": "eslint app test *.js",
+    "lint": "eslint app",
     "hot-server": "node -r babel-register server.js",
     "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build": "npm run build-main && npm run build-renderer",
     "start": "cross-env NODE_ENV=production electron ./",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development",
-    "package": "cross-env NODE_ENV=production node -r babel-register package.js",
-    "package-all": "npm run package -- --all",
+    "package": "npm run build && build --publish never",
+    "package-win": "npm run build && build --win --x64",
+    "package-all": "npm run build && build -mw",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
+  },
+  "build": {
+    "appId": "io.bezie.automator",
+    "category": "public.app-category.utilities",
+    "files": [
+      "main.js",
+      "dist",
+      "node_modules",
+      "app/*.html"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "directories": {
+    "buildResources": "resources",
+    "output": "release"
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -68,11 +101,13 @@
     "del": "^2.2.1",
     "devtron": "^1.2.1",
     "electron": "^1.4.6",
+    "electron-builder": "^10.6.1",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^7.3.0",
     "electron-rebuild": "^1.1.5",
     "eslint": "^3.3.1",
     "eslint-config-airbnb": "^10.0.1",
+    "eslint-formatter-pretty": "^1.1.0",
     "eslint-import-resolver-webpack": "^0.5.1",
     "eslint-plugin-import": "^1.14.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
