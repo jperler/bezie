@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === 'development') {
 } else {
     updateFeed = platform === 'darwin' ?
         `https://bezie.herokuapp.com/update/${platform}_${arch}/${version}` :
-        `https://bezie.herokuapp.com/update/win32/${version}` :
+        `https://bezie.herokuapp.com/update/win32/${version}`
 
     autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName) => {
         if (mainWindow) mainWindow.webContents.send('update-downloaded', releaseName)

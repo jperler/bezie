@@ -58,7 +58,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chentsulin/electron-react-boilerplate.git"
+    "url": "git+https://github.com/jperler/bezie.git"
   },
   "author": {
     "name": "Justin Perler",
@@ -68,7 +68,7 @@
   "license": "MIT",
   "bugs": {},
   "keywords": [],
-  "homepage": "https://github.com/chentsulin/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/jperler/bezie#readme",
   "devDependencies": {
     "asar": "^0.12.1",
     "babel-core": "^6.13.1",
