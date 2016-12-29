@@ -40,6 +40,7 @@ class Bezie extends Component {
     componentDidMount () {
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
+        ipcRenderer.on('update-downloaded', ::this.onUpdatedDownloaded)
 
         storage.get(STORAGE_KEY, () => this.props.authorize())
     }
@@ -50,6 +51,10 @@ class Bezie extends Component {
 
     onOpenFile (sender, filename) {
         io.open(sender, filename, this.props)
+    }
+
+    onUpdatedDownloaded (sender, version) {
+        alert(`Version ${version} is downloaded and will be automatically installed on Quit`) // eslint-disable-line
     }
 
     onResetClick () { this.props.resetPath() }

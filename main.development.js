@@ -1,6 +1,8 @@
 import { autoUpdater, app, BrowserWindow, Menu, shell, dialog } from 'electron'
 import os from 'os'
 
+if (require('electron-squirrel-startup')) app.quit() // eslint-disable-line
+
 let menu
 let template
 let updateFeed
@@ -16,10 +18,10 @@ if (process.env.NODE_ENV === 'development') {
 } else {
     updateFeed = platform === 'darwin' ?
         `https://bezie.herokuapp.com/update/${platform}_${arch}/${version}` :
-        ''
+        `https://bezie.herokuapp.com/update/win32/${version}` :
 
-    autoUpdater.addListener('update-downloaded', () => {
-        autoUpdater.quitAndInstall()
+    autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName) => {
+        if (mainWindow) mainWindow.webContents.send('update-downloaded', releaseName)
     })
 
     autoUpdater.setFeedURL(updateFeed)
