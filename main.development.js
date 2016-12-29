@@ -1,12 +1,29 @@
-import { app, BrowserWindow, Menu, shell, dialog } from 'electron'
+import { autoUpdater, app, BrowserWindow, Menu, shell, dialog } from 'electron'
+import os from 'os'
 
 let menu
 let template
+let updateFeed
 let mainWindow = null
 let currentFile = null
 
+const platform = os.platform()
+const arch = os.arch()
+const version = app.getVersion()
+
 if (process.env.NODE_ENV === 'development') {
     require('electron-debug')() // eslint-disable-line global-require
+} else {
+    updateFeed = platform === 'darwin' ?
+        `https://bezie.herokuapp.com/update/${platform}_${arch}/${version}` :
+        ''
+
+    autoUpdater.addListener('update-downloaded', () => {
+        autoUpdater.quitAndInstall()
+    })
+
+    autoUpdater.setFeedURL(updateFeed)
+    autoUpdater.checkForUpdates()
 }
 
 app.on('window-all-closed', () => {
