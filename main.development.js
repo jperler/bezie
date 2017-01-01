@@ -52,6 +52,9 @@ const installExtensions = async () => {
 const createWindow = async () => {
     await installExtensions()
 
+    // Reset current file
+    currentFile = null
+
     mainWindow = new BrowserWindow({
         show: false,
         width: 1024,
@@ -126,7 +129,8 @@ const createWindow = async () => {
                     label: 'New',
                     accelerator: 'Command+N',
                     click () {
-                        if (mainWindow === null) createWindow()
+                        if (mainWindow) mainWindow.close()
+                        createWindow()
                     },
                 },
                 {
@@ -138,9 +142,9 @@ const createWindow = async () => {
                             filters: [
                                 { name: 'Ableton', extensions: ['alc'] },
                             ],
-                        }, filename => {
-                            currentFile = filename[0]
-                            mainWindow.webContents.send('open-file', filename)
+                        }, paths => {
+                            currentFile = paths[0]
+                            mainWindow.webContents.send('open-file', currentFile)
                         })
                     },
                 },
@@ -156,7 +160,8 @@ const createWindow = async () => {
                                     { name: 'Ableton', extensions: ['alc'] },
                                 ],
                             }, filename => {
-                                mainWindow.webContents.send('save-file', filename)
+                                currentFile = filename
+                                mainWindow.webContents.send('save-file', currentFile)
                             })
                         }
                     },
@@ -268,7 +273,7 @@ const createWindow = async () => {
                 {
                     label: 'Learn More',
                     click () {
-                        shell.openExternal('http://electron.atom.io')
+                        shell.openExternal('http://bezie.io')
                     }
                 },
             ],

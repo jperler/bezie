@@ -59,6 +59,18 @@ export default function bezie (state = initialState, action) {
         state = state.setIn(['paths', pathIdx], path)
     }
 
+    // Update the title to indicate file status
+    if (_.includes([
+        ADD_POINT, REMOVE_POINT, UPDATE_POINT, REMOVE_POINT, CHANGE_TYPE,
+        RESET_PATH, REVERSE_PATH, INVERT_PATH, PASTE_PATH,
+    ], action.type)) {
+        if (document.title === 'Bezie') {
+            document.title = '* untitled'
+        } else if (document.title[0] !== '*') {
+            document.title = `* ${document.title}`
+        }
+    }
+
     switch (action.type) {
         case TOGGLE_SNAP: return handleToggleSnap(state)
         case TOGGLE_TRIPLET: return handleToggleTriplet(state)

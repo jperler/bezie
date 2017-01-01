@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import storage from 'electron-json-storage'
+import { basename } from 'path'
 import { ipcRenderer } from 'electron'
 import { ButtonToolbar, Button } from 'react-bootstrap'
 import Automator from './automator'
@@ -42,15 +43,21 @@ class Bezie extends Component {
         ipcRenderer.on('open-file', ::this.onOpenFile)
         ipcRenderer.on('update-downloaded', ::this.onUpdatedDownloaded)
 
-        storage.get(STORAGE_KEY, () => this.props.authorize())
+        this.props.authorize()
     }
 
     onSaveFile (sender, filename) {
-        io.save(sender, filename, this.props)
+        if (filename) {
+            io.save(sender, filename, this.props)
+            document.title = basename(filename)
+        }
     }
 
     onOpenFile (sender, filename) {
-        io.open(sender, filename, this.props)
+        if (filename) {
+            io.open(sender, filename, this.props)
+            document.title = basename(filename)
+        }
     }
 
     onUpdatedDownloaded (sender, version) {
