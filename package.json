@@ -1,7 +1,7 @@
 {
   "name": "bezie",
   "productName": "Bezie",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Rapid prototyping application for bezier automation in Ableton Live",
   "main": "main.js",
   "scripts": {
@@ -92,7 +92,7 @@
     "del": "^2.2.1",
     "devtron": "^1.2.1",
     "electron": "^1.4.6",
-    "electron-builder": "^10.6.1",
+    "electron-builder": "^10.16.0",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^7.3.0",
     "electron-rebuild": "^1.1.5",
