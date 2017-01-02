@@ -1,7 +1,7 @@
 {
   "name": "bezie",
   "productName": "Bezie",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Rapid prototyping application for bezier automation in Ableton Live",
   "main": "main.js",
   "scripts": {
@@ -46,7 +46,8 @@
       ]
     },
     "win": {
-      "target": "squirrel"
+      "target": "squirrel",
+      "iconUrl": "https://raw.githubusercontent.com/jperler/bezie/master/resources/icon.ico?token=AA3bhzNsDySQUXTcW6dQBgRjuL0ghEdrks5Yc_UPwA%3D%3D"
     }
   },
   "directories": {
