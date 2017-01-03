@@ -28,11 +28,6 @@ if (process.env.NODE_ENV === 'development') {
     autoUpdater.checkForUpdates()
 }
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
-})
-
-
 const installExtensions = async () => {
     if (process.env.NODE_ENV === 'development') {
         const installer = require('electron-devtools-installer') // eslint-disable-line
@@ -358,4 +353,8 @@ app.on('ready', createWindow)
 
 app.on('activate', () => {
     if (mainWindow === null) createWindow()
+})
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
 })
