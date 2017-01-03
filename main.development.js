@@ -314,7 +314,6 @@ function onOpenDialog () {
     })
 }
 
-
 function onSaveDialog () {
     if (currentFile) {
         mainWindow.webContents.send('save-file', currentFile)
