@@ -55,13 +55,16 @@ const createWindow = async () => {
     // Reset current file
     currentFile = null
 
+    // Add padding for the file menu in Windows
+    const height = platform === 'darwin' ? 400 : 440
+
     mainWindow = new BrowserWindow({
         show: false,
         width: 1024,
-        height: 400,
-        minHeight: 400,
-        maxHeight: 400,
         minWidth: 800,
+        height,
+        minHeight: height,
+        maxHeight: height,
     })
 
     mainWindow.loadURL(`file://${__dirname}/app/app.html`)
@@ -90,259 +93,265 @@ const createWindow = async () => {
     }
 
     if (process.platform === 'darwin') {
-        template = [{
-            label: 'Bezie',
-            submenu: [
-                {
-                    label: 'About Bezie',
-                    selector: 'orderFrontStandardAboutPanel:'
-                },
-                { type: 'separator' },
-                {
-                    label: 'Hide',
-                    accelerator: 'Command+H',
-                    selector: 'hide:'
-                },
-                {
-                    label: 'Hide Others',
-                    accelerator: 'Command+Shift+H',
-                    selector: 'hideOtherApplications:'
-                },
-                {
-                    label: 'Show All',
-                    selector: 'unhideAllApplications:'
-                },
-                { type: 'separator' },
-                {
-                    label: 'Quit',
-                    accelerator: 'Command+Q',
-                    click () {
-                        app.quit()
-                    }
-                },
-            ]
-        },
-        {
-            label: 'File',
-            submenu: [
-                {
-                    label: 'New',
-                    accelerator: 'Command+N',
-                    click () {
-                        if (mainWindow) mainWindow.close()
-                        createWindow()
+        template = [
+            {
+                label: 'Bezie',
+                submenu: [
+                    {
+                        label: 'About Bezie',
+                        selector: 'orderFrontStandardAboutPanel:'
                     },
-                },
-                {
-                    label: 'Open',
-                    accelerator: 'Command+O',
-                    click () {
-                        dialog.showOpenDialog({
-                            properties: ['openFile'],
-                            filters: [
-                                { name: 'Ableton', extensions: ['alc'] },
-                            ],
-                        }, paths => {
-                            currentFile = paths[0]
-                            mainWindow.webContents.send('open-file', currentFile)
-                        })
+                    { type: 'separator' },
+                    {
+                        label: 'Hide',
+                        accelerator: 'Command+H',
+                        selector: 'hide:'
                     },
-                },
-                {
-                    label: 'Save',
-                    accelerator: 'Command+S',
-                    click () {
-                        if (currentFile) {
-                            mainWindow.webContents.send('save-file', currentFile)
-                        } else {
-                            dialog.showSaveDialog({
-                                filters: [
-                                    { name: 'Ableton', extensions: ['alc'] },
-                                ],
-                            }, filename => {
-                                currentFile = filename
-                                mainWindow.webContents.send('save-file', currentFile)
-                            })
+                    {
+                        label: 'Hide Others',
+                        accelerator: 'Command+Shift+H',
+                        selector: 'hideOtherApplications:'
+                    },
+                    {
+                        label: 'Show All',
+                        selector: 'unhideAllApplications:'
+                    },
+                    { type: 'separator' },
+                    {
+                        label: 'Quit',
+                        accelerator: 'Command+Q',
+                        click () {
+                            app.quit()
                         }
                     },
-                },
-                {
-                    label: 'Save As...',
-                    accelerator: 'Command+Shift+S',
-                    click () {
-                        dialog.showSaveDialog({
-                            filters: [
-                                { name: 'Ableton', extensions: ['alc'] },
-                            ],
-                        }, filename => {
-                            mainWindow.webContents.send('save-file', filename)
-                        })
+                ]
+            },
+            {
+                label: 'File',
+                submenu: [
+                    {
+                        label: 'New',
+                        accelerator: 'Command+N',
+                        click () {
+                            if (mainWindow) mainWindow.close()
+                            createWindow()
+                        },
                     },
-                },
-            ],
-        },
-        {
-            label: 'Edit',
-            submenu: [
-                {
-                    label: 'Undo',
-                    accelerator: 'Command+Z',
-                    selector: 'undo:'
-                },
-                {
-                    label: 'Redo',
-                    accelerator: 'Shift+Command+Z',
-                    selector: 'redo:'
-                },
-                { type: 'separator' },
-                {
-                    label: 'Cut',
-                    accelerator: 'Command+X',
-                    selector: 'cut:'
-                }, {
-                    label: 'Copy',
-                    accelerator: 'Command+C',
-                    selector: 'copy:'
-                },
-                {
-                    label: 'Paste',
-                    accelerator: 'Command+V',
-                    selector: 'paste:'
-                },
-                {
-                    label: 'Select All',
-                    accelerator: 'Command+A',
-                    selector: 'selectAll:'
-                },
-            ],
-        },
-        {
-            label: 'View',
-            submenu: (process.env.NODE_ENV === 'development') ? [
-                {
-                    label: 'Reload',
-                    accelerator: 'Command+R',
-                    click () {
-                        mainWindow.webContents.reload()
-                    }
-                },
-                {
-                    label: 'Toggle Full Screen',
-                    accelerator: 'Ctrl+Command+F',
-                    click () {
-                        mainWindow.setFullScreen(!mainWindow.isFullScreen())
-                    }
-                },
-                {
-                    label: 'Toggle Developer Tools',
-                    accelerator: 'Alt+Command+I',
-                    click() {
-                        mainWindow.toggleDevTools()
-                    }
-                }] : [{
-                    label: 'Toggle Full Screen',
-                    accelerator: 'Ctrl+Command+F',
-                    click () {
-                        mainWindow.setFullScreen(!mainWindow.isFullScreen())
-                    }
-                }]
-        },
-        {
-            label: 'Window',
-            submenu: [
-                {
-                    label: 'Minimize',
-                    accelerator: 'Command+M',
-                    selector: 'performMiniaturize:'
-                },
-                {
-                    label: 'Close',
-                    accelerator: 'Command+W',
-                    selector: 'performClose:'
-                },
-                { type: 'separator' },
-                {
-                    label: 'Bring All to Front',
-                    selector: 'arrangeInFront:'
-                },
-            ]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'Learn More',
-                    click () {
-                        shell.openExternal('http://bezie.io')
-                    }
-                },
-            ],
-        }]
+                    {
+                        label: 'Open',
+                        accelerator: 'Command+O',
+                        click: onOpenDialog,
+                    },
+                    {
+                        label: 'Save',
+                        accelerator: 'Command+S',
+                        click: onSaveDialog,
+                    },
+                    {
+                        label: 'Save As...',
+                        accelerator: 'Command+Shift+S',
+                        click: onSaveAsDialog,
+                    },
+                ],
+            },
+            {
+                label: 'Edit',
+                submenu: [
+                    {
+                        label: 'Undo',
+                        accelerator: 'Command+Z',
+                        selector: 'undo:'
+                    },
+                    {
+                        label: 'Redo',
+                        accelerator: 'Shift+Command+Z',
+                        selector: 'redo:'
+                    },
+                    { type: 'separator' },
+                    {
+                        label: 'Cut',
+                        accelerator: 'Command+X',
+                        selector: 'cut:'
+                    }, {
+                        label: 'Copy',
+                        accelerator: 'Command+C',
+                        selector: 'copy:'
+                    },
+                    {
+                        label: 'Paste',
+                        accelerator: 'Command+V',
+                        selector: 'paste:'
+                    },
+                    {
+                        label: 'Select All',
+                        accelerator: 'Command+A',
+                        selector: 'selectAll:'
+                    },
+                ],
+            },
+            {
+                label: 'View',
+                submenu: (process.env.NODE_ENV === 'development') ? [
+                    {
+                        label: 'Reload',
+                        accelerator: 'Command+R',
+                        click () {
+                            mainWindow.webContents.reload()
+                        }
+                    },
+                    {
+                        label: 'Toggle Developer Tools',
+                        accelerator: 'Alt+Command+I',
+                        click() {
+                            mainWindow.toggleDevTools()
+                        }
+                    }] : []
+            },
+            {
+                label: 'Window',
+                submenu: [
+                    {
+                        label: 'Minimize',
+                        accelerator: 'Command+M',
+                        selector: 'performMiniaturize:'
+                    },
+                    {
+                        label: 'Close',
+                        accelerator: 'Command+W',
+                        selector: 'performClose:'
+                    },
+                    { type: 'separator' },
+                    {
+                        label: 'Bring All to Front',
+                        selector: 'arrangeInFront:'
+                    },
+                ]
+            },
+            {
+                label: 'Help',
+                submenu: [
+                    {
+                        label: 'Learn More',
+                        click: onLearnMore,
+                    },
+                ],
+            },
+        ]
 
         menu = Menu.buildFromTemplate(template)
         Menu.setApplicationMenu(menu)
     } else {
-        template = [{
-            label: '&File',
-            submenu: [
-                {
-                    label: '&Open',
-                    accelerator: 'Ctrl+O'
-                },
-                {
-                    label: '&Close',
-                    accelerator: 'Ctrl+W',
-                    click () {
-                        mainWindow.close()
-                    }
-                }
-            ],
-        },
-        {
-            label: '&View',
-            submenu: (process.env.NODE_ENV === 'development') ? [{
-                label: '&Reload',
-                accelerator: 'Ctrl+R',
-                click () {
-                    mainWindow.webContents.reload()
-                }
+        template = [
+            {
+                label: '&File',
+                submenu: [
+                    {
+                        label: '&Open',
+                        accelerator: 'Ctrl+O',
+                        click: onOpenDialog,
+                    },
+                    {
+                        label: '&Close',
+                        accelerator: 'Ctrl+W',
+                        click () {
+                            mainWindow.close()
+                        }
+                    },
+                    {
+                        label: '&Save',
+                        accelerator: 'Ctrl+S',
+                        click: onSaveDialog,
+                    },
+                    {
+                        label: '&Save As...',
+                        accelerator: 'Ctrl+Shift+S',
+                        click: onSaveAsDialog,
+                    },
+                ],
             },
             {
-                label: 'Toggle &Full Screen',
-                accelerator: 'F11',
-                click () {
-                    mainWindow.setFullScreen(!mainWindow.isFullScreen())
-                }
+                label: '&View',
+                submenu: (process.env.NODE_ENV === 'development') ? [
+                    {
+                        label: '&Reload',
+                        accelerator: 'Ctrl+R',
+                        click () {
+                            mainWindow.webContents.reload()
+                        }
+                    },
+                    {
+                        label: 'Toggle &Developer Tools',
+                        accelerator: 'Alt+Ctrl+I',
+                        click () {
+                            mainWindow.toggleDevTools()
+                        }
+                    }
+                ] : []
             },
             {
-                label: 'Toggle &Developer Tools',
-                accelerator: 'Alt+Ctrl+I',
-                click () {
-                    mainWindow.toggleDevTools()
-                }
-            }] : [{
-                label: 'Toggle &Full Screen',
-                accelerator: 'F11',
-                click () {
-                    mainWindow.setFullScreen(!mainWindow.isFullScreen())
-                }
-            }]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'Learn More',
-                    click () {
-                        shell.openExternal('http://electron.atom.io')
-                    }
-                },
-            ]
-        }]
+                label: 'Help',
+                submenu: [
+                    {
+                        label: 'Learn More',
+                        click: onLearnMore,
+                    },
+                ]
+            }
+        ]
 
         menu = Menu.buildFromTemplate(template)
         mainWindow.setMenu(menu)
     }
+}
+
+function onOpenDialog () {
+    dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [
+            { name: 'Ableton', extensions: ['alc'] },
+        ],
+    }, (paths = []) => {
+        const filename = paths[0]
+        if (filename) {
+            mainWindow.webContents.send('open-file', filename)
+            currentFile = filename
+        }
+    })
+}
+
+
+function onSaveDialog () {
+    if (currentFile) {
+        mainWindow.webContents.send('save-file', currentFile)
+    } else {
+        dialog.showSaveDialog({
+            filters: [
+                { name: 'Ableton', extensions: ['alc'] },
+            ],
+        }, filename => {
+            if (filename) {
+                mainWindow.webContents.send('save-file', filename)
+                currentFile = filename
+            }
+        })
+    }
+}
+
+function onSaveAsDialog () {
+    dialog.showSaveDialog({
+        filters: [
+            { name: 'Ableton', extensions: ['alc'] },
+        ],
+    }, filename => {
+        if (filename) {
+            mainWindow.webContents.send('save-file', filename)
+            currentFile = filename
+        }
+    })
+}
+
+function onLearnMore () {
+    shell.openExternal('http://bezie.io')
 }
 
 app.on('ready', createWindow)

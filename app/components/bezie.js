@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import storage from 'electron-json-storage'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
 import { ButtonToolbar, Button } from 'react-bootstrap'
@@ -8,7 +7,7 @@ import ContextMenu from './contextMenu'
 import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
-import { MIN_BARS, MAX_BARS, ZOOM_FACTOR, STORAGE_KEY } from '../constants'
+import { MIN_BARS, MAX_BARS, ZOOM_FACTOR } from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -34,7 +33,6 @@ class Bezie extends Component {
         zoom: PropTypes.object.isRequired,
         authorized: PropTypes.bool.isRequired,
         license: PropTypes.object.isRequired,
-        updateHeight: PropTypes.func.isRequired,
         authorize: PropTypes.func.isRequired,
     }
 
@@ -47,17 +45,13 @@ class Bezie extends Component {
     }
 
     onSaveFile (sender, filename) {
-        if (filename) {
-            io.save(sender, filename, this.props)
-            document.title = basename(filename)
-        }
+        io.save(sender, filename, this.props)
+        document.title = basename(filename)
     }
 
     onOpenFile (sender, filename) {
-        if (filename) {
-            io.open(sender, filename, this.props)
-            document.title = basename(filename)
-        }
+        io.open(sender, filename, this.props)
+        document.title = basename(filename)
     }
 
     onUpdatedDownloaded (sender, version) {
@@ -73,7 +67,6 @@ class Bezie extends Component {
     onDecreaseBarsClick () { this.props.decreaseBars() }
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
-    updateHeight () { this.props.updateHeight() }
 
     render () {
         const { authorized } = this.props

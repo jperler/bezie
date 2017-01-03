@@ -91,7 +91,7 @@ export function save (sender, filename, { paths, height, zoom, bars }) {
     })
 }
 
-export function open (sender, filename, { bootstrap, updateHeight }) {
+export function open (sender, filename, { bootstrap }) {
     fs.readFile(filename, (e, data) => {
         xml2js.parseString(zlib.gunzipSync(data), (err, clip) => {
             if (!_.has(clip, PATH_DATA_PATH)) {
@@ -112,8 +112,6 @@ export function open (sender, filename, { bootstrap, updateHeight }) {
                     y: parseFloat(zoomY.$.Value),
                 },
             })
-
-            updateHeight()
         })
     })
 }

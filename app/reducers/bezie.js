@@ -21,7 +21,6 @@ import {
     ZOOM_IN,
     ZOOM_OUT,
     AUTHORIZE,
-    UPDATE_HEIGHT,
     BOOTSTRAP,
 } from '../actions/bezie'
 import * as utils from '../utils'
@@ -92,7 +91,6 @@ export default function bezie (state = initialState, action) {
         case ZOOM_IN: return handleZoomIn(state)
         case ZOOM_OUT: return handleZoomOut(state)
         case AUTHORIZE: return handleAuth(state, payload)
-        case UPDATE_HEIGHT: return handleUpdateHeight(state)
         case BOOTSTRAP: return handleBootstrap(state, payload)
         default: return state
     }
@@ -454,24 +452,6 @@ function handleZoomOut (state) {
 
     return state
         .setIn(['zoom', 'x'], nextZoom)
-        .set('paths', nextPaths)
-}
-
-function handleUpdateHeight (state) {
-    const paths = state.paths.asMutable({ deep: true })
-    const nextHeight = window.outerHeight - 133
-    const prevZoom = state.zoom.y
-    const nextZoom = nextHeight / 133
-    const nextPaths = _.map(paths, path => {
-        if (!path.length) return path
-        return path.map(point => _.extend(point, {
-            y: (point.y / prevZoom) * nextZoom,
-        }))
-    })
-
-    return state
-        .setIn(['zoom', 'y'], nextZoom)
-        .setIn(['interval', 'y'], Math.floor(nextHeight / 25))
         .set('paths', nextPaths)
 }
 
