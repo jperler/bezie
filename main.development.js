@@ -3,6 +3,8 @@ import os from 'os'
 
 if (require('electron-squirrel-startup')) app.quit() // eslint-disable-line
 
+const RELEASE_SERVER_BASE_URL = 'https://bezie-release.herokuapp.com'
+
 let menu
 let template
 let updateFeed
@@ -17,8 +19,8 @@ if (process.env.NODE_ENV === 'development') {
     require('electron-debug')() // eslint-disable-line global-require
 } else {
     updateFeed = platform === 'darwin' ?
-        `https://bezie.herokuapp.com/update/${platform}_${arch}/${version}` :
-        `https://bezie.herokuapp.com/update/win32/${version}`
+        `${RELEASE_SERVER_BASE_URL}/update/${platform}_${arch}/${version}` :
+        `${RELEASE_SERVER_BASE_URL}/update/win32/${version}`
 
     autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName) => {
         if (mainWindow) mainWindow.webContents.send('update-downloaded', releaseName)
