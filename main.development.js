@@ -1,9 +1,8 @@
 import { autoUpdater, app, BrowserWindow, Menu, shell, dialog } from 'electron'
 import os from 'os'
+import { RELEASE_BASE_URL } from './app/constants'
 
 if (require('electron-squirrel-startup')) app.quit() // eslint-disable-line
-
-const RELEASE_SERVER_BASE_URL = 'https://bezie-release.herokuapp.com'
 
 let menu
 let template
@@ -19,8 +18,8 @@ if (process.env.NODE_ENV === 'development') {
     require('electron-debug')() // eslint-disable-line global-require
 } else {
     updateFeed = platform === 'darwin' ?
-        `${RELEASE_SERVER_BASE_URL}/update/${platform}_${arch}/${version}` :
-        `${RELEASE_SERVER_BASE_URL}/update/win32/${version}`
+        `${RELEASE_BASE_URL}/update/${platform}_${arch}/${version}` :
+        `${RELEASE_BASE_URL}/update/win32/${version}`
 
     autoUpdater.addListener('update-downloaded', (event, releaseNotes, releaseName) => {
         if (mainWindow) mainWindow.webContents.send('update-downloaded', releaseName)

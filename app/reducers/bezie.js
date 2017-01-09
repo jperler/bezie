@@ -456,11 +456,18 @@ function handleZoomOut (state) {
 }
 
 function handleAuth (state, payload) {
-    const { email, key } = payload
+    let email = ''
+    let key = ''
+    let secret = ''
+
+    if (payload.data) {
+        [email, key, secret] = Buffer.from(payload.data, 'base64').toString('utf8').split('|')
+    }
+
     let authorized = false
 
     try {
-        authorized = decrypt(key) === email
+        authorized = decrypt(key, secret) === email
     } catch (e) {} // eslint-disable-line
 
     return state

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { shell } from 'electron'
 import ReactDOM from 'react-dom'
 import storage from 'electron-json-storage'
+import request from 'request'
 import {
     Button,
     Form,
@@ -10,7 +11,7 @@ import {
     FormControl,
 } from 'react-bootstrap'
 import Modal, { Header, Title, Body } from 'react-bootstrap/lib/Modal'
-import { STORAGE_KEY } from '../constants'
+import { STORAGE_KEY, ACTIVATION_BASE_URL } from '../constants'
 
 class LicenseForm extends Component {
     static propTypes = {
@@ -19,12 +20,24 @@ class LicenseForm extends Component {
         authorized: PropTypes.bool.isRequired,
     }
 
-    onSubmit () {
+    onSubmit (e) {
+        e.preventDefault()
+
         const email = ReactDOM.findDOMNode(this.email).value
         const key = ReactDOM.findDOMNode(this.key).value
-        const data = { email, key }
 
-        storage.set(STORAGE_KEY, data, () => this.props.authorize())
+        request.post(`${ACTIVATION_BASE_URL}/activate`, {
+            form: { email, license: key },
+        }, (err, response, body) => {
+            if (!err && response.statusCode === 200) {
+                const json = JSON.parse(body)
+                const data = { data: json.data }
+                storage.set(STORAGE_KEY, data, () => this.props.authorize())
+                alert(`Successfully activated!`) // eslint-disable-line
+            } else {
+                alert(`Activation failed!`) // eslint-disable-line
+            }
+        })
     }
 
     onPurchaseClick (e) {
