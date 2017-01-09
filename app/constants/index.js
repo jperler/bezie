@@ -9,6 +9,7 @@ export const STORAGE_KEY = '5ecc381f0692823cb628ce3a15bce02c'
 export const SESSION_ID = crypto.randomBytes(8).toString('hex')
 export const ACTIVATION_BASE_URL = 'http://bezie-activation.herokuapp.com'
 export const RELEASE_BASE_URL = 'http://bezie-release.herokuapp.com'
+export const SECRET_FRAGMENT = '7kZiZynrndu'
 
 export const colors = [
     '#FD1C03',

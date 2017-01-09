@@ -30,9 +30,7 @@ class LicenseForm extends Component {
             form: { email, license: key },
         }, (err, response, body) => {
             if (!err && response.statusCode === 200) {
-                const json = JSON.parse(body)
-                const data = { data: json.data }
-                storage.set(STORAGE_KEY, data, () => this.props.authorize())
+                storage.set(STORAGE_KEY, JSON.parse(body), () => this.props.authorize())
                 alert(`Successfully activated!`) // eslint-disable-line
             } else {
                 alert(`Activation failed!`) // eslint-disable-line
@@ -46,16 +44,12 @@ class LicenseForm extends Component {
     }
 
     render () {
-        const { license, authorized } = this.props
-        const invalid = license.email && license.key && !authorized
-
         return (
             <Modal show>
                 <Header>
                     <Title>License</Title>
                 </Header>
                 <Body>
-                    {invalid && <p style={{ color: 'red' }}>Invalid Key: {license.key}</p>}
                     <p>
                         Please enter your license key below or purchase one from
                         {' '}
@@ -98,6 +92,7 @@ class LicenseForm extends Component {
                             </Col>
                         </FormGroup>
                     </Form>
+                    <p style={{ color: '#555' }}>Requires an internet connection.</p>
                 </Body>
             </Modal>
         )

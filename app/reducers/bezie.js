@@ -45,7 +45,7 @@ const initialState = Immutable({
     selectedIdx: null,
     clipboard: { path: null },
     paths: _.fill(Array(7), []),
-    authorized: true, // Prevent flicker if license is valid
+    authorized: false,
     license: { email: null, key: null },
 })
 
@@ -103,8 +103,6 @@ function handleToggleSnap (state) {
 function handleAddPoint (state, payload) {
     const path = state.paths[state.pathIdx].asMutable()
 
-    if (!state.authorized) return state
-
     path.splice(payload.index, 0, {
         x: payload.x,
         y: payload.y,
@@ -157,8 +155,6 @@ function handleRemovePoint (state, payload) {
 function handleUpdatePoint (state, payload) {
     const path = _.get(state.paths, state.pathIdx)
     const point = _.get(path, payload.index).asMutable()
-
-    if (!state.authorized) return state
 
     const {
         index,
@@ -456,6 +452,7 @@ function handleZoomOut (state) {
 }
 
 function handleAuth (state, payload) {
+    let authorized = false
     let email = ''
     let key = ''
     let secret = ''
@@ -463,8 +460,6 @@ function handleAuth (state, payload) {
     if (payload.data) {
         [email, key, secret] = Buffer.from(payload.data, 'base64').toString('utf8').split('|')
     }
-
-    let authorized = false
 
     try {
         authorized = decrypt(key, secret) === email

@@ -230,6 +230,10 @@ const createWindow = async () => {
                         label: 'Learn More',
                         click: onLearnMore,
                     },
+                    {
+                        label: 'Activate',
+                        click: onActivate,
+                    },
                 ],
             },
         ]
@@ -291,6 +295,10 @@ const createWindow = async () => {
                         label: 'Learn More',
                         click: onLearnMore,
                     },
+                    {
+                        label: 'Activate',
+                        click: onActivate,
+                    },
                 ]
             }
         ]
@@ -347,6 +355,10 @@ function onSaveAsDialog () {
 
 function onLearnMore () {
     shell.openExternal('http://bezie.io')
+}
+
+function onActivate () {
+    mainWindow.webContents.send('activate')
 }
 
 app.on('ready', createWindow)

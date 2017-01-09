@@ -36,22 +36,44 @@ class Bezie extends Component {
         authorize: PropTypes.func.isRequired,
     }
 
+    constructor (props) {
+        super(props)
+        this.state = { requireLicense: false }
+    }
+
     componentDidMount () {
         ipcRenderer.on('save-file', ::this.onSaveFile)
         ipcRenderer.on('open-file', ::this.onOpenFile)
         ipcRenderer.on('update-downloaded', ::this.onUpdatedDownloaded)
+        ipcRenderer.on('activate', ::this.onActivate)
 
         this.props.authorize()
     }
 
     onSaveFile (sender, filename) {
-        io.save(sender, filename, this.props)
-        document.title = basename(filename)
+        if (this.props.authorized) {
+            io.save(sender, filename, this.props)
+            document.title = basename(filename)
+        } else {
+            this.setState({ requireLicense: true })
+        }
     }
 
     onOpenFile (sender, filename) {
-        io.open(sender, filename, this.props)
-        document.title = basename(filename)
+        if (this.props.authorized) {
+            io.open(sender, filename, this.props)
+            document.title = basename(filename)
+        } else {
+            this.setState({ requireLicense: true })
+        }
+    }
+
+    onActivate () {
+        if (this.props.authorized) {
+            alert(`Activated as ${this.props.license.email}`) // eslint-disable-line
+        } else {
+            this.setState({ requireLicense: true })
+        }
     }
 
     onUpdatedDownloaded (sender, version) {
@@ -70,10 +92,11 @@ class Bezie extends Component {
 
     render () {
         const { authorized } = this.props
+        const { requireLicense } = this.state
 
         return (
             <div className="bezie">
-                {!authorized && <LicenseForm {...this.props} />}
+                {!authorized && requireLicense && <LicenseForm {...this.props} />}
                 <div className="push-bottom">
                     <div className="pull-left">
                         <ButtonToolbar>
