@@ -378,12 +378,18 @@ function handleIncreaseBars (state) {
     const paths = state.paths.asMutable({ deep: true })
     const nextBars = bars + 1
     const nextWidth = utils.getWidth({ bars: nextBars, zoom })
+    const height = utils.getHeight(state)
 
     if (bars === MAX_BARS) return state
 
     const nextPaths = _.map(paths, path => {
         if (!path.length) return path
-        return path.concat([_.extend(path.pop(), { x: nextWidth })])
+
+        // If there are no midpoints, just extend without adding any new points
+        if (path.length === 2) return path.concat([_.extend(path.pop(), { x: nextWidth })])
+
+        // Add a new endpoint
+        return path.concat([{ x: nextWidth, y: height, id: _.uniqueId(SESSION_ID) }])
     })
 
     return state
@@ -397,15 +403,27 @@ function handleDecreaseBars (state) {
     const paths = state.paths.asMutable({ deep: true })
     const nextBars = bars - 1
     const nextWidth = utils.getWidth({ bars: nextBars, zoom })
+    const height = utils.getHeight(state)
 
     if (bars === MIN_BARS) return state
 
     const nextPaths = _.map(paths, path => {
         if (!path.length) return path
-        return path
-            .concat([_.extend(path.pop(), { x: nextWidth })])
-            // Remove any points that are out of bounds
-            .filter(point => point.x <= nextWidth)
+        // Filter out points that are out of bounds
+        let nextPath = path.filter(point => point.x <= nextWidth)
+
+        // Calculate index
+        const lastIndex = nextPath.length - 1
+        let lastValidIndex = lastIndex
+        while (nextPath[lastValidIndex].isControl || nextPath[lastValidIndex].hidden) {
+            lastValidIndex--
+        }
+
+        // Ensure the path doesn't end with a fragmented curve
+        if (lastValidIndex !== lastIndex) nextPath = path.filter((point, i) => i <= lastValidIndex)
+
+        // Add a new endpoint
+        return nextPath.concat([{ x: nextWidth, y: height, id: _.uniqueId(SESSION_ID) }])
     })
 
     return state
