@@ -378,18 +378,19 @@ function handleIncreaseBars (state) {
     const paths = state.paths.asMutable({ deep: true })
     const nextBars = bars + 1
     const nextWidth = utils.getWidth({ bars: nextBars, zoom })
-    const height = utils.getHeight(state)
 
     if (bars === MAX_BARS) return state
 
     const nextPaths = _.map(paths, path => {
         if (!path.length) return path
+        // Accommodate path inversion
+        const lastPointY = path[path.length - 1].y
 
         // If there are no midpoints, just extend without adding any new points
         if (path.length === 2) return path.concat([_.extend(path.pop(), { x: nextWidth })])
 
         // Add a new endpoint
-        return path.concat([{ x: nextWidth, y: height, id: _.uniqueId(SESSION_ID) }])
+        return path.concat([{ x: nextWidth, y: lastPointY, id: _.uniqueId(SESSION_ID) }])
     })
 
     return state
@@ -403,7 +404,6 @@ function handleDecreaseBars (state) {
     const paths = state.paths.asMutable({ deep: true })
     const nextBars = bars - 1
     const nextWidth = utils.getWidth({ bars: nextBars, zoom })
-    const height = utils.getHeight(state)
 
     if (bars === MIN_BARS) return state
 
@@ -411,6 +411,8 @@ function handleDecreaseBars (state) {
         if (!path.length) return path
         // Filter out points that are out of bounds
         let nextPath = path.filter(point => point.x <= nextWidth)
+        // Accommodate path inversion
+        const lastPointY = path[path.length - 1].y
 
         // Calculate index
         const lastIndex = nextPath.length - 1
@@ -423,7 +425,7 @@ function handleDecreaseBars (state) {
         if (lastValidIndex !== lastIndex) nextPath = path.filter((point, i) => i <= lastValidIndex)
 
         // Add a new endpoint
-        return nextPath.concat([{ x: nextWidth, y: height, id: _.uniqueId(SESSION_ID) }])
+        return nextPath.concat([{ x: nextWidth, y: lastPointY, id: _.uniqueId(SESSION_ID) }])
     })
 
     return state
