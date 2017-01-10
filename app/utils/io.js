@@ -22,7 +22,9 @@ const BARS_PATH = CLIP_PATH.concat(['Bezie', 0, 'Bars', 0])
 const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 const INVALID_FILE_MESSAGE = 'Oops! This file was not created with Bezie.'
 
-export function save (sender, filename, { paths, height, zoom, bars }) {
+export function save (sender, filename, { paths, height, zoom, bars, authorized }) {
+    if (!authorized) return
+
     xml2js.parseString(TEMPLATE, (err, clip) => {
         const builder = new xml2js.Builder()
         const envelopes = _.get(clip, ENVELOPES_PATH)
@@ -91,7 +93,9 @@ export function save (sender, filename, { paths, height, zoom, bars }) {
     })
 }
 
-export function open (sender, filename, { bootstrap }) {
+export function open (sender, filename, { bootstrap, authorized }) {
+    if (!authorized) return
+
     fs.readFile(filename, (e, data) => {
         xml2js.parseString(zlib.gunzipSync(data), (err, clip) => {
             if (!_.has(clip, PATH_DATA_PATH)) {
