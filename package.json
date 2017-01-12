@@ -132,6 +132,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "font-awesome": "^4.6.3",
     "json-loader": "^0.5.4",
+    "lodash": "^4.17.4",
     "postcss": "^5.1.0",
     "react": "^15.3.1",
     "react-bootstrap": "^0.30.3",
