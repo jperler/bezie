@@ -41,7 +41,8 @@ const config = merge(baseConfig, {
       compressor: {
         screw_ie8: true,
         warnings: false
-      }
+      },
+      comments: false,
     }),
     new ExtractTextPlugin('style.css', { allChunks: true }),
     new webpack.ProvidePlugin({
