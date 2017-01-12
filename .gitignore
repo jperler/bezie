@@ -36,3 +36,4 @@ main.js
 main.js.map
 .env
 *.swp
+*.swo
