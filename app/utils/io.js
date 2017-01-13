@@ -23,8 +23,8 @@ const BARS_PATH = CLIP_PATH.concat(['Bezie', 0, 'Bars', 0])
 const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 const INVALID_FILE_MESSAGE = 'Oops! This file was not created with Bezie.'
 
-export function save (sender, filename, { paths, height, zoom, bars, license }) {
-    if (!decrypt(license.key, license.secret)) return
+export function save (sender, filename, { paths, height, zoom, bars, authorized, license }) {
+    if (decrypt(license.key, license.secret) !== license.email) return
 
     xml2js.parseString(TEMPLATE, (err, clip) => {
         const builder = new xml2js.Builder()
@@ -90,12 +90,12 @@ export function save (sender, filename, { paths, height, zoom, bars, license }) 
             })
         })
 
-        fs.writeFile(filename, zlib.gzipSync(builder.buildObject(clip)))
+        if (authorized) fs.writeFile(filename, zlib.gzipSync(builder.buildObject(clip)))
     })
 }
 
-export function open (sender, filename, { bootstrap, license }) {
-    if (!decrypt(license.key, license.secret)) return
+export function open (sender, filename, { bootstrap, authorized, license }) {
+    if (decrypt(license.key, license.secret) !== license.email) return
 
     fs.readFile(filename, (e, data) => {
         xml2js.parseString(zlib.gunzipSync(data), (err, clip) => {
@@ -109,14 +109,16 @@ export function open (sender, filename, { bootstrap, license }) {
             const zoomY = _.get(clip, ZOOM_Y_PATH)
             const bars = _.get(clip, BARS_PATH)
 
-            bootstrap({
-                bars: parseInt(bars.$.Value, 10),
-                paths: JSON.parse(pathJson),
-                zoom: {
-                    x: parseFloat(zoomX.$.Value),
-                    y: parseFloat(zoomY.$.Value),
-                },
-            })
+            if (authorized) {
+                bootstrap({
+                    bars: parseInt(bars.$.Value, 10),
+                    paths: JSON.parse(pathJson),
+                    zoom: {
+                        x: parseFloat(zoomX.$.Value),
+                        y: parseFloat(zoomY.$.Value),
+                    },
+                })
+            }
         })
     })
 }
