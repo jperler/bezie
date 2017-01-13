@@ -4,6 +4,7 @@ import xml2js from 'xml2js'
 import zlib from 'zlib'
 import { TEMPLATE } from '../constants/clip'
 import * as utils from '../utils'
+import decrypt from '../utils/license'
 
 const AUTOMATION_OFFSET = 331
 const INITIAL_AUTOMATION = -63072000
@@ -22,8 +23,8 @@ const BARS_PATH = CLIP_PATH.concat(['Bezie', 0, 'Bars', 0])
 const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 const INVALID_FILE_MESSAGE = 'Oops! This file was not created with Bezie.'
 
-export function save (sender, filename, { paths, height, zoom, bars, authorized }) {
-    if (!authorized) return
+export function save (sender, filename, { paths, height, zoom, bars, license }) {
+    if (!decrypt(license.key, license.secret)) return
 
     xml2js.parseString(TEMPLATE, (err, clip) => {
         const builder = new xml2js.Builder()
@@ -93,8 +94,8 @@ export function save (sender, filename, { paths, height, zoom, bars, authorized 
     })
 }
 
-export function open (sender, filename, { bootstrap, authorized }) {
-    if (!authorized) return
+export function open (sender, filename, { bootstrap, license }) {
+    if (!decrypt(license.key, license.secret)) return
 
     fs.readFile(filename, (e, data) => {
         xml2js.parseString(zlib.gunzipSync(data), (err, clip) => {
