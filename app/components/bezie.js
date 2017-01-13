@@ -7,6 +7,7 @@ import Automator from './automator'
 import ContextMenu from './contextMenu'
 import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
+import * as io from '../utils/io'
 import { MIN_BARS, MAX_BARS, ZOOM_FACTOR } from '../constants'
 
 class Bezie extends Component {
@@ -51,8 +52,7 @@ class Bezie extends Component {
     }
 
     onSaveFile (sender, filename) {
-        const io = this.ioProxy()
-        if (_.isObject(io) && this.props.authorized) {
+        if (this.props.authorized) {
             io.save(sender, filename, this.props)
             document.title = basename(filename)
         } else {
@@ -61,8 +61,7 @@ class Bezie extends Component {
     }
 
     onOpenFile (sender, filename) {
-        const io = this.ioProxy()
-        if (_.isObject(io) && this.props.authorized) {
+        if (this.props.authorized) {
             io.open(sender, filename, this.props)
             document.title = basename(filename)
         } else {
@@ -92,23 +91,13 @@ class Bezie extends Component {
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
 
-    ioProxy () {
-        const fp = this.props.license.fp
-        let io
-        try { io = require(`../utils/${fp}`) } catch (e) {} // eslint-disable-line
-        return io
-    }
-
     render () {
         const { authorized } = this.props
         const { requireLicense } = this.state
-        const io = this.ioProxy()
 
         return (
             <div className="bezie">
-                {(!authorized || !_.isObject(io)) && requireLicense &&
-                    <LicenseForm {...this.props} />
-                }
+                {!authorized && requireLicense && <LicenseForm {...this.props} />}
                 <div className="push-bottom">
                     <div className="pull-left">
                         <ButtonToolbar>
