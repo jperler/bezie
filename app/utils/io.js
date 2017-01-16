@@ -8,34 +8,35 @@ import decrypt from '../utils/license'
 
 const AUTOMATION_OFFSET = 331
 const INITIAL_AUTOMATION = -63072000
-const CLIP_PATH = [
-    'Ableton', 'LiveSet', 0, 'Tracks', 0, 'MidiTrack', 0, 'DeviceChain', 0,
-    'MainSequencer', 0, 'ClipSlotList', 0, 'ClipSlot', 0, 'ClipSlot', 0,
-    'Value', 0, 'MidiClip', 0
-]
-const ENVELOPES_PATH = CLIP_PATH.concat(['Envelopes', 0, 'Envelopes'])
-const NAME_PATH = CLIP_PATH.concat(['Name', 0])
-const LOOP_PATH = CLIP_PATH.concat(['Loop', 0])
-const PATH_DATA_PATH = CLIP_PATH.concat(['Bezie', 0, 'PathData', 0])
-const ZOOM_X_PATH = CLIP_PATH.concat(['Bezie', 0, 'ZoomX', 0])
-const ZOOM_Y_PATH = CLIP_PATH.concat(['Bezie', 0, 'ZoomY', 0])
-const BARS_PATH = CLIP_PATH.concat(['Bezie', 0, 'Bars', 0])
-const CURRENT_END_PATH = CLIP_PATH.concat(['CurrentEnd', 0])
 const INVALID_FILE_MESSAGE = 'Oops! This file was not created with Bezie.'
 
+const getPaths = (xpath = []) => ({
+    ENVELOPES: xpath.concat(['Envelopes', 0, 'Envelopes']),
+    NAME: xpath.concat(['Name', 0]),
+    LOOP: xpath.concat(['Loop', 0]),
+    PATH_DATA: xpath.concat(['Bezie', 0, 'PathData', 0]),
+    ZOOM_X: xpath.concat(['Bezie', 0, 'ZoomX', 0]),
+    ZOOM_Y: xpath.concat(['Bezie', 0, 'ZoomY', 0]),
+    BARS: xpath.concat(['Bezie', 0, 'Bars', 0]),
+    CURRENT_END: xpath.concat(['CurrentEnd', 0]),
+})
+
 export function save (sender, filename, { paths, height, zoom, bars, authorized, license }) {
-    if (decrypt(license.key, license.secret) !== license.email) return
+    if (!license.xpath && decrypt(license.key, license.secret) !== license.email) return
+
+    const xpath = JSON.parse(Buffer.from(license.xpath, 'base64').toString('utf8'))
+    const { ENVELOPES, NAME, LOOP, PATH_DATA, ZOOM_X, ZOOM_Y, BARS, CURRENT_END } = getPaths(xpath)
 
     xml2js.parseString(TEMPLATE, (err, clip) => {
         const builder = new xml2js.Builder()
-        const envelopes = _.get(clip, ENVELOPES_PATH)
-        const name = _.get(clip, NAME_PATH)
-        const pathData = _.get(clip, PATH_DATA_PATH)
-        const zoomX = _.get(clip, ZOOM_X_PATH)
-        const zoomY = _.get(clip, ZOOM_Y_PATH)
-        const barsNode = _.get(clip, BARS_PATH)
-        const currentEnd = _.get(clip, CURRENT_END_PATH)
-        const loop = _.get(clip, LOOP_PATH)
+        const envelopes = _.get(clip, ENVELOPES)
+        const name = _.get(clip, NAME)
+        const pathData = _.get(clip, PATH_DATA)
+        const zoomX = _.get(clip, ZOOM_X)
+        const zoomY = _.get(clip, ZOOM_Y)
+        const barsNode = _.get(clip, BARS)
+        const currentEnd = _.get(clip, CURRENT_END)
+        const loop = _.get(clip, LOOP)
         const length = bars * 4
 
         // Set name
@@ -95,19 +96,22 @@ export function save (sender, filename, { paths, height, zoom, bars, authorized,
 }
 
 export function open (sender, filename, { bootstrap, authorized, license }) {
-    if (decrypt(license.key, license.secret) !== license.email) return
+    if (!license.xpath && decrypt(license.key, license.secret) !== license.email) return
+
+    const xpath = JSON.parse(Buffer.from(license.xpath, 'base64').toString('utf8'))
+    const { PATH_DATA, ZOOM_X, ZOOM_Y, BARS } = getPaths(xpath)
 
     fs.readFile(filename, (e, data) => {
         xml2js.parseString(zlib.gunzipSync(data), (err, clip) => {
-            if (!_.has(clip, PATH_DATA_PATH)) {
+            if (!_.has(clip, PATH_DATA)) {
                 return alert(INVALID_FILE_MESSAGE) // eslint-disable-line
             }
 
-            const pathData = _.get(clip, PATH_DATA_PATH)
+            const pathData = _.get(clip, PATH_DATA)
             const pathJson = Buffer.from(pathData.$.Value, 'base64').toString('utf8')
-            const zoomX = _.get(clip, ZOOM_X_PATH)
-            const zoomY = _.get(clip, ZOOM_Y_PATH)
-            const bars = _.get(clip, BARS_PATH)
+            const zoomX = _.get(clip, ZOOM_X)
+            const zoomY = _.get(clip, ZOOM_Y)
+            const bars = _.get(clip, BARS)
 
             if (authorized) {
                 bootstrap({

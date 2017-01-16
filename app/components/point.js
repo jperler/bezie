@@ -17,7 +17,8 @@ class Point extends Component {
             nextProps.x !== this.props.x ||
             nextProps.y !== this.props.y ||
             nextProps.selected !== this.props.selected ||
-            nextProps.dragging !== this.props.dragging
+            nextProps.dragging !== this.props.dragging ||
+            nextProps.color !== this.props.color
         )
     }
 

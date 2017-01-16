@@ -476,9 +476,10 @@ function handleAuth (state, payload) {
     let email = ''
     let key = ''
     let secret = ''
+    let xpath = ''
 
     if (payload.data) {
-        [email, key, secret] = Buffer
+        [email, key, secret, xpath] = Buffer
             .from(payload.data, 'base64')
             .toString('utf8')
             .split('|')
@@ -490,7 +491,7 @@ function handleAuth (state, payload) {
 
     return state
         .set('authorized', authorized)
-        .set('license', { email, key, secret })
+        .set('license', { email, key, secret, xpath })
 }
 
 function handleBootstrap (state, payload) {
