@@ -361,15 +361,26 @@ function handleToggleTriplet (state) {
 }
 
 function handleCopyPath (state) {
-    const { paths, pathIdx } = state
-    return state.setIn(['clipboard', 'path'], paths[pathIdx])
+    const { paths, pathIdx, zoom } = state
+    const path = paths[pathIdx].asMutable({ deep: true })
+    const normalizedPath = path.map(point => {
+        point.x /= zoom.x
+        return point
+    })
+
+    return state.setIn(['clipboard', 'path'], normalizedPath)
 }
 
 function handlePastePath (state) {
-    const { pathIdx } = state
+    const { pathIdx, clipboard, zoom } = state
+    const path = clipboard.path.asMutable({ deep: true })
+    const normalizedPath = path.map(point => {
+        point.x *= zoom.x
+        return point
+    })
 
     return state
-        .setIn(['paths', pathIdx], state.clipboard.path)
+        .setIn(['paths', pathIdx], normalizedPath)
         .setIn(['clipboard', 'path'], null)
 }
 
