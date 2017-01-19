@@ -37,7 +37,7 @@ export function save (sender, filename, { paths, height, zoom, bars, authorized,
         const barsNode = _.get(clip, BARS)
         const currentEnd = _.get(clip, CURRENT_END)
         const loop = _.get(clip, LOOP)
-        const length = bars * 4
+        const length = bars
 
         // Set name
         name.$ = { Value: path.parse(filename).name }
