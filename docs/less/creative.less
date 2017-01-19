@@ -298,20 +298,39 @@ header {
     .button-variant(white;@theme-primary;@theme-primary);
 }
 
-.btn-dl {
-    color: @gray-light;
-    &:hover,
-    &:focus {
-        color: @gray-lighter;
-    };
-}
-
 .btn {
     .sans-serif-font;
     border: none;
     border-radius: 300px;
     font-weight: 700;
     text-transform: uppercase;
+}
+
+.btn-dl {
+    padding: 10px 0;
+    border: 2px solid white;
+    border-radius: 5px;
+    width: 250px;
+    color: @gray-light;
+    display: inline-block;
+    &:hover,
+    &:focus {
+        color: @gray-lighter;
+    };
+}
+
+@media (max-width: 768px) {
+    .btn-dl-wrapper {
+        margin: 0 auto;
+        width: 250px;
+    }
+
+    .btn-dl {
+        display: block;
+        &:first-child {
+            margin-bottom: 10px;
+        }
+    }
 }
 
 .btn-xl {
