@@ -25,7 +25,7 @@ export const getGridPoint = (point, xRange, yRange) => ({
 })
 
 export const normalizePoint = ({ point, height, zoom }) => ({
-    x: point.x / zoom.x / PPQ / 4,
+    x: point.x / zoom.x / PPQ,
     y: (height - point.y) / zoom.y,
 })
 

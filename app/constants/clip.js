@@ -255,7 +255,7 @@ export const TEMPLATE = `
                                                 <TimeSignature>
                                                     <TimeSignatures>
                                                         <RemoteableTimeSignature>
-                                                            <Numerator Value="1" />
+                                                            <Numerator Value="4" />
                                                             <Denominator Value="4" />
                                                             <Time Value="0" />
                                                         </RemoteableTimeSignature>
