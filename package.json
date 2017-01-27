@@ -91,11 +91,11 @@
     "css-loader": "^0.23.1",
     "del": "^2.2.1",
     "devtron": "^1.2.1",
-    "electron": "^1.4.6",
+    "electron": "^1.4.15",
     "electron-builder": "^10.16.0",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^7.3.0",
-    "electron-rebuild": "^1.1.5",
+    "electron-rebuild": "^1.2.1",
     "eslint": "^3.3.1",
     "eslint-config-airbnb": "^10.0.1",
     "eslint-formatter-pretty": "^1.1.0",
@@ -133,6 +133,7 @@
     "font-awesome": "^4.6.3",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
+    "midi": "^0.9.5",
     "postcss": "^5.1.0",
     "react": "^15.3.1",
     "react-bootstrap": "^0.30.3",
@@ -147,7 +148,7 @@
     "xml2js": "^0.4.17"
   },
   "devEngines": {
-    "node": "4.x || 5.x || 6.x",
+    "node": ">= 6.0.0",
     "npm": "2.x || 3.x"
   }
 }

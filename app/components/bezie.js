@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
+import midi from 'midi'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
 import { ButtonToolbar, Button } from 'react-bootstrap'
@@ -49,6 +50,9 @@ class Bezie extends Component {
         ipcRenderer.on('activate', ::this.onActivate)
 
         this.props.authorize()
+
+        this.output = new midi.output()
+        this.output.openVirtualPort('Bezie')
     }
 
     onSaveFile (sender, filename) {
@@ -91,6 +95,19 @@ class Bezie extends Component {
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
 
+    onSendMidi () {
+        const { bars, paths, pathIdx, zoom } = this.props
+        const channel = pathIdx + 1
+        const path = paths[pathIdx]
+        const ticks = bars * 96
+
+        _.each(path, (point, i) => {
+            setTimeout(() => {
+                this.output.sendMessage([176, channel, 127 - (point.y / zoom.y)])
+            }, 10 * i)
+        })
+    }
+
     render () {
         const { authorized } = this.props
         const { requireLicense } = this.state
@@ -121,6 +138,9 @@ class Bezie extends Component {
                                 disabled={_.isNull(this.props.clipboard.path)}
                             >
                                 <i className="fa fa-paste" />
+                            </Button>
+                            <Button title="Send Midi" bsSize="small" onClick={::this.onSendMidi}>
+                                <i className="fa fa-play" />
                             </Button>
                             <ContextMenu {...this.props} />
                         </ButtonToolbar>
