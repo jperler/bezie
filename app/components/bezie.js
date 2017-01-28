@@ -16,6 +16,7 @@ import {
     MAX_BARS,
     ZOOM_FACTOR,
     CONTROL_MAX,
+    PPQ,
 } from '../constants'
 
 class Bezie extends Component {
@@ -72,7 +73,6 @@ class Bezie extends Component {
         this.input.on('message', ::this.onMIDIMessage)
 
         this.tick = 0
-        this.maxTicks = this.props.bars * 4 * 24
     }
 
     componentWillUnmount () {
@@ -82,9 +82,10 @@ class Bezie extends Component {
 
     onMIDIMessage (deltaTime, message) {
         const code = message[0]
+        const maxTicks = this.props.bars * PPQ
 
         // Reset ticks to loop automation
-        if (this.tick === this.maxTicks) this.tick = 0
+        if (this.tick === maxTicks) this.tick = 0
 
         if (code === midiEvents.CLOCK) {
             _.each(this.props.paths, (path, pathIdx) => {
@@ -164,7 +165,7 @@ class Bezie extends Component {
     getValueAtTick (tick, pathIdx) {
         const { paths, bars, zoom } = this.props
         const width = getWidth({ bars, zoom })
-        const tickWidth = width / bars / 4 / 24
+        const tickWidth = width / bars / PPQ
         const tickX = tickWidth * tick
         const path = paths[pathIdx]
 
