@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
-import { colors, labels } from '../constants'
+import { colors } from '../constants'
 
 class PathSelector extends Component {
     static propTypes = {
@@ -17,14 +17,11 @@ class PathSelector extends Component {
     render () {
         const { pathIdx } = this.props
 
-        const getTitle = ({ i }) => (
-            <span className="push-right-small">
-                <i
-                    className="fa fa-stop push-right push-left-small"
-                    style={{ color: colors[i] }}
-                />
-                {labels[i]}
-            </span>
+        const getIcon = i => (
+            <i
+                className="fa fa-stop push-right push-left"
+                style={{ color: colors[i] }}
+            />
         )
 
         const items = _.map(colors, (color, i) => (
@@ -33,14 +30,14 @@ class PathSelector extends Component {
                 eventKey={i}
                 key={`path-select-${i}`}
             >
-                {getTitle({ i })}
+                {getIcon(i)}
             </MenuItem>
         ))
 
         return (
             <DropdownButton
                 bsSize="small"
-                title={getTitle({ i: pathIdx })}
+                title={getIcon(pathIdx)}
                 id="pathSelector"
                 onSelect={::this.onPathSelect}
             >

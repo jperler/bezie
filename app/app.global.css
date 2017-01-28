@@ -63,8 +63,16 @@ circle.curve {
 .pull-left { float: right; }
 .clearfix { clear: both; }
 
+.dropdown-menu {
+    min-width: 0 !important;
+}
+
 .dropdown-menu li a {
     padding: 1px 5px;
+}
+
+.btn#pathSelector {
+    padding-left: 5px;
 }
 
 .btn:focus {

@@ -21,16 +21,6 @@ export const colors = [
     '#CC00FF',
 ]
 
-export const labels = [
-    '1 - Modulation',
-    '2 - Breath',
-    '3 - Controller',
-    '4 - Foot Pedal',
-    '5 - Portamento Time',
-    '6 - Data Entry',
-    '7 - Volume',
-]
-
 export const pointTypes = {
     quadratic: 'quadratic',
     cubic: 'cubic',

@@ -9,7 +9,14 @@ import ContextMenu from './contextMenu'
 import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
-import { MIN_BARS, MAX_BARS, ZOOM_FACTOR } from '../constants'
+import * as midiEvents from '../constants/midi'
+import { getWidth } from '../utils'
+import {
+    MIN_BARS,
+    MAX_BARS,
+    ZOOM_FACTOR,
+    CONTROL_MAX,
+} from '../constants'
 
 class Bezie extends Component {
     static propTypes = {
@@ -36,11 +43,16 @@ class Bezie extends Component {
         authorized: PropTypes.bool.isRequired,
         license: PropTypes.object.isRequired,
         authorize: PropTypes.func.isRequired,
+        pathIdx: PropTypes.number.isRequired,
+        paths: PropTypes.array.isRequired,
     }
 
     constructor (props) {
         super(props)
-        this.state = { requireLicense: false }
+        this.state = {
+            requireLicense: false,
+            arm: false,
+        }
     }
 
     componentDidMount () {
@@ -53,6 +65,46 @@ class Bezie extends Component {
 
         this.output = new midi.output()
         this.output.openVirtualPort('Bezie')
+
+        this.input = new midi.input()
+        this.input.openVirtualPort('Bezie')
+        this.input.ignoreTypes(true, false, true)
+        this.input.on('message', ::this.onMIDIMessage)
+
+        this.tick = 0
+        this.maxTicks = this.props.bars * 4 * 24
+    }
+
+    componentWillUnmount () {
+        this.output.closePort()
+        this.input.closePort()
+    }
+
+    onMIDIMessage (deltaTime, message) {
+        const code = message[0]
+
+        // Reset ticks to loop automation
+        if (this.tick === this.maxTicks) this.tick = 0
+
+        if (code === midiEvents.CLOCK) {
+            _.each(this.props.paths, (path, pathIdx) => {
+                if (path.length > 2) {
+                    const value = this.getValueAtTick(this.tick, pathIdx)
+                    const channel = pathIdx + 1
+
+                    if (this.state.arm) {
+                        this.output.sendMessage([
+                            midiEvents.CONTROL_CHANGE,
+                            channel,
+                            value,
+                        ])
+                    }
+                }
+            })
+            this.tick++
+        } else if (code === midiEvents.STOP) {
+            this.tick = 0
+        }
     }
 
     onSaveFile (sender, filename) {
@@ -95,17 +147,43 @@ class Bezie extends Component {
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
 
-    onSendMidi () {
-        const { bars, paths, pathIdx, zoom } = this.props
+    onArmClick () {
+        this.setState({ arm: !this.state.arm })
+    }
+
+    onBroadcastClick () {
+        const { pathIdx } = this.props
         const channel = pathIdx + 1
+
+        // Signal active MIDI channel to DAW
+        this.output.sendMessage([176, channel, 0])
+        this.output.sendMessage([176, channel, CONTROL_MAX])
+        this.output.sendMessage([176, channel, 0])
+    }
+
+    getValueAtTick (tick, pathIdx) {
+        const { paths, bars, zoom } = this.props
+        const width = getWidth({ bars, zoom })
+        const tickWidth = width / bars / 4 / 24
+        const tickX = tickWidth * tick
         const path = paths[pathIdx]
-        const ticks = bars * 96
+
+        let minIndex = 0
+        let maxIndex = null
 
         _.each(path, (point, i) => {
-            setTimeout(() => {
-                this.output.sendMessage([176, channel, 127 - (point.y / zoom.y)])
-            }, 10 * i)
+            if (point.x < tickX) minIndex = i
+            if (!maxIndex && point.x > tickX) maxIndex = i
         })
+
+        const minPoint = path[minIndex]
+        const maxPoint = path[maxIndex]
+
+        const slope = (maxPoint.y - minPoint.y) / (maxPoint.x - minPoint.x)
+        const yIntercept = minPoint.y - (slope * minPoint.x)
+        const tickY = slope * tickX + yIntercept
+
+        return CONTROL_MAX - tickY / zoom.y
     }
 
     render () {
@@ -139,8 +217,21 @@ class Bezie extends Component {
                             >
                                 <i className="fa fa-paste" />
                             </Button>
-                            <Button title="Send Midi" bsSize="small" onClick={::this.onSendMidi}>
-                                <i className="fa fa-play" />
+                            <Button
+                                title="Broadcast MIDI"
+                                bsSize="small"
+                                onClick={::this.onBroadcastClick}
+                            >
+                                <i className="fa fa-bullhorn" />
+                            </Button>
+                            <Button
+                                style={{ color: this.state.arm ? 'red' : '' }}
+                                className={this.state.arm ? 'active' : ''}
+                                title="Arm MIDI"
+                                bsSize="small"
+                                onClick={::this.onArmClick}
+                            >
+                                <i className="fa fa-circle" />
                             </Button>
                             <ContextMenu {...this.props} />
                         </ButtonToolbar>
