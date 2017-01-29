@@ -19,7 +19,6 @@ import {
     CONTROL_MAX,
     PPQ,
     VIRTUAL_PORT_NAME,
-    GENERIC_MIDI_ERROR,
     WIN_MIDI_ERROR,
     colors,
 } from '../constants'
@@ -79,6 +78,7 @@ class Bezie extends Component {
     onMIDIMessage (deltaTime, message) {
         const code = message[0]
         const maxTicks = this.props.bars * PPQ
+        const { authorized } = this.props
 
         // Reset ticks to loop automation
         if (this.tick === maxTicks) {
@@ -92,12 +92,15 @@ class Bezie extends Component {
                     const value = this.getValueAtTick(this.tick, pathIdx)
                     const channel = pathIdx + 1
 
-                    if (this.state.enabled) {
-                        this.output.sendMessage([
-                            midiEvents.CONTROL_CHANGE,
-                            channel,
-                            value,
-                        ])
+                    // Limit demo to send only the first bar
+                    if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
+                        if (this.state.enabled) {
+                            this.output.sendMessage([
+                                midiEvents.CONTROL_CHANGE,
+                                channel,
+                                value,
+                            ])
+                        }
                     }
                 }
             })
@@ -174,11 +177,18 @@ class Bezie extends Component {
         const tickX = tickWidth * tick
         const path = paths[pathIdx]
         const lastSeenIndex = _.get(this.lastSeenIndeces, pathIdx, 0)
+        const len = path.length
 
         let minIndex = 0
         let maxIndex = null
 
-        for (let i = lastSeenIndex, len = path.length; i < len; i++) {
+        // If the path has changed externally (e.g. reset) return null and reset indeces
+        if (lastSeenIndex > len - 1) {
+            this.lastSeenIndeces = {}
+            return null
+        }
+
+        for (let i = lastSeenIndex; i < len; i++) {
             const point = path[i]
             if (point.x <= tickX) minIndex = i
             if (!maxIndex && point.x > tickX) maxIndex = i
@@ -322,7 +332,7 @@ class Bezie extends Component {
                 <div className="push-top monospace noselect">
                     <div className="pull-left" style={{ lineHeight: '30px' }}>
                         <ButtonToolbar>
-                            <span className="pull-left push-left push-right">
+                            <span className="pull-left push-left push-right text-muted">
                                 MIDI: {hasMIDIDevice ? 'Connected' : 'Not connected'}
                             </span>
                             {!hasMIDIDevice &&
