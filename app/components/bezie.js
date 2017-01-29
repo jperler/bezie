@@ -58,7 +58,6 @@ class Bezie extends Component {
         this.state = {
             requireLicense: false,
             enabled: false,
-            connected: false,
         }
         this.initMIDI()
     }
@@ -202,6 +201,7 @@ class Bezie extends Component {
     initMIDI () {
         this.output = new midi.output()
         this.input = new midi.input()
+        this.noDevices = false
 
         if (os.platform() !== 'darwin') {
             const outputPortIndex = _.find(_.range(this.output.getPortCount()), portIdx => (
@@ -215,6 +215,7 @@ class Bezie extends Component {
                 this.output.openPort(outputPortIndex)
                 this.input.openPort(inputPortIndex)
             } else {
+                this.noDevices = true
                 alert(WIN_MIDI_ERROR) // eslint-disable-line
             }
         } else {
@@ -231,7 +232,7 @@ class Bezie extends Component {
     render () {
         const { authorized } = this.props
         const { requireLicense } = this.state
-        const hasMIDIDevice = this.output.getPortCount() > 0
+        const hasMIDIDevice = !this.noDevices
 
         return (
             <div className="bezie">
