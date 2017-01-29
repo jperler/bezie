@@ -10,6 +10,9 @@ export const SESSION_ID = crypto.randomBytes(8).toString('hex')
 export const ACTIVATION_BASE_URL = 'http://bezie-activation.herokuapp.com'
 export const RELEASE_BASE_URL = 'http://bezie-release.herokuapp.com'
 export const SECRET_FRAGMENT = '7kZiZynrndu'
+export const VIRTUAL_PORT_NAME = 'Bezie'
+export const GENERIC_MIDI_ERROR = 'There was an issue creating or connecting to a virtual MIDI port.' // eslint-disable-line
+export const WIN_MIDI_ERROR = `Please install loopmidi with the following devices: "${VIRTUAL_PORT_NAME} in" and "${VIRTUAL_PORT_NAME} out".`// eslint-disable-line
 
 export const colors = [
     '#FD1C03',

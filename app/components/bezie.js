@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
+import os from 'os'
 import midi from 'midi'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
@@ -17,6 +18,9 @@ import {
     ZOOM_FACTOR,
     CONTROL_MAX,
     PPQ,
+    VIRTUAL_PORT_NAME,
+    GENERIC_MIDI_ERROR,
+    WIN_MIDI_ERROR,
     colors,
 } from '../constants'
 
@@ -54,7 +58,9 @@ class Bezie extends Component {
         this.state = {
             requireLicense: false,
             enabled: false,
+            connected: false,
         }
+        this.initMIDI()
     }
 
     componentDidMount () {
@@ -64,17 +70,6 @@ class Bezie extends Component {
         ipcRenderer.on('activate', ::this.onActivate)
 
         this.props.authorize()
-
-        this.output = new midi.output()
-        this.output.openVirtualPort('Bezie')
-
-        this.input = new midi.input()
-        this.input.openVirtualPort('Bezie')
-        this.input.ignoreTypes(true, false, true)
-        this.input.on('message', ::this.onMIDIMessage)
-
-        this.tick = 0
-        this.lastSeenIndeces = {}
     }
 
     componentWillUnmount () {
@@ -168,6 +163,15 @@ class Bezie extends Component {
         this.output.sendMessage([176, channel, 0])
     }
 
+    onRetryMIDI () {
+        this.initMIDI()
+        if (this.output.getPortCount() === 0) {
+            alert(GENERIC_MIDI_ERROR) // eslint-disable-line
+        } else {
+            this.forceUpdate()
+        }
+    }
+
     getValueAtTick (tick, pathIdx) {
         const { paths, bars, zoom } = this.props
         const width = getWidth({ bars, zoom })
@@ -199,9 +203,39 @@ class Bezie extends Component {
         return CONTROL_MAX - tickY / zoom.y
     }
 
+    initMIDI () {
+        this.output = new midi.output()
+        this.input = new midi.input()
+
+        if (os.platform() !== 'darwin') {
+            const outputPortIndex = _.find(_.range(this.output.getPortCount()), portIdx => (
+                this.output.getPortName(portIdx) === `${VIRTUAL_PORT_NAME} out`
+            ))
+            const inputPortIndex = _.find(_.range(this.input.getPortCount()), portIdx => (
+                this.input.getPortName(portIdx) === `${VIRTUAL_PORT_NAME} in`
+            ))
+
+            if (inputPortIndex && outputPortIndex) {
+                this.output.openPort(outputPortIndex)
+                this.input.openPort(inputPortIndex)
+            } else {
+                alert(WIN_MIDI_ERROR) // eslint-disable-line
+            }
+        } else {
+            this.output.openVirtualPort(VIRTUAL_PORT_NAME)
+            this.input.openVirtualPort(VIRTUAL_PORT_NAME)
+        }
+
+        this.input.ignoreTypes(true, false, true)
+        this.input.on('message', ::this.onMIDIMessage)
+        this.tick = 0
+        this.lastSeenIndeces = {}
+    }
+
     render () {
         const { authorized } = this.props
         const { requireLicense } = this.state
+        const hasMIDIDevice = this.output.getPortCount() > 0
 
         return (
             <div className="bezie">
@@ -234,6 +268,7 @@ class Bezie extends Component {
                                 title="Broadcast MIDI"
                                 bsSize="small"
                                 onClick={::this.onBroadcastClick}
+                                disabled={!hasMIDIDevice}
                             >
                                 <i className="fa fa-bullhorn" />
                             </Button>
@@ -243,6 +278,7 @@ class Bezie extends Component {
                                 title="Enable MIDI"
                                 bsSize="small"
                                 onClick={::this.onPowerClick}
+                                disabled={!hasMIDIDevice}
                             >
                                 <i className="fa fa-power-off" />
                             </Button>
@@ -286,8 +322,17 @@ class Bezie extends Component {
                     <div className="clearfix" />
                 </div>
                 <Automator {...this.props} />
-                <div className="push-top">
-                    <div className="pull-left" />
+                <div className="push-top monospace noselect">
+                    <div className="pull-left" style={{ lineHeight: '30px' }}>
+                        <ButtonToolbar>
+                            <span className="pull-left push-left push-right">
+                                MIDI: {hasMIDIDevice ? 'Connected' : 'Not connected'}
+                            </span>
+                            {!hasMIDIDevice &&
+                                <Button onClick={::this.onRetryMIDI} bsSize="small">Retry</Button>
+                            }
+                        </ButtonToolbar>
+                    </div>
                     <div className="pull-right">
                         <ButtonToolbar>
                             <Button
