@@ -6,6 +6,7 @@ import * as utils from '../utils'
 import * as Axis from './axis'
 import Bars from './bars'
 import Point from './point'
+import Seek from './seek'
 import { colors, pointTypes } from '../constants'
 
 class Automator extends Component {
@@ -201,6 +202,7 @@ class Automator extends Component {
                         <rect height={height} width={width} ref={ref => this.rect = ref} />
                         {elements.paths}
                         {elements.points}
+                        <Seek height={height} />
                     </g>
                 </svg>
             </div>

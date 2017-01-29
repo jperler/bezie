@@ -11,7 +11,6 @@ import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
 import * as midiEvents from '../constants/midi'
-import { getWidth } from '../utils'
 import {
     MIN_BARS,
     MAX_BARS,
@@ -25,6 +24,8 @@ import {
 
 class Bezie extends Component {
     static propTypes = {
+        width: PropTypes.number.isRequired,
+        height: PropTypes.number.isRequired,
         resetPath: PropTypes.func.isRequired,
         reversePath: PropTypes.func.isRequired,
         invertPath: PropTypes.func.isRequired,
@@ -78,19 +79,27 @@ class Bezie extends Component {
     onMIDIMessage (deltaTime, message) {
         const code = message[0]
         const maxTicks = this.props.bars * PPQ
-        const { authorized } = this.props
+        const { authorized, bars, height, width } = this.props
+        const tickWidth = width / bars / PPQ
 
         // Reset ticks to loop automation
-        if (this.tick === maxTicks) {
-            this.tick = 0
-            this.lastSeenIndeces = {}
-        }
+        if (this.tick === maxTicks) this.resetTicks()
 
         if (code === midiEvents.CLOCK) {
+            window.seek.style.display = 'block'
             _.each(this.props.paths, (path, pathIdx) => {
                 if (path.length > 2) {
-                    const value = this.getValueAtTick(this.tick, pathIdx)
+                    const tickX = tickWidth * this.tick
+                    const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX })
                     const channel = pathIdx + 1
+
+                    if (this.state.enabled) {
+                        // Seek manually to avoid react render
+                        window.seek.setAttribute('d', `M${tickX},0L${tickX},${height}`)
+                        window.seek.style.display = 'block'
+                    } else {
+                        window.seek.style.display = 'none'
+                    }
 
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
@@ -106,8 +115,7 @@ class Bezie extends Component {
             })
             this.tick++
         } else if (code === midiEvents.STOP) {
-            this.tick = 0
-            this.lastSeenIndeces = {}
+            this.resetTicks()
         }
     }
 
@@ -170,11 +178,8 @@ class Bezie extends Component {
         this.forceUpdate()
     }
 
-    getValueAtTick (tick, pathIdx) {
-        const { paths, bars, zoom } = this.props
-        const width = getWidth({ bars, zoom })
-        const tickWidth = width / bars / PPQ
-        const tickX = tickWidth * tick
+    getValueAtTick ({ pathIdx, tickX }) {
+        const { paths, zoom } = this.props
         const path = paths[pathIdx]
         const lastSeenIndex = _.get(this.lastSeenIndeces, pathIdx, 0)
         const len = path.length
@@ -206,6 +211,12 @@ class Bezie extends Component {
         const tickY = slope * tickX + yIntercept
 
         return CONTROL_MAX - tickY / zoom.y
+    }
+
+    resetTicks () {
+        this.tick = 0
+        window.seek.style.display = 'none'
+        this.lastSeenIndeces = {}
     }
 
     initMIDI () {
