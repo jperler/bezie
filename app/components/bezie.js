@@ -53,7 +53,7 @@ class Bezie extends Component {
         super(props)
         this.state = {
             requireLicense: false,
-            arm: false,
+            enabled: false,
         }
     }
 
@@ -98,7 +98,7 @@ class Bezie extends Component {
                     const value = this.getValueAtTick(this.tick, pathIdx)
                     const channel = pathIdx + 1
 
-                    if (this.state.arm) {
+                    if (this.state.enabled) {
                         this.output.sendMessage([
                             midiEvents.CONTROL_CHANGE,
                             channel,
@@ -154,8 +154,8 @@ class Bezie extends Component {
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
 
-    onArmClick () {
-        this.setState({ arm: !this.state.arm })
+    onPowerClick () {
+        this.setState({ enabled: !this.state.enabled })
     }
 
     onBroadcastClick () {
@@ -238,11 +238,11 @@ class Bezie extends Component {
                                 <i className="fa fa-bullhorn" />
                             </Button>
                             <Button
-                                style={{ color: this.state.arm ? colors[3] : '' }}
-                                className={this.state.arm ? 'active' : ''}
-                                title="Arm MIDI"
+                                style={{ color: this.state.enabled ? colors[3] : '' }}
+                                className={this.state.enabled ? 'active' : ''}
+                                title="Enable MIDI"
                                 bsSize="small"
-                                onClick={::this.onArmClick}
+                                onClick={::this.onPowerClick}
                             >
                                 <i className="fa fa-power-off" />
                             </Button>
