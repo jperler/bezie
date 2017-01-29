@@ -59,7 +59,7 @@ class Bezie extends Component {
             requireLicense: false,
             enabled: false,
         }
-        this.initMIDI()
+        this.initMIDI({ initial: true })
     }
 
     componentDidMount () {
@@ -219,7 +219,7 @@ class Bezie extends Component {
         this.lastSeenIndeces = {}
     }
 
-    initMIDI () {
+    initMIDI ({ initial = false } = {}) {
         this.output = new midi.output()
         this.input = new midi.input()
         this.noDevices = false
@@ -237,7 +237,7 @@ class Bezie extends Component {
                 this.input.openPort(inputPortIndex)
             } else {
                 this.noDevices = true
-                alert(WIN_MIDI_ERROR) // eslint-disable-line
+                !initial && alert(WIN_MIDI_ERROR) // eslint-disable-line
             }
         } else {
             this.output.openVirtualPort(VIRTUAL_PORT_NAME)
