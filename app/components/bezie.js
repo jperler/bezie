@@ -17,6 +17,7 @@ import {
     ZOOM_FACTOR,
     CONTROL_MAX,
     PPQ,
+    colors,
 } from '../constants'
 
 class Bezie extends Component {
@@ -73,6 +74,7 @@ class Bezie extends Component {
         this.input.on('message', ::this.onMIDIMessage)
 
         this.tick = 0
+        this.lastSeenIndeces = {}
     }
 
     componentWillUnmount () {
@@ -85,7 +87,10 @@ class Bezie extends Component {
         const maxTicks = this.props.bars * PPQ
 
         // Reset ticks to loop automation
-        if (this.tick === maxTicks) this.tick = 0
+        if (this.tick === maxTicks) {
+            this.tick = 0
+            this.lastSeenIndeces = {}
+        }
 
         if (code === midiEvents.CLOCK) {
             _.each(this.props.paths, (path, pathIdx) => {
@@ -105,6 +110,7 @@ class Bezie extends Component {
             this.tick++
         } else if (code === midiEvents.STOP) {
             this.tick = 0
+            this.lastSeenIndeces = {}
         }
     }
 
@@ -168,14 +174,20 @@ class Bezie extends Component {
         const tickWidth = width / bars / PPQ
         const tickX = tickWidth * tick
         const path = paths[pathIdx]
+        const lastSeenIndex = _.get(this.lastSeenIndeces, pathIdx, 0)
 
         let minIndex = 0
         let maxIndex = null
 
-        _.each(path, (point, i) => {
-            if (point.x < tickX) minIndex = i
+        for (let i = lastSeenIndex, len = path.length; i < len; i++) {
+            const point = path[i]
+            if (point.x <= tickX) minIndex = i
             if (!maxIndex && point.x > tickX) maxIndex = i
-        })
+        }
+
+        // Cache a reference to the last seen min index to speed things up a bit
+        // Every subsequent tick is guaranteed to be after the last seen min index
+        this.lastSeenIndeces[pathIdx] = minIndex
 
         const minPoint = path[minIndex]
         const maxPoint = path[maxIndex]
@@ -226,13 +238,13 @@ class Bezie extends Component {
                                 <i className="fa fa-bullhorn" />
                             </Button>
                             <Button
-                                style={{ color: this.state.arm ? 'red' : '' }}
+                                style={{ color: this.state.arm ? colors[3] : '' }}
                                 className={this.state.arm ? 'active' : ''}
                                 title="Arm MIDI"
                                 bsSize="small"
                                 onClick={::this.onArmClick}
                             >
-                                <i className="fa fa-circle" />
+                                <i className="fa fa-power-off" />
                             </Button>
                             <ContextMenu {...this.props} />
                         </ButtonToolbar>
