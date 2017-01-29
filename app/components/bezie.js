@@ -165,11 +165,7 @@ class Bezie extends Component {
 
     onRetryMIDI () {
         this.initMIDI()
-        if (this.output.getPortCount() === 0) {
-            alert(GENERIC_MIDI_ERROR) // eslint-disable-line
-        } else {
-            this.forceUpdate()
-        }
+        this.forceUpdate()
     }
 
     getValueAtTick (tick, pathIdx) {
