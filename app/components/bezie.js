@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
-import os from 'os'
 import midi from 'midi'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
@@ -86,20 +85,20 @@ class Bezie extends Component {
         if (this.tick === maxTicks) this.resetTicks()
 
         if (code === midiEvents.CLOCK) {
-            window.seek.style.display = 'block'
+            const tickX = tickWidth * this.tick
+
+            if (this.state.enabled) {
+                // Seek manually to avoid react render
+                window.seek.setAttribute('d', `M${tickX},0L${tickX},${height}`)
+                window.seek.style.display = 'block'
+            } else {
+                window.seek.style.display = 'none'
+            }
+
             _.each(this.props.paths, (path, pathIdx) => {
                 if (path.length > 2) {
-                    const tickX = tickWidth * this.tick
                     const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX })
                     const channel = pathIdx + 1
-
-                    if (this.state.enabled) {
-                        // Seek manually to avoid react render
-                        window.seek.setAttribute('d', `M${tickX},0L${tickX},${height}`)
-                        window.seek.style.display = 'block'
-                    } else {
-                        window.seek.style.display = 'none'
-                    }
 
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
@@ -220,19 +219,27 @@ class Bezie extends Component {
     }
 
     initMIDI ({ initial = false } = {}) {
+        const isWin = /^win/.test(process.platform);
+
         this.output = new midi.output()
         this.input = new midi.input()
         this.noDevices = false
 
-        if (os.platform() !== 'darwin') {
+        if (isWin) {
             const outputPortIndex = _.find(_.range(this.output.getPortCount()), portIdx => (
-                this.output.getPortName(portIdx) === `${VIRTUAL_PORT_NAME} out`
+                _.includes(
+                    _.toLower(this.output.getPortName(portIdx)),
+                    _.toLower(VIRTUAL_PORT_NAME)
+                )
             ))
             const inputPortIndex = _.find(_.range(this.input.getPortCount()), portIdx => (
-                this.input.getPortName(portIdx) === `${VIRTUAL_PORT_NAME} in`
+                _.includes(
+                    _.toLower(this.input.getPortName(portIdx)),
+                    _.toLower(VIRTUAL_PORT_NAME)
+                )
             ))
 
-            if (inputPortIndex && outputPortIndex) {
+            if (_.isNumber(inputPortIndex) && _.isNumber(outputPortIndex)) {
                 this.output.openPort(outputPortIndex)
                 this.input.openPort(inputPortIndex)
             } else {
