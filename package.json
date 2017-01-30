@@ -30,6 +30,10 @@
       "node_modules",
       "app/*.html"
     ],
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
+    },
     "dmg": {
       "contents": [
         {
@@ -49,10 +53,6 @@
       "target": "squirrel",
       "iconUrl": "https://raw.githubusercontent.com/jperler/bezie/master/resources/icon.ico?token=AA3bhzNsDySQUXTcW6dQBgRjuL0ghEdrks5Yc_UPwA%3D%3D"
     }
-  },
-  "directories": {
-    "buildResources": "resources",
-    "output": "release"
   },
   "bin": {
     "electron": "./node_modules/.bin/electron"
@@ -92,7 +92,8 @@
     "del": "^2.2.1",
     "devtron": "^1.2.1",
     "electron": "^1.4.15",
-    "electron-builder": "^10.16.0",
+    "electron-builder": "^12.0.3",
+    "electron-builder-squirrel-windows": "^12.0.2",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^7.3.0",
     "electron-rebuild": "^1.2.1",
@@ -147,7 +148,7 @@
     "source-map-support": "^0.4.2"
   },
   "devEngines": {
-    "node": "4.x || 5.x || 6.x",
+    "node": "4.x || 5.x || 6.x || 7.x",
     "npm": "2.x || 3.x || 4.x"
   }
 }
