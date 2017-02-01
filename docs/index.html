@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Rapid prototyping for bézier curve automation - Compatible with Ableton Live">
+    <meta name="description" content="Virtual MIDI controller for complex automation">
     <meta name="author" content="Justin Perler">
     <meta name="google-site-verification" content="L8k77K8Qm5jYOmuD4sXbYkFsG_k-wTZiy5g5XOrgkMI" />
 
@@ -72,7 +72,7 @@
                     <li><a class="page-scroll" href="#overview">Overview</a></li>
                     <li><a class="page-scroll" href="#features">Features</a></li>
                     <li><a class="page-scroll" href="#screenshots">Screenshots</a></li>
-                    <li><a class="page-scroll" href="#download">Download</a></li>
+                    <!--<li><a class="page-scroll" href="#download">Download</a></li>-->
                     <li><a class="page-scroll" href="#contact">Contact</a></li>
                 </ul>
             </div>
@@ -84,10 +84,12 @@
     <header>
         <div class="header-content">
             <div class="header-content-inner">
-                <h1 id="homeHeading">Rapid prototyping for bézier curve automation</h1>
+                <h1 id="homeHeading">Virtual MIDI controller for complex automation</h1>
                 <hr>
-                <p>Compatible with Ableton Live</p>
-                <a href="https://sites.fastspring.com/bezie/instant/bezie" class="btn btn-primary btn-xl page-scroll">Buy V1 Now $29.99</a>
+                <p>Coming February 2017</p>
+                <!-- PURCHASE FOR VERSION 1 ONLY -->
+                <!--<a href="https://sites.fastspring.com/bezie/instant/bezie" class="btn btn-primary btn-xl page-scroll">Buy Now $29.99</a>-->
+                <a href="#overview" class="btn btn-primary btn-xl page-scroll">Overview</a>
             </div>
         </div>
     </header>
@@ -98,9 +100,9 @@
                 <div class="col-lg-8 col-lg-offset-2 text-center">
                     <h2 class="section-heading">Overview</h2>
                     <hr class="primary">
-                    <p>Bezie provides an interface for creating automation compatible with Ableton Live. Bezie automation is stored in Ableton clip files and is accessible from the clip's envelope section.</p>
+                    <p>Bezie provides an interface for creating complex automation shapes with ease. Parameters can be easily mapped from Bezie to any DAW and can be changed in realtime.<p>
                     <iframe id="ytplayer" type="text/html" width="100%" height="360"
-                      src="https://www.youtube.com/embed/nYri-oRa7Bs?autoplay=0&rel=0"
+                      src="https://www.youtube.com/embed/dDo7CAFclPg?autoplay=0&rel=0"
                       frameborder="0"></iframe>
                 </div>
             </div>
@@ -122,7 +124,7 @@
                     <div class="service-box">
                         <i class="fa fa-4x fa-area-chart text-primary sr-icons"></i>
                         <h3>Automation</h3>
-                        <p class="text-muted">Automate up to seven parameters in a single grid</p>
+                        <p class="text-muted">Automate up to seven parameters simultaneously in a single grid</p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 text-center">
@@ -154,24 +156,12 @@
         <div class="container-fluid">
             <div class="row no-gutter popup-gallery">
                 <div class="col-lg-4 col-sm-6">
-                    <a href="img/portfolio/fullsize/4.png" class="portfolio-box">
-                        <img src="img/portfolio/thumbnails/4.png" class="img-responsive" alt="">
-                        <div class="portfolio-box-caption">
-                            <div class="portfolio-box-caption-content">
-                                <div class="project-category text-faded">
-                                    Full Bézier Control
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-4 col-sm-6">
                     <a href="img/portfolio/fullsize/1.png" class="portfolio-box">
                         <img src="img/portfolio/thumbnails/1.png" class="img-responsive" alt="">
                         <div class="portfolio-box-caption">
                             <div class="portfolio-box-caption-content">
                                 <div class="project-category text-faded">
-                                    Automation Selector
+                                    Full Bézier Control
                                 </div>
                             </div>
                         </div>
@@ -183,7 +173,7 @@
                         <div class="portfolio-box-caption">
                             <div class="portfolio-box-caption-content">
                                 <div class="project-category text-faded">
-                                    Snap to grid, triplet mode and note resolution
+                                    Automation Selector
                                 </div>
                             </div>
                         </div>
@@ -192,6 +182,18 @@
                 <div class="col-lg-4 col-sm-6">
                     <a href="img/portfolio/fullsize/3.png" class="portfolio-box">
                         <img src="img/portfolio/thumbnails/3.png" class="img-responsive" alt="">
+                        <div class="portfolio-box-caption">
+                            <div class="portfolio-box-caption-content">
+                                <div class="project-category text-faded">
+                                    Snap to grid, triplet mode and note resolution
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 col-sm-6">
+                    <a href="img/portfolio/fullsize/4.png" class="portfolio-box">
+                        <img src="img/portfolio/thumbnails/4.png" class="img-responsive" alt="">
                         <div class="portfolio-box-caption">
                             <div class="portfolio-box-caption-content">
                                 <div class="project-category text-faded">
@@ -229,21 +231,25 @@
         </div>
     </section>
 
-    <aside class="bg-dark" id="download">
+    <aside class="bg-dark hide" id="download">
         <div class="container text-center">
             <div class="call-to-action">
                 <h2>Try Bezie V1</h2>
                 <hr class="primary">
                 <div class="container push-top-xlarge">
-                    <p class="col-lg-8 col-lg-offset-2 text-center">The demo is available on both Mac and Windows with exporting disabled. Please read the <a href="" data-toggle="modal" data-target="#eulaModal">Bezie End User License Agreement</a> before downloading.</p>
+                    <p class="col-lg-8 col-lg-offset-2 text-center">The demo is available on both Mac and Windows and is limited to a single bar of automation. Please read the <a href="" data-toggle="modal" data-target="#eulaModal">Bezie End User License Agreement</a> before downloading.</p>
+                </div>
+                <div class="container push-top windows-req-message">
+                    <p>Windows only: <a class="text-muted" href="https://www.tobias-erichsen.de/software/loopmidi.html" target="_blank">Loopmidi</a> is required in order to enable virtual MIDI</p>
                 </div>
                 <div class="btn-dl-wrapper">
-                    <a href="http://bezie-release.herokuapp.com/download/osx" target="_blank" class="btn btn-dl push-right">
+                    <!-- DOWNLOAD FOR VERSION 1 ONLY -->
+                    <a href="http://bezie-release.herokuapp.com/download/osx" onclick="trackDownload('osx');" target="_blank" class="btn btn-dl push-right">
                         <i class="fa fa-apple fa-3x"></i>
                         <div class="push-top">Demo for Mac</div>
                         <div>(MacOS 10.9+ 64bit)</div>
                     </a>
-                    <a href="http://bezie-release.herokuapp.com/download/win" target="_blank" class="btn btn-dl">
+                    <a href="http://bezie-release.herokuapp.com/download/win" onclick="trackDownload('win');"target="_blank" class="btn btn-dl">
                         <i class="fa fa-windows fa-3x"></i>
                         <div class="push-top">Demo for Windows</div>
                         <div>(Windows 7+ 64bit)</div>
@@ -368,6 +374,13 @@
       ga('create', 'UA-90531843-1', 'auto');
       ga('send', 'pageview');
 
+      function trackDownload (platform) {
+        ga('send', 'event', {
+          eventCategory: 'Bezie Download',
+          eventAction: 'click',
+          eventLabel: platform,
+        });
+      }
     </script>
 </body>
 </html>

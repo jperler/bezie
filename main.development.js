@@ -312,7 +312,7 @@ function onOpenDialog () {
     dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [
-            { name: 'Ableton', extensions: ['alc'] },
+            { name: 'Bezie', extensions: ['bezie'] },
         ],
     }, (paths = []) => {
         const filename = paths[0]
@@ -329,7 +329,7 @@ function onSaveDialog () {
     } else {
         dialog.showSaveDialog({
             filters: [
-                { name: 'Ableton', extensions: ['alc'] },
+                { name: 'Bezie', extensions: ['bezie'] },
             ],
         }, filename => {
             if (filename) {
@@ -343,7 +343,7 @@ function onSaveDialog () {
 function onSaveAsDialog () {
     dialog.showSaveDialog({
         filters: [
-            { name: 'Ableton', extensions: ['alc'] },
+            { name: 'Bezie', extensions: ['bezie'] },
         ],
     }, filename => {
         if (filename) {
