@@ -293,7 +293,7 @@ class Bezie extends Component {
                                 title="Broadcast MIDI"
                                 bsSize="small"
                                 onClick={::this.onBroadcastClick}
-                                disabled={!hasMIDIDevice}
+                                disabled={!hasMIDIDevice || this.state.enabled}
                             >
                                 <i className="fa fa-bullhorn" />
                             </Button>

@@ -32,6 +32,7 @@ import {
     MAX_BARS,
     ZOOM_FACTOR,
     SESSION_ID,
+    NUM_PATHS,
 } from '../constants'
 import decrypt from '../utils/license'
 
@@ -44,7 +45,7 @@ const initialState = Immutable({
     pathIdx: 0,
     selectedIdx: null,
     clipboard: { path: null },
-    paths: _.fill(Array(7), []),
+    paths: _.fill(Array(NUM_PATHS), []),
     authorized: false,
     license: { email: null, key: null },
 })
