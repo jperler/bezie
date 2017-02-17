@@ -86,7 +86,7 @@
             <div class="header-content-inner">
                 <h1 id="homeHeading">Virtual MIDI controller for complex automation</h1>
                 <hr>
-                <a href="https://sites.fastspring.com/bezie/instant/bezie" class="btn btn-primary btn-xl page-scroll">Buy Now $29.99</a>
+                <a href="https://sites.fastspring.com/bezie/instant/bezie" class="btn btn-primary btn-xl page-scroll" onclick="trackCTA('Buy Now $29.99');">Buy Now $29.99</a>
             </div>
         </div>
     </header>
@@ -376,6 +376,14 @@
           eventAction: 'click',
           eventLabel: platform,
         });
+      }
+
+      function trackCTA (label) {
+        ga('send', 'event', {
+          eventCategory: 'CTA',
+          eventLabel: label,
+          eventAction: 'click',
+        })
       }
     </script>
 </body>
