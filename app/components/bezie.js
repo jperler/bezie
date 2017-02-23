@@ -356,6 +356,16 @@ class Bezie extends Component {
                             {!hasMIDIDevice &&
                                 <Button onClick={::this.onRetryMIDI} bsSize="small">Retry</Button>
                             }
+                            {!authorized &&
+                                <Button
+                                    bsStyle="primary"
+                                    bsSize="small"
+                                    className="push-left"
+                                    onClick={::this.onActivate}
+                                >
+                                    Activate
+                                </Button>
+                            }
                         </ButtonToolbar>
                     </div>
                     <div className="pull-right">
