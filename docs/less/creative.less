@@ -9,7 +9,7 @@ body {
 }
 
 body {
-    .serif-font;
+    .sans-serif-font;
 }
 
 hr {
@@ -148,6 +148,9 @@ header {
         padding: 100px 15px 100px;
         width: 100%;
         .header-content-inner {
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
             h1 {
                 font-weight: 700;
                 text-transform: uppercase;
@@ -163,6 +166,7 @@ header {
                 color: fade(white, 70%);
                 font-size: 16px;
                 margin-bottom: 50px;
+                .serif-font;
             }
         }
     }
@@ -176,7 +180,7 @@ header {
             transform: translateY(-50%);
             padding: 0 50px;
             .header-content-inner {
-                max-width: 1000px;
+                max-width: 700px;
                 margin-left: auto;
                 margin-right: auto;
                 h1 {
@@ -187,6 +191,7 @@ header {
                     max-width: 80%;
                     margin-left: auto;
                     margin-right: auto;
+                    .serif-font;
                 }
             }
         }
@@ -301,9 +306,17 @@ header {
 .btn {
     .sans-serif-font;
     border: none;
-    border-radius: 300px;
+    border-radius: 10px;
     font-weight: 700;
     text-transform: uppercase;
+}
+
+&.white {
+    color: darken(white, 20%);
+    &:hover,
+    &:focus {
+        color: white;
+    }
 }
 
 .btn-dl {

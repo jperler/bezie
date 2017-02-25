@@ -9,7 +9,7 @@ body {
   width: 100%;
 }
 body {
-  font-family: 'Merriweather', 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
 }
 hr {
   border-color: #fb6360;
@@ -133,6 +133,11 @@ header .header-content {
   padding: 100px 15px 100px;
   width: 100%;
 }
+header .header-content .header-content-inner {
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
 header .header-content .header-content-inner h1 {
   font-weight: 700;
   text-transform: uppercase;
@@ -148,6 +153,7 @@ header .header-content .header-content-inner p {
   color: rgba(255, 255, 255, 0.7);
   font-size: 16px;
   margin-bottom: 50px;
+  font-family: 'Merriweather', 'Helvetica Neue', Arial, sans-serif;
 }
 @media (min-width: 768px) {
   header {
@@ -162,7 +168,7 @@ header .header-content .header-content-inner p {
     padding: 0 50px;
   }
   header .header-content .header-content-inner {
-    max-width: 1000px;
+    max-width: 700px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -174,6 +180,7 @@ header .header-content .header-content-inner p {
     max-width: 80%;
     margin-left: auto;
     margin-right: auto;
+    font-family: 'Merriweather', 'Helvetica Neue', Arial, sans-serif;
   }
 }
 .section-heading {
@@ -358,9 +365,16 @@ fieldset[disabled] .btn-primary.active {
 .btn {
   font-family: 'Open Sans', 'Helvetica Neue', Arial, sans-serif;
   border: none;
-  border-radius: 300px;
+  border-radius: 10px;
   font-weight: 700;
   text-transform: uppercase;
+}
+.white {
+  color: #cccccc;
+}
+.white:hover,
+.white:focus {
+  color: white;
 }
 .btn-dl {
   padding: 10px 0;
