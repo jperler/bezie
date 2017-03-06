@@ -23,11 +23,6 @@ export default class Settings extends Component {
         }
     }
 
-    componentWillMount () {
-        // Enable scrolling for settings
-        document.body.style['overflow-y'] = 'auto'
-    }
-
     onChannelChange (e, pathIdx) {
         const { midi } = this.state
         const channel = parseInt(e.target.value, 10)

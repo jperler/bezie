@@ -69,10 +69,6 @@ class Bezie extends Component {
     }
 
     componentWillMount () {
-        // Ensure that scrolling is disabled
-        document.body.style['overflow-y'] = 'hidden'
-        document.body.scrollTop = 0
-
         // Bind keyboard shortcuts
         _.each(_.range(NUM_PATHS), i => {
             this.props.bindShortcut(`${i + 1}`, () => {
