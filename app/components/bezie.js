@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
+import { mouseTrap } from 'react-mousetrap'
 import midi from 'midi'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
@@ -18,6 +19,7 @@ import {
     PPQ,
     VIRTUAL_PORT_NAME,
     WIN_MIDI_ERROR,
+    NUM_PATHS,
     colors,
 } from '../constants'
 
@@ -35,6 +37,8 @@ class Bezie extends Component {
         copyPath: PropTypes.func.isRequired,
         pastePath: PropTypes.func.isRequired,
         changeSelected: PropTypes.func.isRequired,
+        changePath: PropTypes.func.isRequired,
+        bindShortcut: PropTypes.func.isRequired,
         bars: PropTypes.number.isRequired,
         clipboard: PropTypes.object.isRequired,
         snap: PropTypes.bool.isRequired,
@@ -50,6 +54,9 @@ class Bezie extends Component {
         authorize: PropTypes.func.isRequired,
         pathIdx: PropTypes.number.isRequired,
         paths: PropTypes.array.isRequired,
+        settings: PropTypes.shape({
+            midi: PropTypes.array.isRequired,
+        }),
     }
 
     constructor (props) {
@@ -59,6 +66,33 @@ class Bezie extends Component {
             enabled: false,
         }
         this.initMIDI({ initial: true })
+    }
+
+    componentWillMount () {
+        // Ensure that scrolling is disabled
+        document.body.style['overflow-y'] = 'hidden'
+        document.body.scrollTop = 0
+
+        // Bind keyboard shortcuts
+        _.each(_.range(NUM_PATHS), i => {
+            this.props.bindShortcut(`${i + 1}`, () => {
+                this.props.changeSelected({ index: null })
+                this.props.changePath({ index: i })
+            })
+        })
+
+        this.props.bindShortcut('mod+c', ::this.onCopyClick)
+        this.props.bindShortcut('mod+v', ::this.onPasteClick)
+        this.props.bindShortcut('mod+1', ::this.onDecreaseXIntervalClick)
+        this.props.bindShortcut('mod+2', ::this.onIncreaseXIntervalClick)
+        this.props.bindShortcut('mod+-', ::this.onZoomOutClick)
+        this.props.bindShortcut('mod+=', ::this.onZoomInClick)
+        this.props.bindShortcut('p', ::this.onPowerClick)
+        this.props.bindShortcut('v', ::this.onInverseClick)
+        this.props.bindShortcut('h', ::this.onReverseClick)
+        this.props.bindShortcut('b', ::this.onBroadcastClick)
+        this.props.bindShortcut('t', this.props.toggleTriplet)
+        this.props.bindShortcut('s', this.props.toggleSnap)
     }
 
     componentDidMount () {
@@ -73,12 +107,17 @@ class Bezie extends Component {
     componentWillUnmount () {
         this.output.closePort()
         this.input.closePort()
+
+        ipcRenderer.removeListener('save-file', ::this.onSaveFile)
+        ipcRenderer.removeListener('open-file', ::this.onOpenFile)
+        ipcRenderer.removeListener('update-downloaded', ::this.onUpdatedDownloaded)
+        ipcRenderer.removeListener('activate', ::this.onActivate)
     }
 
     onMIDIMessage (deltaTime, message) {
         const code = message[0]
         const maxTicks = this.props.bars * PPQ
-        const { authorized, bars, height, width } = this.props
+        const { authorized, bars, height, width, settings } = this.props
         const tickWidth = width / bars / PPQ
 
         // Reset ticks to loop automation
@@ -98,7 +137,7 @@ class Bezie extends Component {
             _.each(this.props.paths, (path, pathIdx) => {
                 if (path.length > 2) {
                     const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX })
-                    const channel = pathIdx + 1
+                    const channel = settings.midi[pathIdx].channel
 
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
@@ -152,19 +191,40 @@ class Bezie extends Component {
     onReverseClick () { this.props.reversePath() }
     onInverseClick () { this.props.invertPath() }
     onCopyClick () { this.props.copyPath() }
-    onPasteClick () { this.props.pastePath() }
     onIncreaseBarsClick () { this.props.increaseBars() }
     onDecreaseBarsClick () { this.props.decreaseBars() }
     onZoomInClick () { this.props.zoomIn() }
     onZoomOutClick () { this.props.zoomOut() }
 
+    onPasteClick () {
+        if (!_.isNull(this.props.clipboard.path)) this.props.pastePath()
+    }
+
     onPowerClick () {
         this.setState({ enabled: !this.state.enabled })
     }
 
+    onIncreaseXIntervalClick () {
+        const disabled = this.props.triplet ?
+            this.props.interval.x === 192 :
+            this.props.interval.x === 128
+
+        if (!disabled) this.props.increaseXInterval()
+    }
+
+    onDecreaseXIntervalClick () {
+        const disabled = this.props.triplet ?
+            this.props.interval.x === 1.5 :
+            this.props.interval.x === 1
+
+        if (!disabled) this.props.decreaseXInterval()
+    }
+
     onBroadcastClick () {
-        const { pathIdx } = this.props
-        const channel = pathIdx + 1
+        const { pathIdx, settings } = this.props
+        const channel = settings.midi[pathIdx].channel
+
+        if (this.state.enabled) return
 
         // Signal active MIDI channel to DAW
         this.output.sendMessage([176, channel, 0])
@@ -258,7 +318,7 @@ class Bezie extends Component {
     }
 
     render () {
-        const { authorized } = this.props
+        const { authorized, settings, pathIdx } = this.props
         const { requireLicense } = this.state
         const hasMIDIDevice = !this.noDevices
 
@@ -296,6 +356,15 @@ class Bezie extends Component {
                                 disabled={!hasMIDIDevice || this.state.enabled}
                             >
                                 <i className="fa fa-bullhorn" />
+                            </Button>
+                            <Button
+                                className={this.state.enabled ? 'active' : ''}
+                                title="Settings"
+                                bsSize="small"
+                                disabled={this.state.enabled}
+                                onClick={() => window.location = '#/settings'}
+                            >
+                                <i className="fa fa-cog" />
                             </Button>
                             <Button
                                 style={{ color: this.state.enabled ? colors[3] : '' }}
@@ -366,6 +435,15 @@ class Bezie extends Component {
                                     Activate
                                 </Button>
                             }
+                            <span
+                                className="pull-left monospace push-left noselect"
+                                style={{ lineHeight: '30px' }}
+                            >
+                                {
+                                    settings.midi[pathIdx].name ||
+                                    `Channel ${settings.midi[pathIdx].channel}`
+                                }
+                            </span>
                         </ButtonToolbar>
                     </div>
                     <div className="pull-right">
@@ -425,4 +503,4 @@ class Bezie extends Component {
 
 }
 
-export default Bezie
+export default mouseTrap(Bezie)

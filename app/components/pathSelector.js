@@ -7,6 +7,9 @@ class PathSelector extends Component {
         pathIdx: PropTypes.number.isRequired,
         changePath: PropTypes.func.isRequired,
         changeSelected: PropTypes.func.isRequired,
+        settings: PropTypes.shape({
+            midi: PropTypes.array.isRequired,
+        }),
     }
 
     onPathSelect (i) {
@@ -15,7 +18,7 @@ class PathSelector extends Component {
     }
 
     render () {
-        const { pathIdx } = this.props
+        const { pathIdx, settings } = this.props
 
         const getIcon = i => (
             <i
@@ -24,13 +27,22 @@ class PathSelector extends Component {
             />
         )
 
+        const getName = i => {
+            const name = settings.midi[i].name
+            const channel = settings.midi[i].channel
+
+            return name || `Channel ${channel}`
+        }
+
         const items = _.map(colors, (color, i) => (
             <MenuItem
                 bsSize="small"
                 eventKey={i}
                 key={`path-select-${i}`}
             >
-                {getIcon(i)}
+                <span className="push-right">
+                    {getIcon(i)} {getName(i)}
+                </span>
             </MenuItem>
         ))
 

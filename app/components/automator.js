@@ -39,8 +39,13 @@ class Automator extends Component {
             .on('mousemove', _.throttle(::this.onMouseMove, 30, { trailing: false }))
             .on('mouseup', ::this.onMouseUp)
 
-        d3.select(this.rect)
-            .on('mousedown', ::this.onMouseDownRect)
+        d3.select(this.rect).on('mousedown', ::this.onMouseDownRect)
+    }
+
+    componentWillUnmount () {
+        // Ensure events are removed when switching components
+        d3.select(window).on('mousemove', null).on('mouseup', null)
+        d3.select(this.rect).on('mousedown', null)
     }
 
     onMouseDownPoint (i) {

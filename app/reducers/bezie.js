@@ -22,6 +22,7 @@ import {
     ZOOM_OUT,
     AUTHORIZE,
     BOOTSTRAP,
+    UPDATE_SETTINGS,
 } from '../actions/bezie'
 import * as utils from '../utils'
 import * as cubic from '../utils/cubic'
@@ -48,6 +49,12 @@ const initialState = Immutable({
     paths: _.fill(Array(NUM_PATHS), []),
     authorized: false,
     license: { email: null, key: null },
+    settings: {
+        midi: _.map(_.range(NUM_PATHS), i => ({
+            name: '',
+            channel: i + 1,
+        }))
+    },
 })
 
 export default function bezie (state = initialState, action) {
@@ -93,6 +100,7 @@ export default function bezie (state = initialState, action) {
         case ZOOM_OUT: return handleZoomOut(state)
         case AUTHORIZE: return handleAuth(state, payload)
         case BOOTSTRAP: return handleBootstrap(state, payload)
+        case UPDATE_SETTINGS: return handleUpdateSettings(state, payload)
         default: return state
     }
 }
@@ -508,7 +516,11 @@ function handleAuth (state, payload) {
 function handleBootstrap (state, payload) {
     const attrs = _.keys(payload)
     return state.merge(_.extend(payload, _.omit(initialState,
-        attrs.concat(['authorized', 'license']))))
+        attrs.concat(['authorized', 'license', 'settings']))))
+}
+
+function handleUpdateSettings (state, payload) {
+    return state.merge({ settings: payload })
 }
 
 function setBezier (points, state, options = {}) {

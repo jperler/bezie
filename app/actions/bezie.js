@@ -22,6 +22,7 @@ export const ZOOM_IN = 'ZOOM_IN'
 export const ZOOM_OUT = 'ZOOM_OUT'
 export const AUTHORIZE = 'AUTHORIZE'
 export const BOOTSTRAP = 'BOOTSTRAP'
+export const UPDATE_SETTINGS = 'UPDATE_SETTINGS'
 
 export const addPoint = ({ index, x, y }) => ({ type: ADD_POINT, payload: { index, x, y } })
 export const removePoint = ({ index }) => ({ type: REMOVE_POINT, payload: { index } })
@@ -42,6 +43,7 @@ export const decreaseBars = () => ({ type: DECREASE_BARS })
 export const zoomIn = () => ({ type: ZOOM_IN })
 export const zoomOut = () => ({ type: ZOOM_OUT })
 export const bootstrap = payload => ({ type: BOOTSTRAP, payload })
+export const updateSettings = payload => ({ type: UPDATE_SETTINGS, payload })
 
 export const authorize = () => (dispatch => {
     storage.get(STORAGE_KEY, (error, payload) => {

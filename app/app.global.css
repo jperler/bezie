@@ -8,16 +8,16 @@ body {
     font-family: Arial, Helvetica, Helvetica Neue;
 }
 
-::-webkit-scrollbar {
+#root ::-webkit-scrollbar {
     height: 10px;
 }
 
-::-webkit-scrollbar-track {
+#root ::-webkit-scrollbar-track {
     background: rgba(0,0,0,.2);
     border-radius: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+#root ::-webkit-scrollbar-thumb {
     background: rgba(0,0,0,.8);
     border-radius: 10px;
 }

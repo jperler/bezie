@@ -12,6 +12,7 @@ export const RELEASE_BASE_URL = 'http://bezie-release.herokuapp.com'
 export const SECRET_FRAGMENT = '7kZiZynrndu'
 export const VIRTUAL_PORT_NAME = 'Bezie'
 export const NUM_PATHS = 8
+export const NUM_CC_CHANNELS = 119
 export const WIN_MIDI_ERROR = `Please install loopmidi with the following device: "${VIRTUAL_PORT_NAME}".`// eslint-disable-line
 
 export const colors = [

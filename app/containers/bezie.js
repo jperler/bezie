@@ -18,6 +18,7 @@ function mapStateToProps (state) {
         clipboard: state.bezie.clipboard,
         license: state.bezie.license,
         authorized: state.bezie.authorized,
+        settings: state.bezie.settings,
         xAxisTickRange: getXAxisTickRange(state),
         yAxisTickRange: getYAxisTickRange(state),
     }
