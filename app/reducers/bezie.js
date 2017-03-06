@@ -69,7 +69,7 @@ export default function bezie (state = initialState, action) {
     // Update the title to indicate file status
     if (_.includes([
         ADD_POINT, REMOVE_POINT, UPDATE_POINT, REMOVE_POINT, CHANGE_TYPE,
-        RESET_PATH, REVERSE_PATH, INVERT_PATH, PASTE_PATH,
+        RESET_PATH, REVERSE_PATH, INVERT_PATH, PASTE_PATH, UPDATE_SETTINGS,
     ], action.type)) {
         if (document.title === 'Bezie') {
             document.title = '* untitled'
@@ -516,7 +516,7 @@ function handleAuth (state, payload) {
 function handleBootstrap (state, payload) {
     const attrs = _.keys(payload)
     return state.merge(_.extend(payload, _.omit(initialState,
-        attrs.concat(['authorized', 'license', 'settings']))))
+        attrs.concat(['authorized', 'license']))))
 }
 
 function handleUpdateSettings (state, payload) {
