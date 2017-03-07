@@ -316,7 +316,7 @@ function handleSetBezier (state, { type }) {
 function handleSetDefault (state) {
     const { paths, pathIdx, selectedIdx } = state
     const path = paths[pathIdx].asMutable()
-    const point = path[selectedIdx]
+    let point = path[selectedIdx]
 
     let leftIdx
     let rightIdx
@@ -336,6 +336,9 @@ function handleSetDefault (state) {
             leftIdx = _.findIndex(path, p => p.id === point.left)
             rightIdx = _.findIndex(path, p => p.id === right.right)
         }
+        // Leave mid point in place
+        const mid = (rightIdx - leftIdx) / 2 + leftIdx
+        point = path[mid]
     }
 
     const nextPoint = point.merge({
@@ -343,6 +346,7 @@ function handleSetDefault (state) {
         left: null,
         right: null,
         type: null,
+        hidden: null,
     })
 
     path.splice(leftIdx + 1, rightIdx - leftIdx - 1, nextPoint)
