@@ -11,6 +11,7 @@ import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
 import * as midiEvents from '../constants/midi'
+import * as utils from '../utils'
 import {
     MIN_BARS,
     MAX_BARS,
@@ -21,6 +22,7 @@ import {
     WIN_MIDI_ERROR,
     NUM_PATHS,
     colors,
+    pointTypes,
 } from '../constants'
 
 class Bezie extends Component {
@@ -53,6 +55,8 @@ class Bezie extends Component {
         license: PropTypes.object.isRequired,
         authorize: PropTypes.func.isRequired,
         pathIdx: PropTypes.number.isRequired,
+        selectedIdx: PropTypes.number,
+        changeType: PropTypes.func.isRequired,
         paths: PropTypes.array.isRequired,
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
@@ -89,6 +93,8 @@ class Bezie extends Component {
         this.props.bindShortcut('b', ::this.onBroadcastClick)
         this.props.bindShortcut('t', this.props.toggleTriplet)
         this.props.bindShortcut('s', this.props.toggleSnap)
+        this.props.bindShortcut('up', _.partial(::this.onTypeChange, true))
+        this.props.bindShortcut('down', _.partial(::this.onTypeChange, false))
     }
 
     componentDidMount () {
@@ -108,6 +114,27 @@ class Bezie extends Component {
         ipcRenderer.removeListener('open-file', ::this.onOpenFile)
         ipcRenderer.removeListener('update-downloaded', ::this.onUpdatedDownloaded)
         ipcRenderer.removeListener('activate', ::this.onActivate)
+    }
+
+    onTypeChange (isUp) {
+        const { paths, pathIdx, selectedIdx } = this.props
+
+        if (!selectedIdx) return
+
+        const path = paths[pathIdx]
+        const point = paths[pathIdx][selectedIdx]
+        const allTypes = _.concat(['default'], _.values(pointTypes))
+        const type = point.type || 'default'
+        const index = _.indexOf(allTypes, type)
+        const cycleLeftIndex = index === 0 ? allTypes.length - 1 : index - 1
+        const cycleRightIndex = index < allTypes.length - 1 ? index + 1 : 0
+        const nextIndex = isUp ? cycleLeftIndex : cycleRightIndex
+        const nextType = allTypes[nextIndex]
+
+        if (utils.isEndpoint(path, point)) return
+
+        if (type !== 'default') this.props.changeType({ type: 'default' })
+        if (nextType !== 'default') this.props.changeType({ type: nextType })
     }
 
     onMIDIMessage (deltaTime, message) {
