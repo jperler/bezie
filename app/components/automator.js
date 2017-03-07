@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
 import classNames from 'classnames'
+import { mouseTrap } from 'react-mousetrap'
 import styles from './automator.css'
 import * as utils from '../utils'
 import * as Axis from './axis'
@@ -25,6 +26,7 @@ class Automator extends Component {
         paths: PropTypes.array.isRequired,
         xAxisTickRange: PropTypes.array.isRequired,
         yAxisTickRange: PropTypes.array.isRequired,
+        bindShortcut: PropTypes.func.isRequired,
     }
 
     constructor () {
@@ -32,6 +34,15 @@ class Automator extends Component {
         this.state = {
             draggedIdx: null,
         }
+    }
+
+    componentWillMount () {
+        this.props.bindShortcut('backspace', () => {
+            const index = this.props.selectedIdx
+            if (_.isNull(index)) return
+            this.setState({ draggedIdx: null })
+            this.props.removePoint({ index })
+        })
     }
 
     componentDidMount () {
@@ -215,4 +226,4 @@ class Automator extends Component {
     }
 }
 
-export default Automator
+export default mouseTrap(Automator)
