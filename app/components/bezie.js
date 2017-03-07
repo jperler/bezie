@@ -69,6 +69,7 @@ class Bezie extends Component {
             requireLicense: false,
             enabled: false,
         }
+        this.pathIntervals = {}
         this.initMIDI({ initial: true })
     }
 
@@ -81,12 +82,19 @@ class Bezie extends Component {
             })
         })
 
+        _.each(_.range(NUM_PATHS), i => {
+            this.props.bindShortcut(`shift+${i + 1}`, () => {
+                this.sendPath({ index: i })
+            })
+        })
+
         this.props.bindShortcut('mod+c', ::this.onCopyClick)
         this.props.bindShortcut('mod+v', ::this.onPasteClick)
         this.props.bindShortcut('mod+1', ::this.onDecreaseXIntervalClick)
         this.props.bindShortcut('mod+2', ::this.onIncreaseXIntervalClick)
         this.props.bindShortcut('mod+-', ::this.onZoomOutClick)
         this.props.bindShortcut('mod+=', ::this.onZoomInClick)
+        this.props.bindShortcut('mod+,', ::this.onSettingsClick)
         this.props.bindShortcut('p', ::this.onPowerClick)
         this.props.bindShortcut('v', ::this.onInverseClick)
         this.props.bindShortcut('h', ::this.onReverseClick)
@@ -142,6 +150,8 @@ class Bezie extends Component {
         const maxTicks = this.props.bars * PPQ
         const { authorized, bars, height, width, settings } = this.props
         const tickWidth = width / bars / PPQ
+
+        return false
 
         // Reset ticks to loop automation
         if (this.tick === maxTicks) this.resetTicks()
@@ -227,6 +237,10 @@ class Bezie extends Component {
         this.setState({ enabled: !this.state.enabled })
     }
 
+    onSettingsClick () {
+        if (!this.state.enabled) window.location = '#/settings'
+    }
+
     onIncreaseXIntervalClick () {
         const disabled = this.props.triplet ?
             this.props.interval.x === 192 :
@@ -293,6 +307,37 @@ class Bezie extends Component {
         const tickY = slope * tickX + yIntercept
 
         return CONTROL_MAX - tickY / zoom.y
+    }
+
+    sendPath ({ index }) {
+        const { bars, width, settings } = this.props
+        const delta = 60e3 / (120 * 24)
+        const maxTicks = this.props.bars * PPQ
+        const tickWidth = width / bars / PPQ
+        let tick = 0
+
+        clearInterval(this.pathIntervals[index])
+
+        this.pathIntervals[index] = setInterval(() => {
+            if (tick < maxTicks) {
+                const tickX = tickWidth * tick
+                const value = this.getValueAtTick({ tick, pathIdx: index, tickX })
+                const channel = settings.midi[index].channel
+
+                if (this.state.enabled) {
+                    this.output.sendMessage([
+                        midiEvents.CONTROL_CHANGE,
+                        channel,
+                        value,
+                    ])
+                }
+                tick++
+            } else {
+                clearInterval(this.pathIntervals[index])
+                delete this.pathIntervals[index]
+                tick = 0
+            }
+        }, delta)
     }
 
     resetTicks () {
@@ -385,7 +430,7 @@ class Bezie extends Component {
                                 title="Settings"
                                 bsSize="small"
                                 disabled={this.state.enabled}
-                                onClick={() => window.location = '#/settings'}
+                                onClick={::this.onSettingsClick}
                             >
                                 <i className="fa fa-cog" />
                             </Button>
@@ -398,6 +443,12 @@ class Bezie extends Component {
                                 disabled={!hasMIDIDevice}
                             >
                                 <i className="fa fa-power-off" />
+                            </Button>
+                            <Button bsSize="small">
+                                <i className="fa fa-retweet" />
+                            </Button>
+                            <Button bsSize="small">
+                                <i className="fa fa-keyboard-o" />
                             </Button>
                             <ContextMenu {...this.props} />
                         </ButtonToolbar>

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Immutable from 'seamless-immutable'
 import _ from 'lodash'
 import fs from 'fs'
+import Slider from 'rc-slider';
 import { InputGroup, Form, ButtonToolbar, Button, FormGroup, FormControl } from 'react-bootstrap'
 import { colors, NUM_CC_CHANNELS } from '../constants'
 
@@ -20,6 +21,7 @@ export default class Settings extends Component {
 
         this.state = {
             midi: props.settings.midi,
+            bpm: 120,
         }
     }
 
@@ -40,6 +42,10 @@ export default class Settings extends Component {
     onSaveClick () {
         this.props.updateSettings({ midi: this.state.midi })
         window.location = '#/'
+    }
+
+    onBPMChange (value) {
+        this.setState({ bpm: value })
     }
 
     onSavePresetClick () {
@@ -115,7 +121,7 @@ export default class Settings extends Component {
                                 />
                             </InputGroup>
                         </FormGroup>
-                        <FormGroup>
+                        <FormGroup className="push-left-small">
                             <FormControl
                                 componentClass="select"
                                 placeholder="Select channel"
@@ -133,6 +139,19 @@ export default class Settings extends Component {
                                 ))}
                             </FormControl>
                         </FormGroup>
+                        <FormGroup className="push-left-small">
+                            <InputGroup>
+                                <InputGroup.Addon>
+                                    <Button bsSize="xsmall">Learn</Button>
+                                </InputGroup.Addon>
+                                <FormControl type="text" disabled />
+                                <InputGroup.Addon>
+                                    <Button bsSize="xsmall" disabled>
+                                        <i className="fa fa-close" />
+                                    </Button>
+                                </InputGroup.Addon>
+                            </InputGroup>
+                        </FormGroup>
                     </Form>
                 ))}
                 <ButtonToolbar className="push-top">
@@ -140,6 +159,22 @@ export default class Settings extends Component {
                     <Button bsSize="small" onClick={() => window.location = '#/'}>Cancel</Button>
                     <Button bsSize="small" onClick={::this.onSavePresetClick}>Save Preset</Button>
                     <Button bsSize="small" onClick={::this.onLoadPresetClick}>Load Preset</Button>
+                    <Form inline className="push-left-small pull-left" style={{ width: 100 }}>
+                        <FormGroup>
+                            <InputGroup>
+                                <InputGroup.Addon
+                                    style={{ padding: 5 }}
+                                >BPM</InputGroup.Addon>
+                                <FormControl
+                                    type="text"
+                                    value="120"
+                                    maxLength={3}
+                                    style={{ height: 30 }}
+                                    onChange={() => {}}
+                                />
+                            </InputGroup>
+                        </FormGroup>
+                    </Form>
                 </ButtonToolbar>
             </div>
         )
