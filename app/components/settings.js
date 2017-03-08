@@ -2,9 +2,17 @@ import React, { Component, PropTypes } from 'react'
 import Immutable from 'seamless-immutable'
 import _ from 'lodash'
 import fs from 'fs'
-import Slider from 'rc-slider';
-import { InputGroup, Form, ButtonToolbar, Button, FormGroup, FormControl } from 'react-bootstrap'
+import {
+    ControlLabel,
+    InputGroup,
+    Form,
+    ButtonToolbar,
+    Button,
+    FormGroup,
+    FormControl,
+} from 'react-bootstrap'
 import { colors, NUM_CC_CHANNELS } from '../constants'
+import { default as midiUtil } from '../utils/midi'
 
 const { dialog } = require('electron').remote
 
@@ -13,6 +21,7 @@ export default class Settings extends Component {
         updateSettings: PropTypes.func.isRequired,
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
+            tempo: PropTypes.number.isRequired,
         }),
     }
 
@@ -21,7 +30,8 @@ export default class Settings extends Component {
 
         this.state = {
             midi: props.settings.midi,
-            bpm: 120,
+            tempo: props.settings.tempo,
+            mappings: Immutable({}),
         }
     }
 
@@ -40,12 +50,26 @@ export default class Settings extends Component {
     }
 
     onSaveClick () {
-        this.props.updateSettings({ midi: this.state.midi })
+        this.props.updateSettings({
+            midi: this.state.midi,
+            tempo: this.state.tempo,
+        })
         window.location = '#/'
     }
 
-    onBPMChange (value) {
-        this.setState({ bpm: value })
+    onTempoChange (e) {
+        this.setState({ tempo: parseInt(e.target.value, 10) })
+    }
+
+    onMIDILearnClick (pathIdx) {
+        const { mappings } = this.state
+        const listener = (deltaTime, message) => {
+            const code = [message[0], message[1]].join('.')
+            this.setState({ mappings: mappings.set(pathIdx, code) })
+            midiUtil.controller.removeListener('message', listener)
+        }
+
+        midiUtil.controller.on('message', listener)
     }
 
     onSavePresetClick () {
@@ -101,81 +125,130 @@ export default class Settings extends Component {
 
         return (
             <div>
-                {this.props.settings.midi.map((config, pathIdx) => (
-                    <Form inline key={pathIdx}>
-                        <FormGroup>
-                            <InputGroup>
-                                <InputGroup.Addon>
-                                    <i
-                                        className="fa fa-square"
-                                        style={{ color: colors[pathIdx] }}
+                <div className="pull-left">
+                    {this.props.settings.midi.map((config, pathIdx) => (
+                        <Form inline key={pathIdx}>
+                            <FormGroup>
+                                <InputGroup>
+                                    <InputGroup.Addon>
+                                        <i
+                                            className="fa fa-square"
+                                            style={{ color: colors[pathIdx] }}
+                                        />
+                                    </InputGroup.Addon>
+                                    <FormControl
+                                        type="text"
+                                        label="Text"
+                                        placeholder={`Channel ${midi[pathIdx].channel}`}
+                                        value={midi[pathIdx].name}
+                                        maxLength={25}
+                                        onChange={_.partial(::this.onNameChange, _, pathIdx)}
                                     />
-                                </InputGroup.Addon>
+                                </InputGroup>
+                            </FormGroup>
+                            <FormGroup className="push-left-small">
                                 <FormControl
-                                    type="text"
-                                    label="Text"
-                                    placeholder={`Channel ${midi[pathIdx].channel}`}
-                                    value={midi[pathIdx].name}
-                                    maxLength={25}
-                                    onChange={_.partial(::this.onNameChange, _, pathIdx)}
-                                />
-                            </InputGroup>
-                        </FormGroup>
-                        <FormGroup className="push-left-small">
+                                    componentClass="select"
+                                    value={midi[pathIdx].channel}
+                                    onChange={_.partial(::this.onChannelChange, _, pathIdx)}
+                                >
+                                    {_.map(_.range(NUM_CC_CHANNELS), i => (
+                                        <option
+                                            key={i + 1}
+                                            value={i + 1}
+                                            disabled={_.includes(currentChannels, i + 1)}
+                                        >
+                                            Channel {i + 1}
+                                        </option>
+                                    ))}
+                                </FormControl>
+                            </FormGroup>
+                            <FormGroup className="push-left-small">
+                                <InputGroup>
+                                    <InputGroup.Addon>
+                                        <Button
+                                            bsSize="xsmall"
+                                            onClick={() => this.onMIDILearnClick(pathIdx)}
+                                        >
+                                            Learn
+                                        </Button>
+                                    </InputGroup.Addon>
+                                    <FormControl
+                                        type="text"
+                                        disabled
+                                        value={this.state.mappings[pathIdx]}
+                                        onChange={_.noop}
+                                    />
+                                    <InputGroup.Addon>
+                                        <Button bsSize="xsmall" disabled>
+                                            <i className="fa fa-close" />
+                                        </Button>
+                                    </InputGroup.Addon>
+                                </InputGroup>
+                            </FormGroup>
+                        </Form>
+                    ))}
+                    <ButtonToolbar className="push-top">
+                        <Button
+                            bsSize="small"
+                            onClick={::this.onSaveClick}
+                        >
+                            Update
+                        </Button>
+                        <Button
+                            bsSize="small"
+                            onClick={() => window.location = '#/'}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            bsSize="small"
+                            onClick={::this.onSavePresetClick}
+                        >
+                            Save Preset
+                        </Button>
+                        <Button
+                            bsSize="small"
+                            onClick={::this.onLoadPresetClick}
+                        >
+                            Load Preset
+                        </Button>
+                    </ButtonToolbar>
+                </div>
+                <div className="pull-left push-left" style={{ width: 200 }}>
+                    <Form>
+                        <FormGroup>
+                            <ControlLabel>Controller</ControlLabel>
                             <FormControl
                                 componentClass="select"
-                                placeholder="Select channel"
-                                value={midi[pathIdx].channel}
-                                onChange={_.partial(::this.onChannelChange, _, pathIdx)}
+                                onChange={i => midiUtil.setController(i)}
                             >
-                                {_.map(_.range(NUM_CC_CHANNELS), i => (
+                                <option>None</option>
+                                {_.map(midiUtil.getControllers(), data => (
                                     <option
-                                        key={i + 1}
-                                        value={i + 1}
-                                        disabled={_.includes(currentChannels, i + 1)}
+                                        key={data.label}
+                                        value={data.index}
                                     >
-                                        Channel {i + 1}
+                                        {data.label}
                                     </option>
                                 ))}
                             </FormControl>
                         </FormGroup>
-                        <FormGroup className="push-left-small">
-                            <InputGroup>
-                                <InputGroup.Addon>
-                                    <Button bsSize="xsmall">Learn</Button>
-                                </InputGroup.Addon>
-                                <FormControl type="text" disabled />
-                                <InputGroup.Addon>
-                                    <Button bsSize="xsmall" disabled>
-                                        <i className="fa fa-close" />
-                                    </Button>
-                                </InputGroup.Addon>
-                            </InputGroup>
-                        </FormGroup>
-                    </Form>
-                ))}
-                <ButtonToolbar className="push-top">
-                    <Button bsSize="small" onClick={::this.onSaveClick}>Update</Button>
-                    <Button bsSize="small" onClick={() => window.location = '#/'}>Cancel</Button>
-                    <Button bsSize="small" onClick={::this.onSavePresetClick}>Save Preset</Button>
-                    <Button bsSize="small" onClick={::this.onLoadPresetClick}>Load Preset</Button>
-                    <Form inline className="push-left-small pull-left" style={{ width: 100 }}>
                         <FormGroup>
-                            <InputGroup>
-                                <InputGroup.Addon
-                                    style={{ padding: 5 }}
-                                >BPM</InputGroup.Addon>
-                                <FormControl
-                                    type="text"
-                                    value="120"
-                                    maxLength={3}
-                                    style={{ height: 30 }}
-                                    onChange={() => {}}
-                                />
-                            </InputGroup>
+                            <ControlLabel>Tempo</ControlLabel>
+                            <FormControl
+                                componentClass="select"
+                                onChange={() => {}}
+                                value={this.state.tempo}
+                                onChange={::this.onTempoChange}
+                            >
+                                {_.map(_.range(20, 801), i => (
+                                    <option key={i} value={i}>{i}</option>
+                                ))}
+                            </FormControl>
                         </FormGroup>
                     </Form>
-                </ButtonToolbar>
+                </div>
             </div>
         )
     }
