@@ -52,11 +52,11 @@ class Midi {
         return _.compact(_.map(_.range(this.input.getPortCount()), i => {
             const name = this.input.getPortName(i)
 
-            if (name === VIRTUAL_PORT_NAME) return
+            if (name === VIRTUAL_PORT_NAME || !name) return
 
             return {
                 index: i,
-                label: this.input.getPortName(i),
+                label: name,
             }
         }))
     }

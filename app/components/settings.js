@@ -34,13 +34,12 @@ export default class Settings extends Component {
         this.state = props.settings
     }
 
-    componentWillMount () {
-        // Refresh controllers every 5 seconds
-        this.refreshInterval = setInterval(::this.refreshControllers, 5e3)
-    }
-
     componentWillUnmount () {
-        clearInterval(this.refreshInterval)
+        // Ensure the listener is removed
+        if (this.activeListener) {
+            midiUtil.controller.removeListener('message', this.activeListener)
+            this.activeListener = null
+        }
     }
 
     onChannelChange (e, pathIdx) {
@@ -169,6 +168,11 @@ export default class Settings extends Component {
         this.setState({ mode: e.target.value })
     }
 
+    onRefreshControllersClick () {
+        midiUtil.initControllers()
+        this.forceUpdate()
+    }
+
     getMapLabel (index) {
         const value = this.state.mappings[index]
 
@@ -178,14 +182,17 @@ export default class Settings extends Component {
         const type = parseInt(data[0], 10)
         const note = parseInt(data[1], 10)
         const label = noteNumberToName(note)
+        const noteOffRange = _.range(128, 144)
         const noteOnRange = _.range(144, 160)
+        const isNoteOn = _.includes(noteOnRange, type)
+        const isNoteOff = _.includes(noteOffRange, type)
 
-        return _.includes(noteOnRange, type) ? `Note: ${label}` : value
-    }
+        let noteLabel
+        if (isNoteOn) noteLabel = `Note: ${label}`
+        // Add this in there just to make the mapping mistake obvious
+        if (isNoteOff) noteLabel = `Note Off: ${label}`
 
-    refreshControllers () {
-        midiUtil.initControllers()
-        this.forceUpdate()
+        return noteLabel || value
     }
 
     render () {
@@ -326,6 +333,13 @@ export default class Settings extends Component {
                                         </option>
                                     ))}
                                 </FormControl>
+                                <Button
+                                    onClick={::this.onRefreshControllersClick}
+                                    bsSize="small"
+                                    className="push-top"
+                                >
+                                    Refresh Controllers
+                                </Button>
                             </FormGroup>
                         }
                         {mode === modes.controller &&
