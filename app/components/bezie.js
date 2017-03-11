@@ -24,6 +24,8 @@ import {
     modes,
 } from '../constants'
 
+const Worker = require('worker-loader!../workers/tick')
+
 class Bezie extends Component {
     static propTypes = {
         width: PropTypes.number.isRequired,
@@ -366,7 +368,7 @@ class Bezie extends Component {
         this.clearWorker(index)
 
         // Create a new worker
-        const worker = this.workers[index] = new Worker('./workers/tick.js')
+        const worker = this.workers[index] = new Worker()
 
         // Start listening for ticks
         worker.addEventListener('message', () => {
