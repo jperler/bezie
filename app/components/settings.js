@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import Immutable from 'seamless-immutable'
 import _ from 'lodash'
 import fs from 'fs'
+import { noteNumberToName } from 'midiutils'
 import {
     ControlLabel,
     InputGroup,
@@ -30,7 +31,6 @@ export default class Settings extends Component {
 
     constructor (props) {
         super()
-
         this.state = props.settings
     }
 
@@ -146,6 +146,20 @@ export default class Settings extends Component {
         this.setState({ mode: e.target.value })
     }
 
+    getMapLabel (index) {
+        const value = this.state.mappings[index]
+
+        if (!value) return ''
+
+        const data = value.split('.')
+        const type = parseInt(data[0], 10)
+        const note = parseInt(data[1], 10)
+        const label = noteNumberToName(note)
+        const noteOnRange = _.range(144, 160)
+
+        return _.includes(noteOnRange, type) ? `Note: ${label}` : value
+    }
+
     render () {
         const { midi, mode } = this.state
         const currentChannels = _.map(midi, 'channel')
@@ -208,7 +222,7 @@ export default class Settings extends Component {
                                         <FormControl
                                             type="text"
                                             disabled
-                                            value={this.state.mappings[pathIdx] || ''}
+                                            value={this.getMapLabel(pathIdx)}
                                             onChange={_.noop}
                                         />
                                         <InputGroup.Addon>

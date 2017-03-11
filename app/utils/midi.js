@@ -9,10 +9,13 @@ class Midi {
     constructor () {
         this.output = new midi.output()
         this.input = new midi.input()
-        this.controller = new midi.input()
+
+        this.controllers = {}
+        this.controllerIdx = null
+        this.controller = null
+        this.initControllers()
 
         this._isConnected = false
-        this._hasController = false
 
         // Enable timing events
         this.input.ignoreTypes(true, false, true)
@@ -66,20 +69,28 @@ class Midi {
         return _.find(this.getControllers(), data)
     }
 
+    initControllers () {
+        // Open all controllers
+        _.each(this.getControllers(), controller => {
+            const input = new midi.input()
+            input.openPort(controller.index)
+            this.controllers[controller.label] = input
+        })
+    }
+
     setController (index) {
-        if (this.hasController()) {
-            // Closing the port is causing errors
-            this.controller.removeAllListeners('message')
-            this.controller.closePort()
-            this.controller = new midi.input()
+        // Remove current controllers events
+        if (this.controller) this.controller.removeAllListeners('message')
+
+        // Unset current controller
+        if (_.isNull(index)) {
+            this.controller = null
+            return
         }
 
-        if (_.isNumber(index)) {
-            this.controller.openPort(index)
-            this._hasController = true
-        } else {
-            this._hasController = false
-        }
+        // Set new controller
+        const name = this.getControllerName(index)
+        this.controller = this.controllers[name]
     }
 
     isConnected () {
@@ -87,7 +98,7 @@ class Midi {
     }
 
     hasController () {
-        return this._hasController
+        return !!this.controller
     }
 }
 

@@ -60,6 +60,7 @@ class Bezie extends Component {
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
             mode: PropTypes.oneOf(_.values(modes)).isRequired,
+            controllerName: PropTypes.string,
         }),
     }
 
@@ -74,6 +75,8 @@ class Bezie extends Component {
     }
 
     componentWillMount () {
+        const { settings } = this.props
+
         // Bind keyboard shortcuts
         _.each(_.range(NUM_PATHS), i => {
             this.props.bindShortcut(`${i + 1}`, () => {
@@ -105,7 +108,11 @@ class Bezie extends Component {
         this.props.bindShortcut('down', _.partial(::this.onTypeChange, false))
 
         midi.input.on('message', ::this.onMIDIMessage)
-        midi.controller.on('message', ::this.onControllerInput)
+
+        // If a new controller was selected from midi settings
+        if (midi.hasController()) {
+            midi.controller.on('message', ::this.onControllerInput)
+        }
     }
 
     componentDidMount () {
@@ -117,14 +124,34 @@ class Bezie extends Component {
         this.props.authorize()
     }
 
-    componentWillUnmount () {
-        ipcRenderer.removeListener('save-file', ::this.onSaveFile)
-        ipcRenderer.removeListener('open-file', ::this.onOpenFile)
-        ipcRenderer.removeListener('update-downloaded', ::this.onUpdatedDownloaded)
-        ipcRenderer.removeListener('activate', ::this.onActivate)
+    componentWillReceiveProps (nextProps) {
+        const nextSettings = nextProps.settings
+        const { settings } = this.props
+        const controllerAdded = nextSettings.controllerName && !midi.hasController()
+        const controllerChanged = settings.controllerName !== nextSettings.controllerName
 
+        if (controllerAdded || controllerChanged) {
+            // Select controller by name
+            const controller = midi.findController({ label: nextSettings.controllerName })
+
+            // If a controller was set from bootstrapping or changed then update it
+            if (controller) {
+                midi.setController(controller.index)
+                midi.controller.on('message', ::this.onControllerInput)
+            }
+        }
+    }
+
+    componentWillUnmount () {
+        // Clean up file io listeners
+        ipcRenderer.removeAllListeners('save-file')
+        ipcRenderer.removeAllListeners('open-file')
+        ipcRenderer.removeAllListeners('update-downloaded')
+        ipcRenderer.removeAllListeners('activate')
+
+        // Clean up and midi listeners
         midi.input.removeAllListeners('message')
-        midi.controller.removeAllListeners('message')
+        if (midi.hasController()) midi.controller.removeAllListeners('message')
 
         // Terminate any active workers
         _.map(_.values(this.workers), worker => {
@@ -328,7 +355,7 @@ class Bezie extends Component {
     }
 
     sendPath ({ index }) {
-        const { bars, width, settings } = this.props
+        const { bars, width, settings, authorized } = this.props
         const { enabled } = this.state
         const timeout = 60e3 / (settings.tempo * 24)
         const maxTicks = this.props.bars * PPQ
@@ -345,17 +372,21 @@ class Bezie extends Component {
 
         // Start listening for ticks
         worker.addEventListener('message', () => {
+            // Only clear worker when we've reached the end of an envelope
             if (tick < maxTicks) {
-                midi.output.sendMessage([
-                    midiEvents.CONTROL_CHANGE,
-                    settings.midi[index].channel,
-                    this.getValueAtTick({
-                        tick,
-                        pathIdx: index,
-                        tickX: tickWidth * tick,
-                    }),
-                ])
-                tick++
+                // Only send messages when authorized or in demo
+                if (authorized || (!authorized && tick <= PPQ)) {
+                    midi.output.sendMessage([
+                        midiEvents.CONTROL_CHANGE,
+                        settings.midi[index].channel,
+                        this.getValueAtTick({
+                            tick,
+                            pathIdx: index,
+                            tickX: tickWidth * tick,
+                        }),
+                    ])
+                    tick++
+                }
             } else {
                 this.clearWorker(index)
                 tick = 0

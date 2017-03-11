@@ -41,6 +41,5 @@ export default merge(baseConfig, {
     'source-map-support',
     'bootstrap',
     'bootswatch',
-    'rc-slider',
   ]
 });
