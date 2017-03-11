@@ -110,7 +110,7 @@ export default class Settings extends Component {
     }
 
     onSavePresetClick () {
-        const { midi } = this.state
+        const { midi, tempo, mappings, mode, controllerName } = this.state
 
         dialog.showSaveDialog({
             filters: [
@@ -118,7 +118,7 @@ export default class Settings extends Component {
             ],
         }, filename => {
             if (filename) {
-                const data = { settings: { midi } }
+                const data = { settings: { midi, tempo, mappings, mode, controllerName } }
                 fs.writeFile(filename, JSON.stringify(data))
             }
         })
@@ -145,12 +145,21 @@ export default class Settings extends Component {
                         isValid = false
                     }
 
+                    // Assert that a preset at least has midi
                     if (!_.has(settings, 'midi')) {
                         alert(INVALID_FILE_MESSAGE) // eslint-disable-line
                         isValid = false
                     }
 
-                    if (isValid) this.setState({ midi: Immutable(settings.midi) })
+                    if (isValid) {
+                        this.setState(Immutable({
+                            midi: settings.midi,
+                            tempo: settings.tempo || 120,
+                            mappings: settings.mappings || {},
+                            mode: settings.mode || modes.clock,
+                            controllerName: settings.controllerName || null,
+                        }))
+                    }
                 })
             }
         })
