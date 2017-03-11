@@ -29,6 +29,7 @@ import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
 import {
     pointTypes,
+    modes,
     MIN_BARS,
     MAX_BARS,
     ZOOM_FACTOR,
@@ -51,6 +52,9 @@ const initialState = Immutable({
     license: { email: null, key: null },
     settings: {
         tempo: 120,
+        mode: modes.clock,
+        mappings: {},
+        controllerName: null,
         midi: _.map(_.range(NUM_PATHS), i => ({
             name: '',
             channel: i + 1,

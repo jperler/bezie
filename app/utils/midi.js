@@ -58,11 +58,23 @@ class Midi {
         }))
     }
 
-    setController (e) {
-        const value = parseInt(e.target.value, 10)
-        const index = _.isNaN(value) ? undefined : value
+    getControllerName (i) {
+        return this.input.getPortName(i)
+    }
 
-        if (!_.isUndefined(index)) {
+    findController (data) {
+        return _.find(this.getControllers(), data)
+    }
+
+    setController (index) {
+        if (this.hasController()) {
+            // Closing the port is causing errors
+            this.controller.removeAllListeners('message')
+            this.controller.closePort()
+            this.controller = new midi.input()
+        }
+
+        if (_.isNumber(index)) {
             this.controller.openPort(index)
             this._hasController = true
         } else {

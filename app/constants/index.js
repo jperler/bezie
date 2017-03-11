@@ -30,3 +30,8 @@ export const pointTypes = {
     quadratic: 'quadratic',
     cubic: 'cubic',
 }
+
+export const modes = {
+    clock: 'clock',
+    controller: 'controller',
+}

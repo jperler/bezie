@@ -21,6 +21,7 @@ import {
     NUM_PATHS,
     colors,
     pointTypes,
+    modes,
 } from '../constants'
 
 class Bezie extends Component {
@@ -58,6 +59,7 @@ class Bezie extends Component {
         paths: PropTypes.array.isRequired,
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
+            mode: PropTypes.oneOf(_.values(modes)).isRequired,
         }),
     }
 
@@ -66,9 +68,8 @@ class Bezie extends Component {
         this.state = {
             requireLicense: false,
             enabled: false,
-            trigger: false,
         }
-        this.pathIntervals = {}
+        this.workers = {}
         this.initMIDI()
     }
 
@@ -104,6 +105,7 @@ class Bezie extends Component {
         this.props.bindShortcut('down', _.partial(::this.onTypeChange, false))
 
         midi.input.on('message', ::this.onMIDIMessage)
+        midi.controller.on('message', ::this.onControllerInput)
     }
 
     componentDidMount () {
@@ -120,7 +122,14 @@ class Bezie extends Component {
         ipcRenderer.removeListener('open-file', ::this.onOpenFile)
         ipcRenderer.removeListener('update-downloaded', ::this.onUpdatedDownloaded)
         ipcRenderer.removeListener('activate', ::this.onActivate)
+
         midi.input.removeAllListeners('message')
+        midi.controller.removeAllListeners('message')
+
+        // Terminate any active workers
+        _.map(_.values(this.workers), worker => {
+            if (worker) worker.terminate()
+        })
     }
 
     onTypeChange (isUp) {
@@ -144,13 +153,23 @@ class Bezie extends Component {
         if (nextType !== 'default') this.props.changeType({ type: nextType })
     }
 
-    onMIDIMessage (deltaTime, message) {
-        if (this.state.trigger) return undefined
+    onControllerInput (deltaTime, message) {
+        const { settings } = this.props
+        const code = [message[0], message[1]].join('.')
+        _.each(_.range(NUM_PATHS), i => {
+            if (settings.mappings[i] === code) {
+                this.sendPath({ index: i })
+            }
+        })
+    }
 
+    onMIDIMessage (deltaTime, message) {
         const code = message[0]
         const maxTicks = this.props.bars * PPQ
         const { authorized, bars, height, width, settings } = this.props
         const tickWidth = width / bars / PPQ
+
+        if (settings.mode === modes.controller) return undefined
 
         // Reset ticks to loop automation
         if (this.tick === maxTicks) this.resetTicks()
@@ -268,11 +287,6 @@ class Bezie extends Component {
         midi.output.sendMessage([176, channel, 0])
     }
 
-    onTriggerClick () {
-        this.resetTicks()
-        this.setState({ trigger: !this.state.trigger })
-    }
-
     onRetryMIDI () {
         this.initMIDI()
         this.forceUpdate()
@@ -315,35 +329,51 @@ class Bezie extends Component {
 
     sendPath ({ index }) {
         const { bars, width, settings } = this.props
-        const delta = 60e3 / (settings.tempo * 24)
+        const { enabled } = this.state
+        const timeout = 60e3 / (settings.tempo * 24)
         const maxTicks = this.props.bars * PPQ
         const tickWidth = width / bars / PPQ
         let tick = 0
 
-        if (!this.state.trigger) return undefined
+        if (settings.mode === modes.clock || !enabled) return undefined
 
-        clearInterval(this.pathIntervals[index])
+        // Terminate existing worker
+        this.clearWorker(index)
 
-        this.pathIntervals[index] = setInterval(() => {
+        // Create a new worker
+        const worker = this.workers[index] = new Worker('./workers/tick.js')
+
+        // Start listening for ticks
+        worker.addEventListener('message', () => {
             if (tick < maxTicks) {
-                const tickX = tickWidth * tick
-                const value = this.getValueAtTick({ tick, pathIdx: index, tickX })
-                const channel = settings.midi[index].channel
-
-                if (this.state.enabled) {
-                    midi.output.sendMessage([
-                        midiEvents.CONTROL_CHANGE,
-                        channel,
-                        value,
-                    ])
-                }
+                midi.output.sendMessage([
+                    midiEvents.CONTROL_CHANGE,
+                    settings.midi[index].channel,
+                    this.getValueAtTick({
+                        tick,
+                        pathIdx: index,
+                        tickX: tickWidth * tick,
+                    }),
+                ])
                 tick++
             } else {
-                clearInterval(this.pathIntervals[index])
-                delete this.pathIntervals[index]
+                this.clearWorker(index)
                 tick = 0
             }
-        }, delta)
+        })
+
+        // Start ticking
+        worker.postMessage({ action: 'set', timeout })
+    }
+
+    clearWorker (index) {
+        const worker = this.workers[index]
+
+        if (worker) {
+            worker.postMessage({ action: 'clear' })
+            worker.terminate()
+            delete this.workers[index]
+        }
     }
 
     resetTicks () {
@@ -397,13 +427,6 @@ class Bezie extends Component {
                                 disabled={!isConnected || this.state.enabled}
                             >
                                 <i className="fa fa-bullhorn" />
-                            </Button>
-                            <Button
-                                bsSize="small"
-                                className={this.state.trigger ? 'active' : undefined}
-                                onClick={::this.onTriggerClick}
-                            >
-                                <i className="fa fa-keyboard-o" />
                             </Button>
                             <Button
                                 className={this.state.enabled ? 'active' : ''}

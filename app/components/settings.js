@@ -11,7 +11,7 @@ import {
     FormGroup,
     FormControl,
 } from 'react-bootstrap'
-import { colors, NUM_CC_CHANNELS } from '../constants'
+import { modes, colors, NUM_CC_CHANNELS } from '../constants'
 import { default as midiUtil } from '../utils/midi'
 
 const { dialog } = require('electron').remote
@@ -22,17 +22,16 @@ export default class Settings extends Component {
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
             tempo: PropTypes.number.isRequired,
+            mappings: PropTypes.object.isRequired,
+            mode: PropTypes.oneOf(_.values(modes)).isRequired,
+            controllerName: PropTypes.string,
         }),
     }
 
     constructor (props) {
         super()
 
-        this.state = {
-            midi: props.settings.midi,
-            tempo: props.settings.tempo,
-            mappings: Immutable({}),
-        }
+        this.state = props.settings
     }
 
     onChannelChange (e, pathIdx) {
@@ -53,6 +52,9 @@ export default class Settings extends Component {
         this.props.updateSettings({
             midi: this.state.midi,
             tempo: this.state.tempo,
+            mappings: this.state.mappings,
+            mode: this.state.mode,
+            controllerName: this.state.controllerName,
         })
         window.location = '#/'
     }
@@ -61,11 +63,32 @@ export default class Settings extends Component {
         this.setState({ tempo: parseInt(e.target.value, 10) })
     }
 
+    onControllerChange (e) {
+        const value = parseInt(e.target.value, 10)
+        const isNone = _.isNaN(value)
+        const index = isNone ? null : value
+        const controllerName = isNone ? null : midiUtil.getControllerName(index)
+
+        midiUtil.setController(index)
+
+        this.setState({ controllerName })
+    }
+
     onMIDILearnClick (pathIdx) {
         const { mappings } = this.state
-        const listener = (deltaTime, message) => {
+
+        if (!midiUtil.hasController()) return
+
+        // If clicking learn again before setting mapping
+        if (this.activeListener) {
+            midiUtil.controller.removeListener('message', this.activeListener)
+            this.activeListener = null
+        }
+
+        const listener = this.activeListener = (deltaTime, message) => {
             const code = [message[0], message[1]].join('.')
             this.setState({ mappings: mappings.set(pathIdx, code) })
+            this.activeListener = null
             midiUtil.controller.removeListener('message', listener)
         }
 
@@ -119,15 +142,22 @@ export default class Settings extends Component {
         })
     }
 
+    onModeChange (e) {
+        this.setState({ mode: e.target.value })
+    }
+
     render () {
-        const { midi } = this.state
+        const { midi, mode } = this.state
         const currentChannels = _.map(midi, 'channel')
+        const controller = midiUtil.findController({
+            label: this.state.controllerName,
+        })
 
         return (
             <div>
                 <div className="pull-left">
                     {this.props.settings.midi.map((config, pathIdx) => (
-                        <Form inline key={pathIdx}>
+                        <Form inline key={pathIdx} className="push-bottom-xsmall">
                             <FormGroup>
                                 <InputGroup>
                                     <InputGroup.Addon>
@@ -146,7 +176,7 @@ export default class Settings extends Component {
                                     />
                                 </InputGroup>
                             </FormGroup>
-                            <FormGroup className="push-left-small">
+                            <FormGroup className="push-left-xsmall">
                                 <FormControl
                                     componentClass="select"
                                     value={midi[pathIdx].channel}
@@ -163,29 +193,36 @@ export default class Settings extends Component {
                                     ))}
                                 </FormControl>
                             </FormGroup>
-                            <FormGroup className="push-left-small">
-                                <InputGroup>
-                                    <InputGroup.Addon>
-                                        <Button
-                                            bsSize="xsmall"
-                                            onClick={() => this.onMIDILearnClick(pathIdx)}
-                                        >
-                                            Learn
-                                        </Button>
-                                    </InputGroup.Addon>
-                                    <FormControl
-                                        type="text"
-                                        disabled
-                                        value={this.state.mappings[pathIdx]}
-                                        onChange={_.noop}
-                                    />
-                                    <InputGroup.Addon>
-                                        <Button bsSize="xsmall" disabled>
-                                            <i className="fa fa-close" />
-                                        </Button>
-                                    </InputGroup.Addon>
-                                </InputGroup>
-                            </FormGroup>
+                            {mode === modes.controller &&
+                                <FormGroup className="push-left-xsmall">
+                                    <InputGroup>
+                                        <InputGroup.Addon>
+                                            <Button
+                                                bsSize="xsmall"
+                                                style={{ fontSize: '11px' }}
+                                                onClick={() => this.onMIDILearnClick(pathIdx)}
+                                            >
+                                                Learn
+                                            </Button>
+                                        </InputGroup.Addon>
+                                        <FormControl
+                                            type="text"
+                                            disabled
+                                            value={this.state.mappings[pathIdx] || ''}
+                                            onChange={_.noop}
+                                        />
+                                        <InputGroup.Addon>
+                                            <Button
+                                                style={{ fontSize: 11 }}
+                                                bsSize="xsmall"
+                                                disabled
+                                            >
+                                                <i className="fa fa-close" />
+                                            </Button>
+                                        </InputGroup.Addon>
+                                    </InputGroup>
+                                </FormGroup>
+                            }
                         </Form>
                     ))}
                     <ButtonToolbar className="push-top">
@@ -218,35 +255,50 @@ export default class Settings extends Component {
                 <div className="pull-left push-left" style={{ width: 200 }}>
                     <Form>
                         <FormGroup>
-                            <ControlLabel>Controller</ControlLabel>
+                            <ControlLabel>Mode</ControlLabel>
                             <FormControl
                                 componentClass="select"
-                                onChange={i => midiUtil.setController(i)}
+                                value={this.state.mode}
+                                onChange={::this.onModeChange}
                             >
-                                <option>None</option>
-                                {_.map(midiUtil.getControllers(), data => (
-                                    <option
-                                        key={data.label}
-                                        value={data.index}
-                                    >
-                                        {data.label}
-                                    </option>
-                                ))}
+                                <option value={modes.clock}>Clock</option>
+                                <option value={modes.controller}>Controller</option>
                             </FormControl>
                         </FormGroup>
-                        <FormGroup>
-                            <ControlLabel>Tempo</ControlLabel>
-                            <FormControl
-                                componentClass="select"
-                                onChange={() => {}}
-                                value={this.state.tempo}
-                                onChange={::this.onTempoChange}
-                            >
-                                {_.map(_.range(20, 801), i => (
-                                    <option key={i} value={i}>{i}</option>
-                                ))}
-                            </FormControl>
-                        </FormGroup>
+                        {mode === modes.controller &&
+                            <FormGroup>
+                                <ControlLabel>Controller</ControlLabel>
+                                <FormControl
+                                    componentClass="select"
+                                    onChange={::this.onControllerChange}
+                                    value={controller ? controller.index : undefined}
+                                >
+                                    <option>None</option>
+                                    {_.map(midiUtil.getControllers(), data => (
+                                        <option
+                                            key={data.label}
+                                            value={data.index}
+                                        >
+                                            {data.label}
+                                        </option>
+                                    ))}
+                                </FormControl>
+                            </FormGroup>
+                        }
+                        {mode === modes.controller &&
+                            <FormGroup>
+                                <ControlLabel>Tempo</ControlLabel>
+                                <FormControl
+                                    componentClass="select"
+                                    value={this.state.tempo}
+                                    onChange={::this.onTempoChange}
+                                >
+                                    {_.map(_.range(20, 801), i => (
+                                        <option key={i} value={i}>{i}</option>
+                                    ))}
+                                </FormControl>
+                            </FormGroup>
+                        }
                     </Form>
                 </div>
             </div>
