@@ -75,8 +75,6 @@ class Bezie extends Component {
     }
 
     componentWillMount () {
-        const { settings } = this.props
-
         // Bind keyboard shortcuts
         _.each(_.range(NUM_PATHS), i => {
             this.props.bindShortcut(`${i + 1}`, () => {
