@@ -72,9 +72,12 @@ class Midi {
     initControllers () {
         // Open all controllers
         _.each(this.getControllers(), controller => {
-            const input = new midi.input()
-            input.openPort(controller.index)
-            this.controllers[controller.label] = input
+            // Only add it if it doesn't yet exist
+            if (!this.controllers[controller.label]) {
+                const input = new midi.input()
+                input.openPort(controller.index)
+                this.controllers[controller.label] = input
+            }
         })
     }
 

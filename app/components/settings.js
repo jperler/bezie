@@ -34,6 +34,15 @@ export default class Settings extends Component {
         this.state = props.settings
     }
 
+    componentWillMount () {
+        // Refresh controllers every 5 seconds
+        this.refreshInterval = setInterval(::this.refreshControllers, 5e3)
+    }
+
+    componentWillUnmount () {
+        clearInterval(this.refreshInterval)
+    }
+
     onChannelChange (e, pathIdx) {
         const { midi } = this.state
         const channel = parseInt(e.target.value, 10)
@@ -163,6 +172,11 @@ export default class Settings extends Component {
         const noteOnRange = _.range(144, 160)
 
         return _.includes(noteOnRange, type) ? `Note: ${label}` : value
+    }
+
+    refreshControllers () {
+        midiUtil.initControllers()
+        this.forceUpdate()
     }
 
     render () {
