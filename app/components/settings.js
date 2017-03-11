@@ -95,6 +95,11 @@ export default class Settings extends Component {
         midiUtil.controller.on('message', listener)
     }
 
+    onMIDIUnlearnClick (pathIdx) {
+        const { mappings } = this.state
+        this.setState({ mappings: mappings.set(pathIdx, undefined) })
+    }
+
     onSavePresetClick () {
         const { midi } = this.state
 
@@ -229,7 +234,8 @@ export default class Settings extends Component {
                                             <Button
                                                 style={{ fontSize: 11 }}
                                                 bsSize="xsmall"
-                                                disabled
+                                                disabled={!this.getMapLabel(pathIdx)}
+                                                onClick={() => this.onMIDIUnlearnClick(pathIdx)}
                                             >
                                                 <i className="fa fa-close" />
                                             </Button>
