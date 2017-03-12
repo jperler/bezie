@@ -29,6 +29,7 @@ import * as cubic from '../utils/cubic'
 import * as quadratic from '../utils/quadratic'
 import {
     pointTypes,
+    modes,
     MIN_BARS,
     MAX_BARS,
     ZOOM_FACTOR,
@@ -50,6 +51,10 @@ const initialState = Immutable({
     authorized: false,
     license: { email: null, key: null },
     settings: {
+        tempo: 120,
+        mode: modes.clock,
+        mappings: {},
+        controllerName: null,
         midi: _.map(_.range(NUM_PATHS), i => ({
             name: '',
             channel: i + 1,
@@ -520,7 +525,7 @@ function handleAuth (state, payload) {
 function handleBootstrap (state, payload) {
     const attrs = _.keys(payload)
     return state.merge(_.extend(payload, _.omit(initialState,
-        attrs.concat(['authorized', 'license']))))
+        attrs.concat(['authorized', 'license']))), { deep: true })
 }
 
 function handleUpdateSettings (state, payload) {

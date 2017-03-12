@@ -137,6 +137,7 @@
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
     "midi": "^0.9.5",
+    "midiutils": "0.0.4",
     "postcss": "^5.1.0",
     "react": "^15.3.1",
     "react-bootstrap": "^0.30.3",
@@ -148,7 +149,8 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "seamless-immutable": "^6.1.1",
-    "source-map-support": "^0.4.2"
+    "source-map-support": "^0.4.2",
+    "worker-loader": "^0.8.0"
   },
   "devEngines": {
     "node": "4.x || 5.x || 6.x || 7.x",

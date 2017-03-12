@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import _ from 'lodash'
 import { mouseTrap } from 'react-mousetrap'
-import midi from 'midi'
 import { basename } from 'path'
 import { ipcRenderer } from 'electron'
 import { ButtonToolbar, Button } from 'react-bootstrap'
@@ -11,6 +10,7 @@ import PathSelector from './pathSelector'
 import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
 import * as midiEvents from '../constants/midi'
+import midi from '../utils/midi'
 import * as utils from '../utils'
 import {
     MIN_BARS,
@@ -18,12 +18,13 @@ import {
     ZOOM_FACTOR,
     CONTROL_MAX,
     PPQ,
-    VIRTUAL_PORT_NAME,
-    WIN_MIDI_ERROR,
     NUM_PATHS,
     colors,
     pointTypes,
+    modes,
 } from '../constants'
+
+const Worker = require('worker-loader!../workers/tick')
 
 class Bezie extends Component {
     static propTypes = {
@@ -60,6 +61,8 @@ class Bezie extends Component {
         paths: PropTypes.array.isRequired,
         settings: PropTypes.shape({
             midi: PropTypes.array.isRequired,
+            mode: PropTypes.oneOf(_.values(modes)).isRequired,
+            controllerName: PropTypes.string,
         }),
     }
 
@@ -69,7 +72,8 @@ class Bezie extends Component {
             requireLicense: false,
             enabled: false,
         }
-        this.initMIDI({ initial: true })
+        this.workers = {}
+        this.initMIDI()
     }
 
     componentWillMount () {
@@ -81,12 +85,19 @@ class Bezie extends Component {
             })
         })
 
+        _.each(_.range(NUM_PATHS), i => {
+            this.props.bindShortcut(`shift+${i + 1}`, () => {
+                this.sendPath({ index: i })
+            })
+        })
+
         this.props.bindShortcut('mod+c', ::this.onCopyClick)
         this.props.bindShortcut('mod+v', ::this.onPasteClick)
         this.props.bindShortcut('mod+1', ::this.onDecreaseXIntervalClick)
         this.props.bindShortcut('mod+2', ::this.onIncreaseXIntervalClick)
         this.props.bindShortcut('mod+-', ::this.onZoomOutClick)
         this.props.bindShortcut('mod+=', ::this.onZoomInClick)
+        this.props.bindShortcut('mod+,', ::this.onSettingsClick)
         this.props.bindShortcut('p', ::this.onPowerClick)
         this.props.bindShortcut('v', ::this.onInverseClick)
         this.props.bindShortcut('h', ::this.onReverseClick)
@@ -95,6 +106,13 @@ class Bezie extends Component {
         this.props.bindShortcut('s', this.props.toggleSnap)
         this.props.bindShortcut('up', _.partial(::this.onTypeChange, true))
         this.props.bindShortcut('down', _.partial(::this.onTypeChange, false))
+
+        midi.input.on('message', ::this.onMIDIMessage)
+
+        // If a new controller was selected from midi settings
+        if (midi.hasController()) {
+            midi.controller.on('message', ::this.onControllerInput)
+        }
     }
 
     componentDidMount () {
@@ -106,14 +124,39 @@ class Bezie extends Component {
         this.props.authorize()
     }
 
-    componentWillUnmount () {
-        this.output.closePort()
-        this.input.closePort()
+    componentWillReceiveProps (nextProps) {
+        const nextSettings = nextProps.settings
+        const { settings } = this.props
+        const controllerAdded = nextSettings.controllerName && !midi.hasController()
+        const controllerChanged = settings.controllerName !== nextSettings.controllerName
 
-        ipcRenderer.removeListener('save-file', ::this.onSaveFile)
-        ipcRenderer.removeListener('open-file', ::this.onOpenFile)
-        ipcRenderer.removeListener('update-downloaded', ::this.onUpdatedDownloaded)
-        ipcRenderer.removeListener('activate', ::this.onActivate)
+        if (controllerAdded || controllerChanged) {
+            // Select controller by name
+            const controller = midi.findController({ label: nextSettings.controllerName })
+
+            // If a controller was set from bootstrapping or changed then update it
+            if (controller) {
+                midi.setController(controller.index)
+                midi.controller.on('message', ::this.onControllerInput)
+            }
+        }
+    }
+
+    componentWillUnmount () {
+        // Clean up file io listeners
+        ipcRenderer.removeAllListeners('save-file')
+        ipcRenderer.removeAllListeners('open-file')
+        ipcRenderer.removeAllListeners('update-downloaded')
+        ipcRenderer.removeAllListeners('activate')
+
+        // Clean up and midi listeners
+        midi.input.removeAllListeners('message')
+        if (midi.hasController()) midi.controller.removeAllListeners('message')
+
+        // Terminate any active workers
+        _.map(_.values(this.workers), worker => {
+            if (worker) worker.terminate()
+        })
     }
 
     onTypeChange (isUp) {
@@ -137,11 +180,23 @@ class Bezie extends Component {
         if (nextType !== 'default') this.props.changeType({ type: nextType })
     }
 
+    onControllerInput (deltaTime, message) {
+        const { settings } = this.props
+        const code = [message[0], message[1]].join('.')
+        _.each(_.range(NUM_PATHS), i => {
+            if (settings.mappings[i] === code) {
+                this.sendPath({ index: i })
+            }
+        })
+    }
+
     onMIDIMessage (deltaTime, message) {
         const code = message[0]
         const maxTicks = this.props.bars * PPQ
         const { authorized, bars, height, width, settings } = this.props
         const tickWidth = width / bars / PPQ
+
+        if (settings.mode === modes.controller) return undefined
 
         // Reset ticks to loop automation
         if (this.tick === maxTicks) this.resetTicks()
@@ -165,7 +220,7 @@ class Bezie extends Component {
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
                         if (this.state.enabled) {
-                            this.output.sendMessage([
+                            midi.output.sendMessage([
                                 midiEvents.CONTROL_CHANGE,
                                 channel,
                                 value,
@@ -227,6 +282,10 @@ class Bezie extends Component {
         this.setState({ enabled: !this.state.enabled })
     }
 
+    onSettingsClick () {
+        if (!this.state.enabled) window.location = '#/settings'
+    }
+
     onIncreaseXIntervalClick () {
         const disabled = this.props.triplet ?
             this.props.interval.x === 192 :
@@ -250,9 +309,9 @@ class Bezie extends Component {
         if (this.state.enabled) return
 
         // Signal active MIDI channel to DAW
-        this.output.sendMessage([176, channel, 0])
-        this.output.sendMessage([176, channel, CONTROL_MAX])
-        this.output.sendMessage([176, channel, 0])
+        midi.output.sendMessage([176, channel, 0])
+        midi.output.sendMessage([176, channel, CONTROL_MAX])
+        midi.output.sendMessage([176, channel, 0])
     }
 
     onRetryMIDI () {
@@ -295,47 +354,67 @@ class Bezie extends Component {
         return CONTROL_MAX - tickY / zoom.y
     }
 
+    sendPath ({ index }) {
+        const { bars, width, settings, authorized } = this.props
+        const { enabled } = this.state
+        const timeout = 60e3 / (settings.tempo * 24)
+        const maxTicks = this.props.bars * PPQ
+        const tickWidth = width / bars / PPQ
+        let tick = 0
+
+        if (settings.mode === modes.clock || !enabled) return undefined
+
+        // Terminate existing worker
+        this.clearWorker(index)
+
+        // Create a new worker
+        const worker = this.workers[index] = new Worker()
+
+        // Start listening for ticks
+        worker.addEventListener('message', () => {
+            // Only clear worker when we've reached the end of an envelope
+            if (tick < maxTicks) {
+                // Only send messages when authorized or in demo
+                if (authorized || (!authorized && tick <= PPQ)) {
+                    midi.output.sendMessage([
+                        midiEvents.CONTROL_CHANGE,
+                        settings.midi[index].channel,
+                        this.getValueAtTick({
+                            tick,
+                            pathIdx: index,
+                            tickX: tickWidth * tick,
+                        }),
+                    ])
+                    tick++
+                }
+            } else {
+                this.clearWorker(index)
+                tick = 0
+            }
+        })
+
+        // Start ticking
+        worker.postMessage({ action: 'set', timeout })
+    }
+
+    clearWorker (index) {
+        const worker = this.workers[index]
+
+        if (worker) {
+            worker.postMessage({ action: 'clear' })
+            worker.terminate()
+            delete this.workers[index]
+        }
+    }
+
     resetTicks () {
         this.tick = 0
         window.seek.style.display = 'none'
         this.lastSeenIndeces = {}
     }
 
-    initMIDI ({ initial = false } = {}) {
-        const isWin = /^win/.test(process.platform);
-
-        this.output = new midi.output()
-        this.input = new midi.input()
-        this.noDevices = false
-
-        if (isWin) {
-            const outputPortIndex = _.find(_.range(this.output.getPortCount()), portIdx => (
-                _.includes(
-                    _.toLower(this.output.getPortName(portIdx)),
-                    _.toLower(VIRTUAL_PORT_NAME)
-                )
-            ))
-            const inputPortIndex = _.find(_.range(this.input.getPortCount()), portIdx => (
-                _.includes(
-                    _.toLower(this.input.getPortName(portIdx)),
-                    _.toLower(VIRTUAL_PORT_NAME)
-                )
-            ))
-
-            if (_.isNumber(inputPortIndex) && _.isNumber(outputPortIndex)) {
-                this.output.openPort(outputPortIndex)
-                this.input.openPort(inputPortIndex)
-            } else {
-                this.noDevices = true
-                !initial && alert(WIN_MIDI_ERROR) // eslint-disable-line
-            }
-        } else {
-            this.output.openVirtualPort(VIRTUAL_PORT_NAME)
-            this.input.openVirtualPort(VIRTUAL_PORT_NAME)
-        }
-
-        this.input.ignoreTypes(true, false, true)
-        this.input.on('message', ::this.onMIDIMessage)
+    initMIDI () {
+        if (!midi.isConnected()) midi.connectVirtualPorts()
         this.tick = 0
         this.lastSeenIndeces = {}
     }
@@ -343,7 +422,7 @@ class Bezie extends Component {
     render () {
         const { authorized, settings, pathIdx } = this.props
         const { requireLicense } = this.state
-        const hasMIDIDevice = !this.noDevices
+        const isConnected = midi.isConnected()
 
         return (
             <div className="bezie">
@@ -376,7 +455,7 @@ class Bezie extends Component {
                                 title="Broadcast MIDI"
                                 bsSize="small"
                                 onClick={::this.onBroadcastClick}
-                                disabled={!hasMIDIDevice || this.state.enabled}
+                                disabled={!isConnected || this.state.enabled}
                             >
                                 <i className="fa fa-bullhorn" />
                             </Button>
@@ -385,7 +464,7 @@ class Bezie extends Component {
                                 title="Settings"
                                 bsSize="small"
                                 disabled={this.state.enabled}
-                                onClick={() => window.location = '#/settings'}
+                                onClick={::this.onSettingsClick}
                             >
                                 <i className="fa fa-cog" />
                             </Button>
@@ -395,7 +474,7 @@ class Bezie extends Component {
                                 title="Enable MIDI"
                                 bsSize="small"
                                 onClick={::this.onPowerClick}
-                                disabled={!hasMIDIDevice}
+                                disabled={!isConnected}
                             >
                                 <i className="fa fa-power-off" />
                             </Button>
@@ -443,9 +522,9 @@ class Bezie extends Component {
                     <div className="pull-left" style={{ lineHeight: '30px' }}>
                         <ButtonToolbar>
                             <span className="pull-left push-left push-right text-muted">
-                                MIDI: {hasMIDIDevice ? 'Connected' : 'Not connected'}
+                                MIDI: {isConnected ? 'Connected' : 'Not connected'}
                             </span>
-                            {!hasMIDIDevice &&
+                            {!isConnected &&
                                 <Button onClick={::this.onRetryMIDI} bsSize="small">Retry</Button>
                             }
                             {!authorized &&

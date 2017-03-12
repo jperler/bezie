@@ -54,10 +54,12 @@ circle.curve {
 .push-right-small { margin-right: 5px; }
 .push-right { margin-right: 10px; }
 .push-left-small { margin-left: 5px; }
+.push-left-xsmall { margin-left: 2px; }
 .push-left { margin-left: 10px; }
 .push-top-small { margin-top: 5px; }
 .push-top { margin-top: 10px; }
 .push-bottom-small { margin-bottom: 5px; }
+.push-bottom-xsmall { margin-bottom: 2px; }
 .push-bottom { margin-bottom: 10px; }
 .pull-right { float: right; }
 .pull-left { float: right; }
