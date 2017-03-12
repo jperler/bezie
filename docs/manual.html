@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Virtual MIDI controller for complex automation">
+    <meta name="author" content="Justin Perler">
+    <meta name="robots" content="noindex">
+
+    <title>Bezie</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Generated from: http://faviconit.com/ -->
+    <link rel="shortcut icon" href="img/favicon/favicon.ico">
+    <link rel="icon" sizes="16x16 32x32 64x64" href="img/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="196x196" href="img/favicon/favicon-192.png">
+    <link rel="icon" type="image/png" sizes="160x160" href="img/favicon/favicon-160.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="img/favicon/favicon-96.png">
+    <link rel="icon" type="image/png" sizes="64x64" href="img/favicon/favicon-64.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon/favicon-16.png">
+    <link rel="apple-touch-icon" href="img/favicon/favicon-57.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="img/favicon/favicon-114.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="img/favicon/favicon-72.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="img/favicon/favicon-144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="img/favicon/favicon-60.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="img/favicon/favicon-120.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="img/favicon/favicon-76.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="img/favicon/favicon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon/favicon-180.png">
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+
+    <!-- Plugin CSS -->
+    <link href="vendor/magnific-popup/magnific-popup.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/creative.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand page-scroll" href="http://bezie.io"><img class="logo" src="img/icon1500x1500.png" alt="Bezie Logo"> Bezie</a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="bg-dark">
+        <div class="container">
+            <h1>Functions</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <td><h3>Icon</h3></td>
+                        <td><h3>Description</h3></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <i class="fa fa-refresh"></i>
+                        </td>
+                        <td>
+                            Reset current envelope
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="20">
+                            <i class="fa fa-arrows-h"></i>
+                        </td>
+                        <td>
+                            Invert current envelope horizontally
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-arrows-v"></i>
+                        </td>
+                        <td>
+                            Invert current envelope vertically
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-copy"></i>
+                        </td>
+                        <td>
+                            Copy current envelope
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-paste"></i>
+                        </td>
+                        <td>
+                            Paste copied envelope
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-bullhorn"></i>
+                        </td>
+                        <td>
+                            Send out a MIDI signal on the current channel for mapping
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-cog"></i>
+                        </td>
+                        <td>
+                            MIDI preferences
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-power-off"></i>
+                        </td>
+                        <td>
+                            Toggle on/off MIDI transmission
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-search-minus"></i>
+                        </td>
+                        <td>
+                            Zoom out
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-search-plus"></i>
+                        </td>
+                        <td>
+                            Zoom in
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-minus"></i>
+                        </td>
+                        <td>
+                            Decrease the number of bars (top right)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                        </td>
+                        <td>
+                            Increase the number of bars (top right)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Snap
+                        </td>
+                        <td>
+                            Toggle snap to grid
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Triplet
+                        </td>
+                        <td>
+                            Toggle triplet mode in the grid
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-minus"></i>
+                        </td>
+                        <td>
+                            Decrease grid interval (bottom right)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <i class="fa fa-plus"></i>
+                        </td>
+                        <td>
+                            Increase grid interval (bottom right)
+                        </td>
+                    </tr>
+                <tbody>
+            </table>
+            <h1>Keyboard Shortcuts</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <td><h3>Shortcut</h3></td>
+                        <td><h3>Description</h3></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1-8</td><td>Envelope switching</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + c</td><td>Copy envelope</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + v</td><td>Paste envelope</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + 1</td><td>Decrease note interval</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + 2</td><td>Increase note interval</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + -</td><td>Zoom out</td></tr>
+                    <tr><td>command (mac) / ctrl (win) + =</td><td>Zoom in</td></tr>
+                    <tr><td>p</td><td>Power</td></tr>
+                    <tr><td>v</td><td>Vertical inversion</td></tr>
+                    <tr><td>h</td><td>Horizontal inversion</td></tr>
+                    <tr><td>b</td><td>Broadcast MIDI channel for mapping (equivalent to clicking the horn)</td></tr>
+                    <tr><td>t</td><td>Toggle triplet mode</td></tr>
+                    <tr><td>s</td><td>Toggle snap to grid mode</td></tr>
+                    <tr><td>shift + 1-8</td><td>Trigger envelope (active in controller mode only)</td></tr>
+                    <tr><td>up/down</td><td>Cycle through curve types on the selected point (default, bezier 1, bezier 2)</td></tr>
+                    <tr><td>backspace</td><td>Delete selected point</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- jQuery -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+    <script src="vendor/scrollreveal/scrollreveal.min.js"></script>
+    <script src="vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+
+    <!-- Theme JavaScript -->
+    <script src="js/creative.min.js"></script>
+</body>
+</html>
