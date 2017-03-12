@@ -28,10 +28,10 @@ class Midi {
             const numOutputs = this.output.getPortCount()
             const numInputs = this.input.getPortCount()
             const outputPortIndex = _.find(_.range(numOutputs), i => (
-                this.output.getPortName(i) === VIRTUAL_PORT_NAME
+                _.includes(_.toLower(this.output.getPortName(i)), _.toLower(VIRTUAL_PORT_NAME))
             ))
             const inputPortIndex = _.find(_.range(numInputs), i => (
-                this.input.getPortName(i) === VIRTUAL_PORT_NAME
+                _.includes(_.toLower(this.input.getPortName(i)), _.toLower(VIRTUAL_PORT_NAME))
             ))
 
             if (_.isNumber(inputPortIndex) && _.isNumber(outputPortIndex)) {
@@ -52,7 +52,8 @@ class Midi {
         return _.compact(_.map(_.range(this.input.getPortCount()), i => {
             const name = this.input.getPortName(i)
 
-            if (name === VIRTUAL_PORT_NAME || !name) return
+            // Make sure to do includes based on how windows names it's virtual midi ports
+            if (_.includes(_.toLower(name), _.toLower(VIRTUAL_PORT_NAME)) || !name) return
 
             return {
                 index: i,
