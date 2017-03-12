@@ -232,6 +232,10 @@ const createWindow = async () => {
                         click: onLearnMore,
                     },
                     {
+                        label: 'Manual',
+                        click: onManual,
+                    },
+                    {
                         label: 'Activate',
                         click: onActivate,
                     },
@@ -297,6 +301,10 @@ const createWindow = async () => {
                         click: onLearnMore,
                     },
                     {
+                        label: 'Manual',
+                        click: onManual,
+                    },
+                    {
                         label: 'Activate',
                         click: onActivate,
                     },
@@ -356,6 +364,10 @@ function onSaveAsDialog () {
 
 function onLearnMore () {
     shell.openExternal('http://bezie.io')
+}
+
+function onManual () {
+    shell.openExternal('http://bezie.io/manual.html')
 }
 
 function onActivate () {
