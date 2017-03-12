@@ -11,7 +11,6 @@ class Midi {
         this.input = new midi.input()
 
         this.controllers = {}
-        this.controllerIdx = null
         this.controller = null
         this.initControllers()
 
