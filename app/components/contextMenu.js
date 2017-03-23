@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { pointTypes } from '../constants'
 import * as utils from '../utils'
+import midi from '../utils/midi'
 import styles from './contextMenu.css'
 
 class ContextMenu extends Component {
@@ -39,6 +40,12 @@ class ContextMenu extends Component {
         const formatted = {
             x: utils.numberFormat(normalized.x / 4),
             y: utils.numberFormat(normalized.y),
+        }
+
+        // TODO implement isPitch
+        const isPitch = true
+        if (isPitch) {
+            formatted.y = midi.normalizePitch(normalized.y)
         }
 
         const isEndpoint = utils.isEndpoint(path, selected)

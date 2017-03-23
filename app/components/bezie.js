@@ -216,15 +216,23 @@ class Bezie extends Component {
                 if (path.length > 2) {
                     const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX })
                     const channel = settings.midi[pathIdx].channel
+                    const isPitch = channel === -1
 
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
                         if (this.state.enabled) {
-                            midi.output.sendMessage([
-                                midiEvents.CONTROL_CHANGE,
-                                channel,
-                                value,
-                            ])
+                            if (isPitch) {
+                                midi.output.sendMessage([
+                                    midiEvents.PITCH,
+                                    ...midi.getPitchValue(value)
+                                ])
+                            } else {
+                                midi.output.sendMessage([
+                                    midiEvents.CONTROL_CHANGE,
+                                    channel,
+                                    value,
+                                ])
+                            }
                         }
                     }
                 }
@@ -308,6 +316,8 @@ class Bezie extends Component {
 
         if (this.state.enabled) return
 
+        // TODO remove broadcasting for pitch
+
         // Signal active MIDI channel to DAW
         midi.output.sendMessage([176, channel, 0])
         midi.output.sendMessage([176, channel, CONTROL_MAX])
@@ -376,6 +386,7 @@ class Bezie extends Component {
             if (tick < maxTicks) {
                 // Only send messages when authorized or in demo
                 if (authorized || (!authorized && tick <= PPQ)) {
+                    // TODO broadcast pitch as well
                     midi.output.sendMessage([
                         midiEvents.CONTROL_CHANGE,
                         settings.midi[index].channel,
@@ -543,7 +554,7 @@ class Bezie extends Component {
                             >
                                 {
                                     settings.midi[pathIdx].name ||
-                                    `Channel ${settings.midi[pathIdx].channel}`
+                                    midi.getChannelName(settings.midi[pathIdx].channel)
                                 }
                             </span>
                         </ButtonToolbar>

@@ -17,6 +17,8 @@ import { default as midiUtil } from '../utils/midi'
 
 const { dialog } = require('electron').remote
 
+const PITCH = -1
+
 export default class Settings extends Component {
     static propTypes = {
         updateSettings: PropTypes.func.isRequired,
@@ -218,7 +220,7 @@ export default class Settings extends Component {
                                     <FormControl
                                         type="text"
                                         label="Text"
-                                        placeholder={`Channel ${midi[pathIdx].channel}`}
+                                        placeholder={midiUtil.getChannelName(midi[pathIdx].channel)}
                                         value={midi[pathIdx].name}
                                         maxLength={25}
                                         onChange={_.partial(::this.onNameChange, _, pathIdx)}
@@ -231,6 +233,12 @@ export default class Settings extends Component {
                                     value={midi[pathIdx].channel}
                                     onChange={_.partial(::this.onChannelChange, _, pathIdx)}
                                 >
+                                    <option
+                                        value={PITCH}
+                                        disabled={_.includes(currentChannels, PITCH)}
+                                    >
+                                        Pitch
+                                    </option>
                                     {_.map(_.range(NUM_CC_CHANNELS), i => (
                                         <option
                                             key={i + 1}

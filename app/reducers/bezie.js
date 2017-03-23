@@ -248,7 +248,8 @@ function handleUpdatePoint (state, payload) {
 
 function handleChangePath (state, payload) {
     const path = state.paths[payload.index].asMutable()
-    if (!path.length) initPath(path, state)
+    const bipolar = state.settings.midi[payload.index].channel === -1
+    if (!path.length) initPath(path, state, bipolar)
     return state
         .set('pathIdx', payload.index)
         .setIn(['paths', payload.index], path)
@@ -256,8 +257,9 @@ function handleChangePath (state, payload) {
 
 function handleResetPath (state) {
     const path = []
+    const bipolar = state.settings.midi[state.pathIdx].channel === -1
 
-    initPath(path, state)
+    initPath(path, state, bipolar)
 
     return state
         .set('selectedIdx', null)
@@ -529,7 +531,33 @@ function handleBootstrap (state, payload) {
 }
 
 function handleUpdateSettings (state, payload) {
-    return state.merge({ settings: payload })
+    // for each envelope
+    // if channel is now -1 and wasn't then set origin at height/2
+    // if channel was -1 and is now 1+ then set origin to height
+    const prevMidi = state.settings.midi
+    const nextMidi = payload.midi
+    const paths = Immutable.asMutable(state.paths, { deep: true })
+
+    _.each(paths, (path, i) => {
+        if (prevMidi[i].channel !== -1 &&
+            nextMidi[i].channel === -1 &&
+            path.length >= 2
+        ) {
+            // Moved to pitch
+            initPath(path, state, true)
+        } else if (prevMidi[i].channel === -1 &&
+            nextMidi[i].channel !== -1 &&
+            path.length >= 2
+        ) {
+            // Moved from pitch
+            initPath(path, state)
+        }
+    })
+
+    return state.merge({
+        settings: payload,
+        paths,
+    })
 }
 
 function setBezier (points, state, options = {}) {
@@ -540,12 +568,16 @@ function setBezier (points, state, options = {}) {
     }
 }
 
-function initPath (path, state) {
+function initPath (path, state, bipolar = false) {
     const height = utils.getHeight(state)
     const width = utils.getWidth(state)
+    const initialY = bipolar ? height / 2 : height
+
+    // Clear array reference
+    path.length = 0
 
     path.push(
-        { x: 0, y: height, id: _.uniqueId(SESSION_ID) },
-        { x: width, y: height, id: _.uniqueId(SESSION_ID) }
+        { x: 0, y: initialY, id: _.uniqueId(SESSION_ID) },
+        { x: width, y: initialY, id: _.uniqueId(SESSION_ID) }
     )
 }
