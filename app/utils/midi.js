@@ -3,9 +3,19 @@ import midi from 'midi'
 import {
     VIRTUAL_PORT_NAME,
     WIN_MIDI_ERROR,
+    CONTROL_MAX,
+    PITCH_MAX,
 } from '../constants'
 
+import { PITCH } from '../constants/midi'
+
+const pitchScale = d3.scale
+    .linear()
+    .domain([0, CONTROL_MAX])
+    .range([0, PITCH_MAX])
+
 class Midi {
+
     constructor () {
         this.output = new midi.output()
         this.input = new midi.input()
@@ -103,6 +113,17 @@ class Midi {
     hasController () {
         return !!this.controller
     }
+
+    getChannelName (n) {
+        return n === PITCH ? 'Pitch' : `Channel ${n}`
+    }
+
+    getScaledPitch = _.memoize(n => _.round(pitchScale(n)))
+    normalizePitch = n => this.getScaledPitch(n) - (PITCH_MAX + 1) / 2
+    getPitchValue = _.memoize(n => {
+        const scaled = this.getScaledPitch(n)
+        return [scaled & 0x7F, scaled >> 7]
+    })
 }
 
 module.exports = new Midi()

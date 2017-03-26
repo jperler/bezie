@@ -216,15 +216,23 @@ class Bezie extends Component {
                 if (path.length > 2) {
                     const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX })
                     const channel = settings.midi[pathIdx].channel
+                    const isPitch = channel === midiEvents.PITCH
 
                     // Limit demo to send only the first bar
                     if (_.isNumber(value) && authorized || (!authorized && this.tick <= PPQ)) {
                         if (this.state.enabled) {
-                            midi.output.sendMessage([
-                                midiEvents.CONTROL_CHANGE,
-                                channel,
-                                value,
-                            ])
+                            if (isPitch) {
+                                midi.output.sendMessage([
+                                    midiEvents.PITCH,
+                                    ...midi.getPitchValue(value)
+                                ])
+                            } else {
+                                midi.output.sendMessage([
+                                    midiEvents.CONTROL_CHANGE,
+                                    channel,
+                                    value,
+                                ])
+                            }
                         }
                     }
                 }
@@ -305,13 +313,14 @@ class Bezie extends Component {
     onBroadcastClick () {
         const { pathIdx, settings } = this.props
         const channel = settings.midi[pathIdx].channel
+        const isPitch = channel === midiEvents.PITCH
 
-        if (this.state.enabled) return
+        if (this.state.enabled || isPitch) return
 
         // Signal active MIDI channel to DAW
-        midi.output.sendMessage([176, channel, 0])
-        midi.output.sendMessage([176, channel, CONTROL_MAX])
-        midi.output.sendMessage([176, channel, 0])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, CONTROL_MAX])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0])
     }
 
     onRetryMIDI () {
@@ -360,6 +369,8 @@ class Bezie extends Component {
         const timeout = 60e3 / (settings.tempo * 24)
         const maxTicks = this.props.bars * PPQ
         const tickWidth = width / bars / PPQ
+        const channel = settings.midi[index].channel
+        const isPitch = channel === midiEvents.PITCH
         let tick = 0
 
         if (settings.mode === modes.clock || !enabled) return undefined
@@ -376,15 +387,25 @@ class Bezie extends Component {
             if (tick < maxTicks) {
                 // Only send messages when authorized or in demo
                 if (authorized || (!authorized && tick <= PPQ)) {
-                    midi.output.sendMessage([
-                        midiEvents.CONTROL_CHANGE,
-                        settings.midi[index].channel,
-                        this.getValueAtTick({
-                            tick,
-                            pathIdx: index,
-                            tickX: tickWidth * tick,
-                        }),
-                    ])
+                    const value = this.getValueAtTick({
+                        tick,
+                        pathIdx: index,
+                        tickX: tickWidth * tick,
+                    })
+
+                    if (isPitch) {
+                        midi.output.sendMessage([
+                            midiEvents.PITCH,
+                            ...midi.getPitchValue(value)
+                        ])
+                    } else {
+                        midi.output.sendMessage([
+                            midiEvents.CONTROL_CHANGE,
+                            channel,
+                            value,
+                        ])
+                    }
+
                     tick++
                 }
             } else {
@@ -543,7 +564,7 @@ class Bezie extends Component {
                             >
                                 {
                                     settings.midi[pathIdx].name ||
-                                    `Channel ${settings.midi[pathIdx].channel}`
+                                    midi.getChannelName(settings.midi[pathIdx].channel)
                                 }
                             </span>
                         </ButtonToolbar>

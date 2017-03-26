@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { pointTypes } from '../constants'
 import * as utils from '../utils'
+import midi from '../utils/midi'
 import styles from './contextMenu.css'
+import { PITCH } from '../constants/midi'
 
 class ContextMenu extends Component {
     static propTypes = {
@@ -13,6 +15,9 @@ class ContextMenu extends Component {
         paths: PropTypes.array.isRequired,
         changeType: PropTypes.func.isRequired,
         removePoint: PropTypes.func.isRequired,
+        settings: PropTypes.shape({
+            midi: PropTypes.array.isRequired,
+        }),
     }
 
     onTypeSelect (type) {
@@ -24,8 +29,9 @@ class ContextMenu extends Component {
     }
 
     render () {
-        const { selectedIdx, pathIdx, paths, zoom, height } = this.props
+        const { selectedIdx, pathIdx, paths, zoom, height, settings } = this.props
         const selected = _.get(paths, [pathIdx, selectedIdx])
+        const isPitch = settings.midi[pathIdx].channel === PITCH
         const path = paths[pathIdx]
 
         if (!selected) return <span />
@@ -40,6 +46,9 @@ class ContextMenu extends Component {
             x: utils.numberFormat(normalized.x / 4),
             y: utils.numberFormat(normalized.y),
         }
+
+        // Update scale for pitch
+        if (isPitch) formatted.y = midi.normalizePitch(normalized.y)
 
         const isEndpoint = utils.isEndpoint(path, selected)
         const isDefault = !_.includes(pointTypes, selected.type)

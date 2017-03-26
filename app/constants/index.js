@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 
 export const CONTROL_MAX = 127
+export const PITCH_MAX = 16383
 export const PPQ = 96
 export const MIN_BARS = 1
 export const MAX_BARS = 16
