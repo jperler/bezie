@@ -318,9 +318,9 @@ class Bezie extends Component {
         if (this.state.enabled || isPitch) return
 
         // Signal active MIDI channel to DAW
-        midi.output.sendMessage([CONTROL_CHANGE, channel, 0])
-        midi.output.sendMessage([CONTROL_CHANGE, channel, CONTROL_MAX])
-        midi.output.sendMessage([CONTROL_CHANGE, channel, 0])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, CONTROL_MAX])
+        midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0])
     }
 
     onRetryMIDI () {
