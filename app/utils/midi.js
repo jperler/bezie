@@ -7,6 +7,8 @@ import {
     PITCH_MAX,
 } from '../constants'
 
+import { PITCH } from '../constants/midi'
+
 const pitchScale = d3.scale
     .linear()
     .domain([0, CONTROL_MAX])
@@ -113,7 +115,7 @@ class Midi {
     }
 
     getChannelName (n) {
-        return n === -1 ? 'Pitch' : `Channel ${n}`
+        return n === PITCH ? 'Pitch' : `Channel ${n}`
     }
 
     getScaledPitch = _.memoize(n => _.round(pitchScale(n)))

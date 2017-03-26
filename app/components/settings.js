@@ -13,11 +13,10 @@ import {
     FormControl,
 } from 'react-bootstrap'
 import { modes, colors, NUM_CC_CHANNELS } from '../constants'
+import { PITCH } from '../constants/midi'
 import { default as midiUtil } from '../utils/midi'
 
 const { dialog } = require('electron').remote
-
-const PITCH = -1
 
 export default class Settings extends Component {
     static propTypes = {

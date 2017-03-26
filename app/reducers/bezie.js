@@ -36,6 +36,7 @@ import {
     SESSION_ID,
     NUM_PATHS,
 } from '../constants'
+import { PITCH } from '../constants/midi'
 import decrypt from '../utils/license'
 
 const initialState = Immutable({
@@ -248,7 +249,7 @@ function handleUpdatePoint (state, payload) {
 
 function handleChangePath (state, payload) {
     const path = state.paths[payload.index].asMutable()
-    const bipolar = state.settings.midi[payload.index].channel === -1
+    const bipolar = state.settings.midi[payload.index].channel === PITCH
     if (!path.length) initPath(path, state, bipolar)
     return state
         .set('pathIdx', payload.index)
@@ -257,7 +258,7 @@ function handleChangePath (state, payload) {
 
 function handleResetPath (state) {
     const path = []
-    const bipolar = state.settings.midi[state.pathIdx].channel === -1
+    const bipolar = state.settings.midi[state.pathIdx].channel === PITCH
 
     initPath(path, state, bipolar)
 
@@ -532,21 +533,21 @@ function handleBootstrap (state, payload) {
 
 function handleUpdateSettings (state, payload) {
     // for each envelope
-    // if channel is now -1 and wasn't then set origin at height/2
-    // if channel was -1 and is now 1+ then set origin to height
+    // if channel is now pitch and wasn't then set origin at height/2
+    // if channel was pitch and is now not then set origin to height
     const prevMidi = state.settings.midi
     const nextMidi = payload.midi
     const paths = Immutable.asMutable(state.paths, { deep: true })
 
     _.each(paths, (path, i) => {
-        if (prevMidi[i].channel !== -1 &&
-            nextMidi[i].channel === -1 &&
+        if (prevMidi[i].channel !== PITCH &&
+            nextMidi[i].channel === PITCH &&
             path.length >= 2
         ) {
             // Moved to pitch
             initPath(path, state, true)
-        } else if (prevMidi[i].channel === -1 &&
-            nextMidi[i].channel !== -1 &&
+        } else if (prevMidi[i].channel === PITCH &&
+            nextMidi[i].channel !== PITCH &&
             path.length >= 2
         ) {
             // Moved from pitch
