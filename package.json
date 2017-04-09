@@ -15,6 +15,7 @@
     "build-main": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.electron.js --progress --profile --colors",
     "build-renderer": "cross-env NODE_ENV=production node -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.production.js --progress --profile --colors",
     "build": "npm run build-main && npm run build-renderer",
+    "clean": "rm -rf release/*",
     "prebuild-mac": "rm -rf node_modules/midi/build && cp -r prebuilt/mac/midi/build node_modules/midi/build",
     "prebuild-win": "rm -rf node_modules/midi/build && cp -r prebuilt/win/midi/build node_modules/midi/build",
     "package-mac": "npm run prebuild-mac && npm run build && build --mac --x64",
