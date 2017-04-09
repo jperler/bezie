@@ -222,6 +222,13 @@ const createWindow = async () => {
                         label: 'Bring All to Front',
                         selector: 'arrangeInFront:'
                     },
+                    {
+                        label: 'Toggle Always on Top',
+                        accelerator: 'Command+T',
+                        click () {
+                            mainWindow.setAlwaysOnTop(!mainWindow.isAlwaysOnTop())
+                        },
+                    },
                 ]
             },
             {
@@ -292,6 +299,18 @@ const createWindow = async () => {
                         }
                     }
                 ] : []
+            },
+            {
+                label: 'Window',
+                submenu: [
+                    {
+                        label: 'Toggle Always on Top',
+                        accelerator: 'Ctrl+T',
+                        click () {
+                            mainWindow.setAlwaysOnTop(!mainWindow.isAlwaysOnTop())
+                        },
+                    },
+                ],
             },
             {
                 label: 'Help',
