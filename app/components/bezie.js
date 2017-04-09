@@ -11,6 +11,7 @@ import LicenseForm from './licenseForm'
 import * as io from '../utils/io'
 import * as midiEvents from '../constants/midi'
 import midi from '../utils/midi'
+import { version } from '../../package.json'
 import * as utils from '../utils'
 import {
     MIN_BARS,
@@ -542,6 +543,9 @@ class Bezie extends Component {
                 <div className="push-top monospace noselect">
                     <div className="pull-left" style={{ lineHeight: '30px' }}>
                         <ButtonToolbar>
+                            <span className="pull-left push-left text-muted version">
+                                {version}
+                            </span>
                             <span className="pull-left push-left push-right text-muted">
                                 MIDI: {isConnected ? 'Connected' : 'Not connected'}
                             </span>

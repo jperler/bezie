@@ -29,8 +29,9 @@ class PathSelector extends Component {
         )
 
         const getName = i => {
+            const name = settings.midi[i].name
             const channel = settings.midi[i].channel
-            return midiUtils.getChannelName(channel)
+            return name || midiUtils.getChannelName(channel)
         }
 
         const items = _.map(colors, (color, i) => (
