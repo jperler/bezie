@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { DropdownButton, MenuItem } from 'react-bootstrap'
 import { colors } from '../constants'
+import midiUtils from '../utils/midi'
 
 class PathSelector extends Component {
     static propTypes = {
@@ -28,10 +29,8 @@ class PathSelector extends Component {
         )
 
         const getName = i => {
-            const name = settings.midi[i].name
             const channel = settings.midi[i].channel
-
-            return name || `Channel ${channel}`
+            return midiUtils.getChannelName(channel)
         }
 
         const items = _.map(colors, (color, i) => (

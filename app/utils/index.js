@@ -15,8 +15,10 @@ export const binomial = (n, k) => {
     return coeff
 }
 
+// Gets insert index within endpoints
 export const getInsertIndex = (points, x) => (
-    _.indexOf(points, _.last(_.filter(points, point => x > point.x))) + 1
+    _.indexOf(points, _.last(_.filter(points, point => x >= point.x))) +
+        (x === points[points.length - 1].x ? -1 : 1)
 )
 
 export const getGridPoint = (point, xRange, yRange) => ({

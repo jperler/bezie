@@ -74,7 +74,7 @@ class Automator extends Component {
     }
 
     onMouseMove () {
-        if (!this.state.draggedIdx) return undefined
+        if (_.isNull(this.state.draggedIdx)) return undefined
         const [x, y] = d3.mouse(this.rect)
         const {
             updatePoint,
@@ -89,6 +89,7 @@ class Automator extends Component {
         const { draggedIdx } = this.state
         const path = paths[pathIdx]
         const draggedPoint = path[draggedIdx]
+        const isEndpoint = draggedIdx === 0 || draggedIdx === path.length - 1
         const mousePoint = { x, y }
         const gridPoint = snap ?
             utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
@@ -118,7 +119,8 @@ class Automator extends Component {
         if (!_.isEqual(draggedPoint.x, nextX) || !_.isEqual(draggedPoint.y, nextY)) {
             updatePoint({
                 index: draggedIdx,
-                x: nextX,
+                // Lock x position if dragging an endpoint
+                x: isEndpoint ? draggedPoint.x : nextX,
                 y: nextY,
                 controlLeft,
                 controlRight,
@@ -152,7 +154,6 @@ class Automator extends Component {
         const margin = { top: 6, right: 6, bottom: 6, left: 6 }
         const { bars, width, height, paths, pathIdx, selectedIdx } = this.props
         const { draggedIdx } = this.state
-        const innerPath = utils.takeInner(paths[pathIdx])
         const classes = classNames(styles.automator, {
             [styles.dragging]: !!draggedIdx
         })
@@ -164,14 +165,14 @@ class Automator extends Component {
         const elements = {}
 
         // Don't filter out points so all the indexes are aligned
-        elements.points = _.compact(innerPath.map((point, i) => {
+        elements.points = _.compact(paths[pathIdx].map((point, i) => {
             if (!point.hidden) {
                 return (
                     <Point
-                        onMouseDown={() => this.onMouseDownPoint(i + 1)}
-                        onDoubleClick={() => this.onDoubleClickPoint(i + 1)}
-                        selected={i + 1 === selectedIdx}
-                        dragging={i + 1 === draggedIdx}
+                        onMouseDown={() => this.onMouseDownPoint(i)}
+                        onDoubleClick={() => this.onDoubleClickPoint(i)}
+                        selected={i === selectedIdx}
+                        dragging={i === draggedIdx}
                         x={point.x}
                         y={point.y}
                         key={`point-${i}`}
