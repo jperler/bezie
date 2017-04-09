@@ -38,8 +38,9 @@ class Automator extends Component {
 
     componentWillMount () {
         this.props.bindShortcut('backspace', () => {
-            const index = this.props.selectedIdx
-            if (_.isNull(index)) return
+            const { paths, pathIdx, selectedIdx: index } = this.props
+            const path = paths[pathIdx]
+            if (_.isNull(index) || utils.isPathEndpoint(path, index)) return
             this.setState({ draggedIdx: null })
             this.props.removePoint({ index })
         })
@@ -64,9 +65,12 @@ class Automator extends Component {
         this.props.changeSelected({ index: i })
     }
 
-    onDoubleClickPoint (i) {
+    onDoubleClickPoint (index) {
+        const { paths, pathIdx } = this.props
+        const path = paths[pathIdx]
+        if (utils.isPathEndpoint(path, index)) return
         this.setState({ draggedIdx: null })
-        this.props.removePoint({ index: i })
+        this.props.removePoint({ index })
     }
 
     onMouseUp () {
@@ -89,7 +93,6 @@ class Automator extends Component {
         const { draggedIdx } = this.state
         const path = paths[pathIdx]
         const draggedPoint = path[draggedIdx]
-        const isEndpoint = draggedIdx === 0 || draggedIdx === path.length - 1
         const mousePoint = { x, y }
         const gridPoint = snap ?
             utils.getGridPoint(mousePoint, xAxisTickRange, yAxisTickRange) :
@@ -120,7 +123,7 @@ class Automator extends Component {
             updatePoint({
                 index: draggedIdx,
                 // Lock x position if dragging an endpoint
-                x: isEndpoint ? draggedPoint.x : nextX,
+                x: utils.isPathEndpoint(path, draggedIdx) ? draggedPoint.x : nextX,
                 y: nextY,
                 controlLeft,
                 controlRight,

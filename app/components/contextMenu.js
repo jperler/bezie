@@ -50,7 +50,8 @@ class ContextMenu extends Component {
         // Update scale for pitch
         if (isPitch) formatted.y = midi.normalizePitch(normalized.y)
 
-        const isEndpoint = utils.isEndpoint(path, selected)
+        const isEndpoint = utils.isEndpoint(path, selected) ||
+            utils.isPathEndpoint(path, selectedIdx)
         const isDefault = !_.includes(pointTypes, selected.type)
         const getPointDisplay = type => {
             switch (type) {
