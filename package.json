@@ -1,14 +1,11 @@
 {
   "name": "bezie",
   "productName": "Bezie",
-  "version": "1.3.9",
+  "version": "1.4.0",
   "description": "Virtual MIDI controller for complex automation",
   "main": "main.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register --recursive --require ./test/setup.js test/**/*.spec.js",
-    "test-watch": "npm test -- --watch",
-    "test-e2e": "cross-env NODE_ENV=test mocha --compilers js:babel-register --require ./test/setup.js ./test/e2e.js",
-    "lint": "eslint app",
+    "lint": "eslint app *.js",
     "hot-server": "node -r babel-register server.js",
     "start": "cross-env NODE_ENV=production electron ./",
     "start-hot": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./main.development",
@@ -18,15 +15,19 @@
     "clean": "rm -rf release/*",
     "prebuild-mac": "rm -rf node_modules/midi/build && cp -r prebuilt/mac/midi/build node_modules/midi/build",
     "prebuild-win": "rm -rf node_modules/midi/build && cp -r prebuilt/win/midi/build node_modules/midi/build",
-    "package-mac": "npm run prebuild-mac && npm run build && build --mac --x64",
-    "package-win": "npm run prebuild-win && npm run build && build --win --x64",
+    "package-mac": "npm run prebuild-mac && npm run build && electron-builder --mac --x64",
+    "package-win": "npm run prebuild-win && npm run build && electron-builder --win --x64",
     "package-all": "npm run package-mac && npm run package-win",
     "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
   },
   "build": {
+    "npmRebuild": false,
     "appId": "io.bezie.automator",
-    "category": "public.app-category.utilities",
+    "mac": {
+      "category": "public.app-category.utilities",
+      "type": "distribution"
+    },
     "files": [
       "main.js",
       "dist",
@@ -53,8 +54,8 @@
       ]
     },
     "win": {
-      "target": "squirrel",
-      "iconUrl": "https://raw.githubusercontent.com/jperler/bezie/master/resources/icon.ico?token=AA3bhzNsDySQUXTcW6dQBgRjuL0ghEdrks5Yc_UPwA%3D%3D"
+      "target": "nsis",
+      "icon": "resources/icon.ico"
     }
   },
   "bin": {
@@ -87,45 +88,40 @@
     "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-react-optimize": "^1.0.1",
     "babel-preset-stage-0": "^6.5.0",
-    "babel-register": "^6.9.0",
     "chai": "^3.5.0",
     "concurrently": "^2.2.0",
     "cross-env": "^2.0.0",
     "css-loader": "^0.23.1",
     "del": "^2.2.1",
     "devtron": "^1.2.1",
-    "electron": "^1.4.15",
-    "electron-builder": "^12.0.3",
-    "electron-builder-squirrel-windows": "^12.0.2",
+    "electron": "^3.0.10",
+    "electron-builder": "^19.26.2",
     "electron-devtools-installer": "^2.0.1",
-    "electron-packager": "^7.3.0",
-    "electron-rebuild": "^1.2.1",
-    "eslint": "^3.3.1",
+    "electron-packager": "^7.7.0",
+    "eslint": "^3.19.0",
     "eslint-config-airbnb": "^10.0.1",
     "eslint-formatter-pretty": "^1.1.0",
     "eslint-import-resolver-webpack": "^0.5.1",
-    "eslint-plugin-import": "^1.14.0",
+    "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^6.0.0",
-    "express": "^4.14.0",
-    "extract-text-webpack-plugin": "^1.0.1",
     "fbjs-scripts": "^0.7.1",
     "jsdom": "^9.4.1",
     "minimist": "^1.2.0",
     "mocha": "^3.0.0",
     "node-libs-browser": "^1.0.0",
+    "prettier": "1.15.3",
+    "prettier-eslint": "^8.8.2",
     "react-addons-test-utils": "^15.3.0",
     "redux-logger": "^2.6.1",
     "request": "^2.79.0",
     "sinon": "^1.17.4",
     "spectron": "^3.2.6",
-    "style-loader": "^0.13.1",
-    "webpack": "^1.13.1",
-    "webpack-dev-middleware": "^1.6.1",
-    "webpack-hot-middleware": "^2.12.1",
-    "webpack-merge": "^0.14.0"
+    "style-loader": "^0.13.1"
   },
   "dependencies": {
+    "babel-register": "^6.9.0",
     "bootstrap": "^3.3.7",
     "bootswatch": "^3.3.7",
     "classnames": "^2.2.5",
@@ -133,7 +129,8 @@
     "d3": "3.5.10",
     "electron-debug": "^1.0.1",
     "electron-json-storage": "^2.1.0",
-    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.14.0",
+    "extract-text-webpack-plugin": "^1.0.1",
     "font-awesome": "^4.6.3",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
@@ -151,10 +148,14 @@
     "redux-thunk": "^2.1.0",
     "seamless-immutable": "^6.1.1",
     "source-map-support": "^0.4.2",
+    "webpack": "^1.13.1",
+    "webpack-dev-middleware": "^1.6.1",
+    "webpack-hot-middleware": "^2.12.1",
+    "webpack-merge": "^0.14.0",
     "worker-loader": "^0.8.0"
   },
   "devEngines": {
-    "node": "4.x || 5.x || 6.x || 7.x",
-    "npm": "2.x || 3.x || 4.x"
+    "node": "4.x || 5.x || 6.x || 7.x || 8.x",
+    "npm": "2.x || 3.x || 4.x || 5.x || 6.x"
   }
 }

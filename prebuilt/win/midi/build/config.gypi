@@ -55,10 +55,10 @@
     "v8_random_seed": 0,
     "v8_use_snapshot": "true",
     "want_separate_host_toolset": 0,
-    "nodedir": "C:\\Users\\Justin\\.node-gyp\\iojs-1.4.15",
+    "nodedir": "C:\\Users\\Justin\\.node-gyp\\iojs-3.0.10",
     "copy_dev_lib": "true",
     "standalone_static_library": 1,
-    "target": "1.4.15",
+    "target": "3.0.10",
     "build_from_source": "true",
     "abi": "50"
   }

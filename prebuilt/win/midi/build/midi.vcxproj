@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{DEE309C1-5354-ECE9-8F04-5CE363AE7451}</ProjectGuid>
+    <ProjectGuid>{746A5A6B-A22B-9C74-7402-2A29BEF86BC8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>midi</RootNamespace>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
@@ -47,18 +47,19 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-1.4.15\include\node;C:\Users\Justin\.node-gyp\iojs-1.4.15\src;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-3.0.10\include\node;C:\Users\Justin\.node-gyp\iojs-3.0.10\src;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/bigobj /MP %(AdditionalOptions)</AdditionalOptions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <CompileAsWinRT>false</CompileAsWinRT>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4351;4355;4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4267;4351;4355;4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>false</ExceptionHandling>
       <MinimalRebuild>false</MinimalRebuild>
       <OmitFramePointers>false</OmitFramePointers>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=midi;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;__WINDOWS_MM__;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=midi;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;__WINDOWS_MM__;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StringPooling>true</StringPooling>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -66,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\Justin\.node-gyp\iojs-1.4.15\$(Configuration)\iojs.lib&quot;;winmm.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\Justin\.node-gyp\iojs-3.0.10\$(Configuration)\iojs.lib&quot;;winmm.lib</AdditionalDependencies>
       <AdditionalOptions>/ignore:4199 %(AdditionalOptions)</AdditionalOptions>
       <AllowIsolation>true</AllowIsolation>
       <DataExecutionPrevention>true</DataExecutionPrevention>
@@ -81,18 +82,18 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-1.4.15\include\node;C:\Users\Justin\.node-gyp\iojs-1.4.15\src;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=midi;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;__WINDOWS_MM__;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-3.0.10\include\node;C:\Users\Justin\.node-gyp\iojs-3.0.10\src;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=midi;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;__WINDOWS_MM__;BUILDING_NODE_EXTENSION;DEBUG;_DEBUG;V8_ENABLE_CHECKS;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-1.4.15\include\node;C:\Users\Justin\.node-gyp\iojs-1.4.15\src;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-3.0.10\include\node;C:\Users\Justin\.node-gyp\iojs-3.0.10\src;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/MP %(AdditionalOptions)</AdditionalOptions>
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <CompileAsWinRT>false</CompileAsWinRT>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4351;4355;4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4267;4351;4355;4800;4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -114,15 +115,14 @@
       <AdditionalOptions>/LTCG %(AdditionalOptions)</AdditionalOptions>
     </Lib>
     <Link>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\Justin\.node-gyp\iojs-1.4.15\$(Configuration)\iojs.lib&quot;;winmm.lib</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4199 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;DelayImp.lib;&quot;C:\Users\Justin\.node-gyp\iojs-3.0.10\$(Configuration)\iojs.lib&quot;;winmm.lib</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4199 /LTCG:INCREMENTAL %(AdditionalOptions)</AdditionalOptions>
       <AllowIsolation>true</AllowIsolation>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <DelayLoadDLLs>iojs.exe;node.exe;%(DelayLoadDLLs)</DelayLoadDLLs>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <MapExports>true</MapExports>
       <OptimizeReferences>true</OptimizeReferences>
       <OutputFile>$(OutDir)$(ProjectName).node</OutputFile>
@@ -132,7 +132,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-1.4.15\include\node;C:\Users\Justin\.node-gyp\iojs-1.4.15\src;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-1.4.15\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Justin\.node-gyp\iojs-3.0.10\include\node;C:\Users\Justin\.node-gyp\iojs-3.0.10\src;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\uv\include;C:\Users\Justin\.node-gyp\iojs-3.0.10\deps\v8\include;..\..\nan;..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NODE_GYP_MODULE_NAME=midi;USING_UV_SHARED=1;USING_V8_SHARED=1;V8_DEPRECATION_WARNINGS=1;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_HAS_EXCEPTIONS=0;__WINDOWS_MM__;BUILDING_NODE_EXTENSION;%(PreprocessorDefinitions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
   </ItemDefinitionGroup>
