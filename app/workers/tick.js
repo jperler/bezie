@@ -1,19 +1,26 @@
-let interval
+let interval;
 
-self.addEventListener('message', e => {
+self.addEventListener(
+  "message",
+  e => {
     switch (e.data.action) {
-        case 'set': return set(e.data)
-        case 'clear': return clear(e.data)
-        default: return
+      case "set":
+        return set(e.data);
+      case "clear":
+        return clear(e.data);
+      default:
+        return;
     }
-}, false)
+  },
+  false
+);
 
-function set ({ timeout }) {
-    interval = setInterval(() => {
-        self.postMessage('tick')
-    }, timeout)
+function set({ timeout }) {
+  interval = setInterval(() => {
+    self.postMessage("tick");
+  }, timeout);
 }
 
-function clear () {
-    clearInterval(interval)
+function clear() {
+  clearInterval(interval);
 }

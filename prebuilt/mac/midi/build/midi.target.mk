@@ -13,7 +13,8 @@ DEFS_Debug := \
 	'-D__MACOSX_CORE__' \
 	'-DBUILDING_NODE_EXTENSION' \
 	'-DDEBUG' \
-	'-D_DEBUG'
+	'-D_DEBUG' \
+	'-DV8_ENABLE_CHECKS'
 
 # Flags passed to all source files.
 CFLAGS_Debug := \
@@ -32,7 +33,8 @@ CFLAGS_C_Debug := \
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Debug := \
-	-std=gnu++0x \
+	-std=gnu++1y \
+	-stdlib=libc++ \
 	-fno-rtti \
 	-fno-threadsafe-statics \
 	-fno-strict-aliasing
@@ -44,10 +46,10 @@ CFLAGS_OBJC_Debug :=
 CFLAGS_OBJCC_Debug :=
 
 INCS_Debug := \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/include/node \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/src \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/deps/uv/include \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/deps/v8/include \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/include/node \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/src \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/deps/uv/include \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/deps/v8/include \
 	-I$(srcdir)/../nan \
 	-I$(srcdir)/src
 
@@ -79,7 +81,8 @@ CFLAGS_C_Release := \
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Release := \
-	-std=gnu++0x \
+	-std=gnu++1y \
+	-stdlib=libc++ \
 	-fno-rtti \
 	-fno-threadsafe-statics \
 	-fno-strict-aliasing
@@ -91,10 +94,10 @@ CFLAGS_OBJC_Release :=
 CFLAGS_OBJCC_Release :=
 
 INCS_Release := \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/include/node \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/src \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/deps/uv/include \
-	-I/Users/justinperler/.node-gyp/iojs-1.4.15/deps/v8/include \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/include/node \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/src \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/deps/uv/include \
+	-I/Users/justinperler/.node-gyp/iojs-3.0.10/deps/v8/include \
 	-I$(srcdir)/../nan \
 	-I$(srcdir)/src
 
@@ -133,7 +136,8 @@ LDFLAGS_Debug := \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.7 \
 	-arch x86_64 \
-	-L$(builddir)
+	-L$(builddir) \
+	-stdlib=libc++
 
 LIBTOOLFLAGS_Debug := \
 	-undefined dynamic_lookup \
@@ -146,7 +150,8 @@ LDFLAGS_Release := \
 	-Wl,-search_paths_first \
 	-mmacosx-version-min=10.7 \
 	-arch x86_64 \
-	-L$(builddir)
+	-L$(builddir) \
+	-stdlib=libc++
 
 LIBTOOLFLAGS_Release := \
 	-undefined dynamic_lookup \
