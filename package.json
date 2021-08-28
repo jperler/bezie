@@ -5,6 +5,7 @@
   "description": "Virtual MIDI controller for complex automation",
   "main": "main.js",
   "scripts": {
+    "gif": "node gif/main.js",
     "lint": "eslint app *.js",
     "hot-server": "node -r babel-register server.js",
     "start": "cross-env NODE_ENV=production electron ./",

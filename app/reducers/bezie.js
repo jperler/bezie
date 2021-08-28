@@ -31,7 +31,7 @@ import { PITCH } from "../constants/midi";
 
 const initialState = Immutable({
   snap: true,
-  bars: 4,
+  bars: 1,
   triplet: false,
   zoom: { x: 1, y: 2 },
   interval: { x: 8, y: 10 },
