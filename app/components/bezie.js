@@ -14,7 +14,7 @@ import { version } from "../../package.json";
 import * as utils from "../utils";
 import { MIN_BARS, MAX_BARS, ZOOM_FACTOR, CONTROL_MAX, PPQ, NUM_PATHS, colors, pointTypes, modes } from "../constants";
 
-const Worker = require("worker-loader!../workers/tick");
+// const Worker = require("worker-loader!../workers/tick");
 
 class Bezie extends Component {
   static propTypes = {
@@ -59,7 +59,6 @@ class Bezie extends Component {
       enabled: false
     };
     this.workers = {};
-    this.initMIDI();
   }
 
   componentWillMount() {
@@ -92,51 +91,6 @@ class Bezie extends Component {
     this.props.bindShortcut("s", this.props.toggleSnap);
     this.props.bindShortcut("up", _.partial(::this.onTypeChange, true));
     this.props.bindShortcut("down", _.partial(::this.onTypeChange, false));
-
-    midi.input.on("message", ::this.onMIDIMessage);
-
-    // If a new controller was selected from midi settings
-    if (midi.hasController()) {
-      midi.controller.on("message", ::this.onControllerInput);
-    }
-  }
-
-  componentDidMount() {
-    ipcRenderer.on("save-file", ::this.onSaveFile);
-    ipcRenderer.on("open-file", ::this.onOpenFile);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const nextSettings = nextProps.settings;
-    const { settings } = this.props;
-    const controllerAdded = nextSettings.controllerName && !midi.hasController();
-    const controllerChanged = settings.controllerName !== nextSettings.controllerName;
-
-    if (controllerAdded || controllerChanged) {
-      // Select controller by name
-      const controller = midi.findController({ label: nextSettings.controllerName });
-
-      // If a controller was set from bootstrapping or changed then update it
-      if (controller) {
-        midi.setController(controller.index);
-        midi.controller.on("message", ::this.onControllerInput);
-      }
-    }
-  }
-
-  componentWillUnmount() {
-    // Clean up file io listeners
-    ipcRenderer.removeAllListeners("save-file");
-    ipcRenderer.removeAllListeners("open-file");
-
-    // Clean up and midi listeners
-    midi.input.removeAllListeners("message");
-    if (midi.hasController()) midi.controller.removeAllListeners("message");
-
-    // Terminate any active workers
-    _.map(_.values(this.workers), worker => {
-      if (worker) worker.terminate();
-    });
   }
 
   onTypeChange(isUp) {
@@ -158,69 +112,6 @@ class Bezie extends Component {
 
     if (type !== "default") this.props.changeType({ type: "default" });
     if (nextType !== "default") this.props.changeType({ type: nextType });
-  }
-
-  onControllerInput(deltaTime, message) {
-    const { settings } = this.props;
-    const code = [message[0], message[1]].join(".");
-    _.each(_.range(NUM_PATHS), i => {
-      if (settings.mappings[i] === code) {
-        this.sendPath({ index: i });
-      }
-    });
-  }
-
-  onMIDIMessage(deltaTime, message) {
-    const code = message[0];
-    const maxTicks = this.props.bars * PPQ;
-    const { bars, height, width, settings } = this.props;
-    const tickWidth = width / bars / PPQ;
-
-    if (settings.mode === modes.controller) return undefined;
-
-    // Reset ticks to loop automation
-    if (this.tick === maxTicks) this.resetTicks();
-
-    if (code === midiEvents.CLOCK) {
-      const tickX = tickWidth * this.tick;
-
-      if (this.state.enabled) {
-        // Seek manually to avoid react render
-        window.seek.setAttribute("d", `M${tickX},0L${tickX},${height}`);
-        window.seek.style.display = "block";
-      } else {
-        window.seek.style.display = "none";
-      }
-
-      _.each(this.props.paths, (path, pathIdx) => {
-        if (path.length > 2) {
-          const value = this.getValueAtTick({ tick: this.tick, pathIdx, tickX });
-          const channel = settings.midi[pathIdx].channel;
-          const isPitch = channel === midiEvents.PITCH;
-
-          if (this.state.enabled) {
-            if (isPitch) {
-              midi.output.sendMessage([midiEvents.PITCH, ...midi.getPitchValue(value)]);
-            } else {
-              midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, value]);
-            }
-          }
-        }
-      });
-      this.tick++;
-    } else if (code === midiEvents.STOP) {
-      this.resetTicks();
-    }
-  }
-
-  onSaveFile(sender, filename) {
-    io.save(sender, filename, this.props);
-    document.title = basename(filename);
-  }
-
-  onOpenFile(sender, filename) {
-    io.open(sender, filename, this.props);
-    document.title = basename(filename);
   }
 
   onResetClick() {
@@ -278,16 +169,6 @@ class Bezie extends Component {
     const isPitch = channel === midiEvents.PITCH;
 
     if (this.state.enabled || isPitch) return;
-
-    // Signal active MIDI channel to DAW
-    midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0]);
-    midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, CONTROL_MAX]);
-    midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, 0]);
-  }
-
-  onRetryMIDI() {
-    this.initMIDI();
-    this.forceUpdate();
   }
 
   getValueAtTick({ pathIdx, tickX }) {
@@ -325,76 +206,9 @@ class Bezie extends Component {
     return CONTROL_MAX - tickY / zoom.y;
   }
 
-  sendPath({ index }) {
-    const { bars, width, settings } = this.props;
-    const { enabled } = this.state;
-    const timeout = 60e3 / (settings.tempo * 24);
-    const maxTicks = this.props.bars * PPQ;
-    const tickWidth = width / bars / PPQ;
-    const channel = settings.midi[index].channel;
-    const isPitch = channel === midiEvents.PITCH;
-    let tick = 0;
-
-    if (settings.mode === modes.clock || !enabled) return undefined;
-
-    // Terminate existing worker
-    this.clearWorker(index);
-
-    // Create a new worker
-    const worker = (this.workers[index] = new Worker());
-
-    // Start listening for ticks
-    worker.addEventListener("message", () => {
-      // Only clear worker when we've reached the end of an envelope
-      if (tick < maxTicks) {
-        const value = this.getValueAtTick({
-          tick,
-          pathIdx: index,
-          tickX: tickWidth * tick
-        });
-
-        if (isPitch) {
-          midi.output.sendMessage([midiEvents.PITCH, ...midi.getPitchValue(value)]);
-        } else {
-          midi.output.sendMessage([midiEvents.CONTROL_CHANGE, channel, value]);
-        }
-
-        tick++;
-      } else {
-        this.clearWorker(index);
-        tick = 0;
-      }
-    });
-
-    // Start ticking
-    worker.postMessage({ action: "set", timeout });
-  }
-
-  clearWorker(index) {
-    const worker = this.workers[index];
-
-    if (worker) {
-      worker.postMessage({ action: "clear" });
-      worker.terminate();
-      delete this.workers[index];
-    }
-  }
-
-  resetTicks() {
-    this.tick = 0;
-    window.seek.style.display = "none";
-    this.lastSeenIndeces = {};
-  }
-
-  initMIDI() {
-    if (!midi.isConnected()) midi.connectVirtualPorts();
-    this.tick = 0;
-    this.lastSeenIndeces = {};
-  }
-
   render() {
     const { settings, pathIdx } = this.props;
-    const isConnected = midi.isConnected();
+    const isConnected = true; // midi.isConnected();
 
     return (
       <div className="bezie">
@@ -485,11 +299,6 @@ class Bezie extends Component {
               <span className="pull-left push-left push-right text-muted">
                 MIDI: {isConnected ? "Connected" : "Not connected"}
               </span>
-              {!isConnected && (
-                <Button onClick={::this.onRetryMIDI} bsSize="small">
-                  Retry
-                </Button>
-              )}
               <span className="pull-left monospace push-left noselect" style={{ lineHeight: "30px" }}>
                 {settings.midi[pathIdx].name || midi.getChannelName(settings.midi[pathIdx].channel)}
               </span>
