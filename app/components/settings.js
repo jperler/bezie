@@ -8,7 +8,7 @@ import { modes, colors, NUM_CC_CHANNELS } from "../constants";
 import { PITCH } from "../constants/midi";
 import { default as midiUtil } from "../utils/midi";
 
-const { dialog } = require("electron").remote;
+// var dialog = require("@electron/remote").dialog;
 
 export default class Settings extends Component {
   static propTypes = {
@@ -104,6 +104,7 @@ export default class Settings extends Component {
   onSavePresetClick() {
     const { midi, tempo, mappings, mode, controllerName } = this.state;
 
+    /*
     dialog.showSaveDialog(
       {
         filters: [{ name: "Bezie Preset", extensions: ["preset"] }]
@@ -115,10 +116,12 @@ export default class Settings extends Component {
         }
       }
     );
+    */
   }
 
   onLoadPresetClick() {
     const INVALID_FILE_MESSAGE = "Oops! This preset is invalid.";
+    /*
     dialog.showOpenDialog(
       {
         properties: ["openFile"],
@@ -134,13 +137,13 @@ export default class Settings extends Component {
             try {
               settings = JSON.parse(json).settings;
             } catch (e) {
-                        alert(INVALID_FILE_MESSAGE) // eslint-disable-line
+              alert(INVALID_FILE_MESSAGE); // eslint-disable-line
               isValid = false;
             }
 
             // Assert that a preset at least has midi
             if (!_.has(settings, "midi")) {
-                        alert(INVALID_FILE_MESSAGE) // eslint-disable-line
+              alert(INVALID_FILE_MESSAGE); // eslint-disable-line
               isValid = false;
             }
 
@@ -159,6 +162,7 @@ export default class Settings extends Component {
         }
       }
     );
+    */
   }
 
   onModeChange(e) {

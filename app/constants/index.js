@@ -11,7 +11,7 @@ export const SECRET_FRAGMENT = "7kZiZynrndu";
 export const VIRTUAL_PORT_NAME = "Bezie";
 export const NUM_PATHS = 8;
 export const NUM_CC_CHANNELS = 119;
-export const WIN_MIDI_ERROR = `Please install loopmidi with the following device: "${VIRTUAL_PORT_NAME}".`// eslint-disable-line
+export const WIN_MIDI_ERROR = `Please install loopmidi with the following device: "${VIRTUAL_PORT_NAME}".`; // eslint-disable-line
 
 export const colors = ["#FD1C03", "#FF6600", "#FFFF00", "#00FF00", "#00FFFF", "#0062FF", "#CC00FF", "#FFFFFF"];
 

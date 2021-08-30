@@ -1,5 +1,8 @@
-import { app, BrowserWindow, Menu, shell, dialog } from "electron";
+import { remote, app, BrowserWindow, Menu, shell, dialog } from "electron";
+
 import os from "os";
+
+// require("@electron/remote/main").initialize();
 
 let menu;
 let template;
@@ -26,51 +29,51 @@ const installExtensions = async () => {
 };
 
 function onOpenDialog() {
-  dialog.showOpenDialog(
-    {
+  dialog
+    .showOpenDialog({
       properties: ["openFile"],
       filters: [{ name: "Bezie", extensions: ["bezie"] }]
-    },
-    (paths = []) => {
-      const filename = paths[0];
+    })
+    .then(result => {
+      const filename = result.filePaths[0];
+
       if (filename) {
         mainWindow.webContents.send("open-file", filename);
         currentFile = filename;
       }
-    }
-  );
+    });
 }
 
 function onSaveDialog() {
   if (currentFile) {
     mainWindow.webContents.send("save-file", currentFile);
   } else {
-    dialog.showSaveDialog(
-      {
+    dialog
+      .showSaveDialog({
         filters: [{ name: "Bezie", extensions: ["bezie"] }]
-      },
-      filename => {
+      })
+      .then(result => {
+        const filename = result.filePath;
         if (filename) {
           mainWindow.webContents.send("save-file", filename);
           currentFile = filename;
         }
-      }
-    );
+      });
   }
 }
 
 function onSaveAsDialog() {
-  dialog.showSaveDialog(
-    {
+  dialog
+    .showSaveDialog({
       filters: [{ name: "Bezie", extensions: ["bezie"] }]
-    },
-    filename => {
+    })
+    .then(result => {
+      const filename = result.filePath;
       if (filename) {
         mainWindow.webContents.send("save-file", filename);
         currentFile = filename;
       }
-    }
-  );
+    });
 }
 
 function onLearnMore() {
@@ -88,15 +91,15 @@ const createWindow = async () => {
   currentFile = null;
 
   // Add padding for the file menu in Windows
-  const height = platform === "darwin" ? 400 : 440;
+  const height = 1000; //platform === "darwin" ? 400 : 440;
 
   mainWindow = new BrowserWindow({
-    show: false,
+    webPreferences: { nodeIntegration: true, contextIsolation: false, enableRemoteModule: false },
+    show: true,
     width: 1024,
     minWidth: 950,
     height,
-    minHeight: height,
-    maxHeight: height
+    minHeight: height
   });
 
   mainWindow.loadURL(`file://${__dirname}/app/app.html`);

@@ -33,7 +33,7 @@ const initialState = Immutable({
   snap: true,
   bars: 1,
   triplet: false,
-  zoom: { x: 1, y: 2 },
+  zoom: { x: 0.8, y: 2 },
   interval: { x: 8, y: 10 },
   pathIdx: 0,
   selectedIdx: null,

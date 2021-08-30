@@ -30,11 +30,18 @@ class Automator extends Component {
     bindShortcut: PropTypes.func.isRequired
   };
 
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
-      draggedIdx: null
+      draggedIdx: null,
+      isPrint: false
     };
+
+    props.bindShortcut("g", ::this.togglePrint);
+  }
+
+  togglePrint() {
+    this.setState(state => ({ isPrint: !state.isPrint }));
   }
 
   componentWillMount() {
@@ -144,7 +151,7 @@ class Automator extends Component {
   render() {
     const margin = { top: 0, right: 0, bottom: 0, left: 0 };
     const { bars, width, height, paths, pathIdx, selectedIdx } = this.props;
-    const { draggedIdx } = this.state;
+    const { draggedIdx, isPrint } = this.state;
     const classes = classNames(styles.automator, {
       [styles.dragging]: !!draggedIdx
     });
@@ -177,11 +184,12 @@ class Automator extends Component {
     );
 
     elements.paths = paths
+      .filter(p => (isPrint ? p.length > 2 : true))
       .map((path, i) => {
         if (i === pathIdx) return undefined;
         return (
           <path
-            className={`line ${path.length > 2 ? "" : "empty"}`}
+            className="line"
             d={line(path)}
             key={`path-${i}`}
             stroke={colors[i]}
@@ -190,27 +198,40 @@ class Automator extends Component {
           />
         );
       })
-      .concat([
-        <path
-          className="line"
-          d={line(paths[pathIdx])}
-          key={`path-${pathIdx}`}
-          stroke={colors[pathIdx]}
-          strokeOpacity={1}
-          fill={colors[pathIdx]}
-        />
-      ]);
+      .concat(
+        isPrint && paths[pathIdx].length <= 2
+          ? []
+          : [
+              <path
+                className="line"
+                d={line(paths[pathIdx])}
+                key={`path-${pathIdx}`}
+                stroke={colors[pathIdx]}
+                strokeOpacity={1}
+                fill={colors[pathIdx]}
+              />
+            ]
+      );
 
     return (
-      <div className={classes}>
-        <svg width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+      <div className={classes} style={{ width: 800 }}>
+        <svg
+          width="100%"
+          viewBox={`0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
           <g transform={`translate(${margin.left}, ${margin.top})`}>
             <Bars width={width} height={height} bars={bars} />
-            <Axis.X {...this.props} />
-            <Axis.Y {...this.props} />
-            <rect height={height} width={width} ref={ref => (this.rect = ref)} />
+            {!isPrint && <Axis.X {...this.props} />}
+            {!isPrint && <Axis.Y {...this.props} />}
+            <rect
+              height={height}
+              width={width}
+              ref={ref => (this.rect = ref)}
+              style={{ fillOpacity: isPrint ? 0 : 0.2 }}
+            />
             {elements.paths}
-            {elements.points}
+            {!isPrint && elements.points}
             <Seek height={height} />
           </g>
         </svg>

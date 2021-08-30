@@ -19,7 +19,7 @@
     "package-mac": "npm run prebuild-mac && npm run build && electron-builder --mac --x64",
     "package-win": "npm run prebuild-win && npm run build && electron-builder --win --x64",
     "package-all": "npm run package-mac && npm run package-win",
-    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json",
+    "postinstall": "node node_modules/fbjs-scripts/node/check-dev-engines.js package.json && yarn electron-builder install-app-deps",
     "dev": "concurrently --kill-others \"npm run hot-server\" \"npm run start-hot\""
   },
   "build": {
@@ -95,7 +95,7 @@
     "css-loader": "^0.23.1",
     "del": "^2.2.1",
     "devtron": "^1.2.1",
-    "electron": "^3.0.10",
+    "electron": "^13.2.3",
     "electron-builder": "^19.26.2",
     "electron-devtools-installer": "^2.0.1",
     "electron-packager": "^7.7.0",
@@ -121,7 +121,12 @@
     "spectron": "^3.2.6",
     "style-loader": "^0.13.1"
   },
+  "resolutions": {
+    "fsevents": "1.2.9",
+    "**/fsevents": "1.2.9"
+  },
   "dependencies": {
+    "@electron/remote": "^1.2.1",
     "babel-register": "^6.9.0",
     "bootstrap": "^3.3.7",
     "bootswatch": "^3.3.7",
@@ -133,6 +138,7 @@
     "express": "^4.14.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "font-awesome": "^4.6.3",
+    "fsevents": "1.2.9",
     "gm": "^1.23.1",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
@@ -148,6 +154,7 @@
     "redux": "^3.5.2",
     "redux-thunk": "^2.1.0",
     "seamless-immutable": "^6.1.1",
+    "sharp": "^0.29.0",
     "source-map-support": "^0.4.2",
     "webpack": "^1.13.1",
     "webpack-dev-middleware": "^1.6.1",
