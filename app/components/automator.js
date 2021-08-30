@@ -142,7 +142,7 @@ class Automator extends Component {
   }
 
   render() {
-    const margin = { top: 6, right: 6, bottom: 6, left: 6 };
+    const margin = { top: 0, right: 0, bottom: 0, left: 0 };
     const { bars, width, height, paths, pathIdx, selectedIdx } = this.props;
     const { draggedIdx } = this.state;
     const classes = classNames(styles.automator, {
@@ -181,7 +181,7 @@ class Automator extends Component {
         if (i === pathIdx) return undefined;
         return (
           <path
-            className="line"
+            className={`line ${path.length > 2 ? "" : "empty"}`}
             d={line(path)}
             key={`path-${i}`}
             stroke={colors[i]}

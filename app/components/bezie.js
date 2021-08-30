@@ -93,6 +93,21 @@ class Bezie extends Component {
     this.props.bindShortcut("down", _.partial(::this.onTypeChange, false));
   }
 
+  componentDidMount() {
+    ipcRenderer.on("save-file", ::this.onSaveFile);
+    ipcRenderer.on("open-file", ::this.onOpenFile);
+  }
+
+  onSaveFile(sender, filename) {
+    io.save(sender, filename, this.props);
+    document.title = basename(filename);
+  }
+
+  onOpenFile(sender, filename) {
+    io.open(sender, filename, this.props);
+    document.title = basename(filename);
+  }
+
   onTypeChange(isUp) {
     const { paths, pathIdx, selectedIdx } = this.props;
 
