@@ -120,7 +120,7 @@ class Automator extends Component {
       updatePoint({
         index: draggedIdx,
         // Lock x position if dragging an endpoint
-        x: utils.isPathEndpoint(path, draggedIdx) ? draggedPoint.x : nextX,
+        x: nextX, //utils.isPathEndpoint(path, draggedIdx) ? draggedPoint.x : nextX,
         y: nextY,
         controlLeft,
         controlRight,

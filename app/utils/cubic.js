@@ -55,14 +55,16 @@ export function setBezier([p0, p1, p2, p3], state, options = {}) {
       });
     }
 
+    /*
     if (p.y > height) p.y = height;
     if (p.y < 0) p.y = 0;
     if (p.x < p0.x) p.x = p0.x;
     if (p.x > p3.x) p.x = p3.x;
+    */
   });
 
   // Ensure that all x values are linear
-  linearize(innerCurve, curve, steps);
+  // linearize(innerCurve, curve, steps);
 
   if (p1.isControl || p2.isControl) {
     const leftIdx = _.findIndex(path, p => p.id === p0.id);
