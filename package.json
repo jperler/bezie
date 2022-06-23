@@ -107,7 +107,7 @@
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^6.0.0",
     "fbjs-scripts": "^0.7.1",
-    "jsdom": "^9.4.1",
+    "jsdom": "^16.5.0",
     "minimist": "^1.2.0",
     "mocha": "^3.0.0",
     "node-libs-browser": "^1.0.0",
