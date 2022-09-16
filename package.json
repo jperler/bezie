@@ -122,7 +122,7 @@
   },
   "dependencies": {
     "babel-register": "^6.9.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^3.4.1",
     "bootswatch": "^3.3.7",
     "classnames": "^2.2.5",
     "css-modules-require-hook": "^4.0.1",
